@@ -1,0 +1,32 @@
+<div class="case-management">
+    <h2>Manage Cases</h2>
+     <table class="table opaque-bg" *ngIf="cases.length > 0">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">First Name</th>
+                <th scope="col">Last Name</th>
+                <th scope="col">Phone Number</th>
+                <th scope="col">Notes</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngFor="let item of cases">
+              <tr>
+                <th scope="row">{{ item.id }}</th>
+                <td>{{ item.firstName }}</td>
+                <td>{{ item.lastName }}</td>
+                <td>{{ item.phoneNumber }}</td>
+                <td>{{ item.notes }}</td>
+                <td>
+                    <select class="form-select" (change)="onStatusChange(item, $event)">
+                      <option *ngFor="let status of statuses" [value]="status" [selected]="item.status === status">{{ status }}</option>
+                    </select>
+                  </td>
+              </tr>
+            </ng-container>
+        </tbody>
+    </table>
+  </div>
+  
