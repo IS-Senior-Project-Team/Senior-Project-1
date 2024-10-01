@@ -6,7 +6,7 @@
       "lastName": "Patalano",
       "phoneNumber": "123-456-7890",
       "notes": "Found lost dog on side of Southside Blvd.",
-      "status": "Closed"
+      "status": "Open"
     },
     {
       "id": "2",
@@ -14,7 +14,7 @@
       "lastName": "Lazzara",
       "phoneNumber": "372-446-3990",
       "notes": "Need to rehome my dog.",
-      "status": "Open"
+      "status": "Closed"
     }
   ]
 }
