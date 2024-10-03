@@ -1,0 +1,8 @@
+<!-- https://stackoverflow.com/questions/47936183/angular-file-upload -->
+<div class="form-group">
+    <label for="file">Choose File</label>
+    <input type="file"
+           id="file"
+           (change)="handleFileInput($event)">
+    <button (onClick)="uploadFileToActivity()">Upload</button>
+</div>
