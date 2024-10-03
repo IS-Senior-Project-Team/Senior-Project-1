@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@angular/cli": "^18.2.5",
-    "@angular/core": "^18.2.5"
+    "@angular/core": "^18.2.5",
+    "bootstrap": "^3.4.1"
   }
 }
