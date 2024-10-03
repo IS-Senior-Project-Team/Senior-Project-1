@@ -2,7 +2,7 @@
 
 # Start frontend
 open new terminal, 
-cd senior-project-1, 
+cd frontend, 
 ng serve
 
 open new terminal, 
