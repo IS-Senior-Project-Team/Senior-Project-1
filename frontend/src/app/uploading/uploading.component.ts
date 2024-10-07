@@ -11,20 +11,20 @@ import { UploadsService } from '../services/uploads.service';
 })
 export class UploadingComponent {
 
-  fileToUpload: File | null = null;
+  filesToUpload: File[] | null = null;
 
   constructor(private uploadService: UploadsService) {}
 
   handleFileInput(event: Event) {
     const input = event.target as HTMLInputElement;
-    if (input?.files && input.files.length > 0) {
-      this.fileToUpload = input.files.item(0);
+    if (input?.files) {
+      this.filesToUpload = Array.from(input.files);
     }
   }
 
   uploadFileToActivity() {
-    if (this.fileToUpload) {
-      this.uploadService.postFile(this.fileToUpload).subscribe(
+    if (this.filesToUpload) {
+      this.uploadService.postFiles(this.filesToUpload).subscribe(
         data => {
           console.log("File upload successful:", data);
         },
@@ -35,14 +35,11 @@ export class UploadingComponent {
     }
   }
 
-  removeFile() {
-    this.fileToUpload = null;
-  }
-
-  downloadFile() {
-    if (this.fileToUpload) {
-      // Implement the logic to download or display the file
-      console.log('Downloading file:', this.fileToUpload.name);
+  removeFile(file: File) {
+    const index = this.filesToUpload?.indexOf(file);
+     // Check if the file is found in the array
+    if ((index ?? -2) > -1) {
+      this.filesToUpload?.splice((index ?? 0), 1); 
     }
   }
 }

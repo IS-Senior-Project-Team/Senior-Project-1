@@ -94,6 +94,17 @@
     color: #007bff;
 }
 
-.remove-file-btn:hover {
-    background: #d32f2f;
+.upload-file-btn {
+    color: rgba(255, 255, 255, 0.908);
+    background-color: #4dc959d7;
+    border-radius: 16px;
+    border-color: white;
+    border-style: none;
+}
+.upload-file-btn:disabled {
+    color: rgba(255, 255, 255, 0.908);
+    background-color: #4dc95934;
+    border-radius: 16px;
+    border-color: white;
+    border-style: none;
 }

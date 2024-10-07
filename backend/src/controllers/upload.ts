@@ -15,10 +15,10 @@ const storage = multer.diskStorage({
 // Set up multer storage
 const upload = multer({ storage: storage });
 export const postUpload = (req: Request, res: Response) => {
-    if (!req.file) {
-        return res.status(400).send('No file uploaded.');
+  if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
+        return res.status(400).send('No files uploaded.');
       }
     
       const uploadedFile = req.file;
-      res.status(200).send(`File uploaded: ${uploadedFile.originalname}`);
+      res.status(200).send("Success");
   };

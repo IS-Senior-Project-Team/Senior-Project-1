@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^22.7.0",
     "@types/pg": "^8.11.10",
@@ -24,6 +25,7 @@
   },
   "dependencies": {
     "@types/multer": "^1.4.12",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express-fileupload": "^1.5.1",
     "jsonwebtoken": "^9.0.2",

@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Case } from '../models/case';
 import { Observable } from 'rxjs';
 import { UploadResponse } from '../models/UploadResponse';
 
@@ -12,13 +11,12 @@ export class UploadsService {
 
   constructor(private httpClient: HttpClient) {}
 
-  postFile(fileToUpload: File): Observable<UploadResponse> {
+  postFiles(filesToUpload: File[]): Observable<UploadResponse> {
     const formData: FormData = new FormData();
-    formData.append('fileKey', fileToUpload, fileToUpload.name);
-    return this.httpClient
-      .post<UploadResponse>(this.apiUrl, formData, { headers: {} })
-}
-    handleError(e: any) {
-        throw new Error('Method not implemented.');
-    }
+    filesToUpload.forEach(file => {
+      formData.append('files', file, file.name);
+    });
+
+    return this.httpClient.post<UploadResponse>(this.apiUrl, formData);
+  }
 }
