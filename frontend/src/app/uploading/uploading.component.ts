@@ -1,36 +1,48 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { UploadsService } from '../services/uploads.service';
 
 @Component({
   selector: 'app-uploading',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './uploading.component.html',
-  styleUrl: './uploading.component.css'
+  styleUrls: ['./uploading.component.css']
 })
 export class UploadingComponent {
 
-  constructor(private uploadService: UploadsService) {}
-
   fileToUpload: File | null = null;
 
-handleFileInput(event: Event) {
-  const input = event.target as HTMLInputElement;
-  if (input?.files) {
-    const files = input.files;
-    // Handle the files here
-    this.fileToUpload = files.item(0);
-  }
-}
+  constructor(private uploadService: UploadsService) {}
 
-uploadFileToActivity() {
-  if (this.fileToUpload != null) {
-  this.uploadService.postFile(this.fileToUpload).subscribe(data => {
-    console.log("Success");
-  }, (error: any) => {
-      console.log(error);
-    });
+  handleFileInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input?.files && input.files.length > 0) {
+      this.fileToUpload = input.files.item(0);
+    }
   }
-}
 
+  uploadFileToActivity() {
+    if (this.fileToUpload) {
+      this.uploadService.postFile(this.fileToUpload).subscribe(
+        data => {
+          console.log("File upload successful:", data);
+        },
+        error => {
+          console.error("File upload error:", error);
+        }
+      );
+    }
+  }
+
+  removeFile() {
+    this.fileToUpload = null;
+  }
+
+  downloadFile() {
+    if (this.fileToUpload) {
+      // Implement the logic to download or display the file
+      console.log('Downloading file:', this.fileToUpload.name);
+    }
+  }
 }

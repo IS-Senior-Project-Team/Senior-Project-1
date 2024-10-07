@@ -7,7 +7,7 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Hello, TypeScript Express!');
 });
 
-app.get('/upload', (req: Request, res: Response) => {
+app.post('/upload', (req: Request, res: Response) => {
     postUpload(req, res);
 });
 

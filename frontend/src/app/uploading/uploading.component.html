@@ -1,8 +1,30 @@
-<!-- https://stackoverflow.com/questions/47936183/angular-file-upload -->
-<div class="form-group">
-    <label for="file">Choose File</label>
-    <input type="file"
-           id="file"
-           (change)="handleFileInput($event)">
-    <button (onClick)="uploadFileToActivity()">Upload</button>
+<div class="file-upload-container">
+    <div class="upload-box" (click)="fileInput.click()">
+        <div class="upload-icon">
+            <span>+</span>
+        </div>
+        <p>Drag & drop or click to choose files</p>
+        <small>Max file size: 10 MB</small>
+    </div>
+
+    <input type="file" 
+           id="file" 
+           #fileInput 
+           (change)="handleFileInput($event)" 
+           style="display: none;">
+    
+    <div class="file-item" *ngIf="fileToUpload">
+        <div class="file-info">
+            <span class="file-icon">📄</span>
+            <div class="file-details">
+                <p class="file-name">{{ fileToUpload?.name }}</p>
+                <p class="file-size">{{ fileToUpload ? (fileToUpload.size / 1024 / 1024).toFixed(2) : '0.00' }} MB</p>
+            </div>
+        </div>
+        <div class="file-actions">
+            <button class="download-btn" (click)="downloadFile()">⬇</button>
+            <button class="delete-btn" (click)="removeFile()">🗑</button>
+        </div>
+    </div>
+    <button class="upload-file-btn" *ngIf="fileToUpload" (click)="uploadFileToActivity()">Upload</button>
 </div>
