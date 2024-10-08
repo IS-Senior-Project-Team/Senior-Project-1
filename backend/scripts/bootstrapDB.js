@@ -62,7 +62,7 @@ async function createVolunteersTable(pool) {
 
   try {
     await pool.query(query);
-    console.log("Simplified table 'volunteers' is set up successfully.");
+    console.log("Table 'volunteers' is set up successfully.");
   } catch (err) {
     console.error("Error setting up volunteers table:", err.stack);
   }
