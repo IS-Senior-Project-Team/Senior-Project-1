@@ -8,6 +8,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Enable CORS
+// This is needed to work with the frontend
 app.use(cors({
     origin: 'http://localhost:4200',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -40,7 +41,6 @@ const upload = multer({
     fileFilter: csvFileFilter
 });
 
-// Update the route to handle multiple file uploads (limit to 5 files for example)
 app.post('/upload', upload.array('files', 5), (req: Request, res: Response) => {
     postUpload(req, res);
 });
