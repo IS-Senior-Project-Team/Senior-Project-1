@@ -6,7 +6,13 @@
       "lastName": "Patalano",
       "phoneNumber": "123-456-7890",
       "notes": "Found lost dog on side of Southside Blvd.",
-      "status": "Open"
+      "status": "Open",
+      "assignedVolunteers": [101, 102],
+      "createdDate": "2024-09-15T10:00:00Z",
+      "lastUpdated": "2024-09-17T12:30:00Z",
+      "priority": "High",
+      "location": "Southside Blvd, Jacksonville, FL",
+      "relatedCases": [3]
     },
     {
       "id": "2",
@@ -14,7 +20,103 @@
       "lastName": "Lazzara",
       "phoneNumber": "372-446-3990",
       "notes": "Need to rehome my dog.",
-      "status": "Closed"
+      "status": "Closed",
+      "assignedVolunteers": [103],
+      "createdDate": "2024-09-10T09:30:00Z",
+      "lastUpdated": "2024-09-11T14:00:00Z",
+      "priority": "Medium",
+      "location": "Mandarin, Jacksonville, FL",
+      "relatedCases": []
+    }
+  ],
+  "volunteers": [
+    {
+      "id": 101,
+      "firstName": "Alice",
+      "lastName": "Smith",
+      "username": "alice_smith",
+      "password": "hashed_password_123",
+      "preferredCenters": ["Southside", "Downtown"],
+      "skillsInterests": ["Pet Rescue", "Dog Training"],
+      "availabilityTimes": {
+        "Monday": ["9:00-12:00", "14:00-18:00"],
+        "Wednesday": ["10:00-16:00"]
+      },
+      "address": {
+        "street": "123 Elm St",
+        "city": "Jacksonville",
+        "state": "FL",
+        "zip": "32207"
+      },
+      "phoneNumbers": ["123-456-7891"],
+      "email": "alice.smith@example.com",
+      "educationalBackground": "Animal Science",
+      "currentLicenses": ["Pet CPR"],
+      "emergencyContact": {
+        "name": "John Smith",
+        "phoneNumber": "321-654-0987",
+        "relationship": "Husband"
+      },
+      "driversLicenseOnFile": true,
+      "socialSecurityCardOnFile": true,
+      "approvalStatus": "Approved",
+      "notes": "Experienced with rescue operations.",
+      "assignedCases": [1]
+    },
+    {
+      "id": 102,
+      "firstName": "Bob",
+      "lastName": "Johnson",
+      "username": "bob_johnson",
+      "password": "hashed_password_456",
+      "preferredCenters": ["Arlington"],
+      "skillsInterests": ["Cat Care", "Pet Transport"],
+      "availabilityTimes": {
+        "Tuesday": ["12:00-18:00"],
+        "Thursday": ["10:00-15:00"]
+      },
+      "address": {
+        "street": "456 Oak Rd",
+        "city": "Jacksonville",
+        "state": "FL",
+        "zip": "32208"
+      },
+      "phoneNumbers": ["234-567-8901"],
+      "email": "bob.johnson@example.com",
+      "educationalBackground": "Veterinary Assistant",
+      "currentLicenses": ["Animal Transport Certification"],
+      "emergencyContact": {
+        "name": "Jane Johnson",
+        "phoneNumber": "987-654-3210",
+        "relationship": "Wife"
+      },
+      "driversLicenseOnFile": true,
+      "socialSecurityCardOnFile": false,
+      "approvalStatus": "Pending",
+      "notes": "Great with cats and small animals.",
+      "assignedCases": [1]
+    }
+  ],
+  "interactions": [
+    {
+      "interactionId": "I-001",
+      "caseId": 1,
+      "volunteerId": 101,
+      "interactionType": "Phone Call",
+      "date": "2024-09-15T10:30:00Z",
+      "summary": "Discussed finding a lost dog; assigned to volunteers for follow-up.",
+      "actionTaken": "Created case and assigned volunteer team.",
+      "nextSteps": "Visit location to rescue the dog."
+    },
+    {
+      "interactionId": "I-002",
+      "caseId": 2,
+      "volunteerId": 103,
+      "interactionType": "Walk-in",
+      "date": "2024-09-10T11:00:00Z",
+      "summary": "Client needs to rehome their dog.",
+      "actionTaken": "Scheduled rehoming interview.",
+      "nextSteps": "Follow-up with potential adopters."
     }
   ]
 }
