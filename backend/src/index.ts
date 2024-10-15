@@ -45,6 +45,10 @@ app.post('/upload', upload.array('files', 5), (req: Request, res: Response) => {
     postUpload(req, res);
 });
 
+app.get('/', upload.array('files', 5), (req: Request, res: Response) => {
+   res.send("Successful");
+});
+
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
