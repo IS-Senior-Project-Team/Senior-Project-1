@@ -15,7 +15,7 @@
     "test-backend": "mocha",
     "test-frontend": "cd frontend && ng test",
     "serve": "node backend/dist/index.js",
-    "test-headless": "ng test --browsers ChromeHeadless"
+    "test-headless": "cd frontend && ng test --browsers ChromeHeadless"
   },
   "dependencies": {
     "@angular/animations": "^18.2.0",
