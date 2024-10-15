@@ -12,7 +12,7 @@
     "build-backend": "tsc -p backend/tsconfig.json",
     "build-frontend": "cd frontend && ng build",
     "test": "concurrently \"npm run test-backend\" \"npm run test-frontend\"",
-    "test-backend": "mocha",
+    "test-backend": "cd backend && mocha",
     "test-frontend": "cd frontend && ng test",
     "serve": "node backend/dist/index.js",
     "test-headless": "cd frontend && ng test --browsers ChromeHeadless"
