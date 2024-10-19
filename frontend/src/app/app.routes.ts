@@ -3,6 +3,7 @@ import { CaseManagementComponent } from './case-management/case-management.compo
 import { RegisterStaffComponent } from './view/register-staff/register-staff.component';
 import { StaffLoginComponent } from './view/staff-login/staff-login.component';
 import { ForgotPasswordComponent } from './view/forgot-password/forgot-password.component';
+import { UploadingComponent } from './uploading/uploading.component';
 
 export const routes: Routes = [
     {
@@ -23,7 +24,10 @@ export const routes: Routes = [
     },
     {
         path: 'forgot-password',
-        component: ForgotPasswordComponent
+        component: ForgotPasswordComponent,
+    },
+    {
+        path: 'upload',
+        component: UploadingComponent
     }
-
 ];

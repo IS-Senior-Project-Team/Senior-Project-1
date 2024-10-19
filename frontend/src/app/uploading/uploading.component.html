@@ -1,0 +1,30 @@
+<div class="file-upload-container">
+    <div class="upload-box" (click)="fileInput.click()">
+        <div class="upload-icon">
+            <span>+</span>
+        </div>
+        <p>Drag & drop or click to choose files</p>
+    </div>
+
+    <input type="file" 
+           accept=".csv"
+           multiple
+           id="file" 
+           #fileInput 
+           (change)="handleFileInput($event)"
+           style="display: none;">
+    
+    <div class="file-item" *ngFor="let file of filesToUpload">
+        <div class="file-info">
+            <span class="file-icon">📄</span>
+            <div class="file-details">
+                <p class="file-name">{{ file.name }}</p>
+                <p class="file-size">{{ (file.size / 1024 / 1024).toFixed(2) }} MB</p>
+            </div>
+        </div>
+        <div class="file-actions">
+            <button class="delete-btn" (click)="removeFile(file)">🗑</button>
+        </div>
+    </div>
+    <button class="upload-file-btn" accept=".csv" [disabled]="filesToUpload?.length == 0 || filesToUpload == null" (click)="uploadFileToActivity()">Upload</button>
+</div>
