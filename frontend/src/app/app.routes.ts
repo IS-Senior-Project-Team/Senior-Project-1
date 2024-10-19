@@ -5,6 +5,7 @@ import { StaffLoginComponent } from './view/staff-login/staff-login.component';
 import { ForgotPasswordComponent } from './view/forgot-password/forgot-password.component';
 import { UploadingComponent } from './uploading/uploading.component';
 
+
 export const routes: Routes = [
     {
         path: 'case-management',
