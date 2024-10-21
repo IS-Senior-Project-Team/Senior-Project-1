@@ -1,0 +1,44 @@
+<!-- <div class="registerPage">
+<div class="form">
+</div>
+</div> -->
+<div class="registerPage">
+  <h2 style="text-align: center;">Create Account</h2>
+    <div class="form">
+
+<form #registerForm="ngForm" (ngSubmit)="CreateNewUser(registerForm)" novalidate>
+    <input type="text" name="st_firstname" [(ngModel)]="staffData.staff_firstname" placeholder="First Name" required #firstname="ngModel" />
+    <div *ngIf="firstname.invalid && firstname.touched" style="color:red; font-size:smaller">
+      First Name is required.
+    </div>
+  
+    <input type="text" name="st_lastname" [(ngModel)]="staffData.staff_lastname" placeholder="Last Name" required #lastname="ngModel" />
+    <div *ngIf="lastname.invalid && lastname.touched" style="color:red; font-size:smaller">
+      Last Name is required.
+    </div>
+  
+    <input type="text" name="st_username" [(ngModel)]="staffData.staff_username" placeholder="Username" required #username="ngModel" />
+    <div *ngIf="username.invalid && username.touched" style="color:red; font-size:smaller">
+      Username is required.
+    </div>
+  
+    <input type="email" name="st_email" [(ngModel)]="staffData.staff_email" placeholder="Email" required email #email="ngModel" />
+    <div *ngIf="email.invalid && email.touched" style="color:red; font-size:smaller">
+      Please enter a valid email address.
+    </div>
+  
+    <input type="password" name="st_password" [(ngModel)]="staffData.staff_password" placeholder="Password" required minlength="6" #password="ngModel" />
+    <div *ngIf="password.invalid && password.touched" style="color:red; font-size:smaller">
+      Password must be at least 6 characters long.
+    </div>
+  
+    <input type="tel" name="st_phoneNumber" [(ngModel)]="staffData.staff_phone" placeholder="Phone Number" required pattern="^[0-9]{10}$" #phone="ngModel" />
+    <div *ngIf="phone.invalid && phone.touched" style="color:red; font-size:smaller; margin-bottom: 5pt;">
+      Please enter a valid 10-digit phone number.
+    </div>
+  
+    <button type="submit" [disabled]="registerForm.invalid">Create</button>
+  </form>
+  <p class="message">Already registered? <a (click)="toggleLogin()">Login your account</a></p>
+  </div>
+</div>

@@ -118,5 +118,17 @@
       "actionTaken": "Scheduled rehoming interview.",
       "nextSteps": "Follow-up with potential adopters."
     }
+  ],
+  "staffMembers": [
+    {
+      "id": 1,
+      "staff_firstname": "David",
+      "staff_lastname": "Fashokun",
+      "staff_email": "davidfashokun@gmail.com",
+      "staff_username": "keem",
+      "staff_password": "password",
+      "staff_address": "",
+      "staff_phone": "9047145794"
+    }
   ]
 }
