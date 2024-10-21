@@ -3,7 +3,7 @@ import { CommonModule, NgFor, NgForOf } from '@angular/common';
 import { UploadsService } from '../services/uploads.service';
 import { getCases } from '../../../../backend/src/firebase/firebaseConnection';
 import { DocumentData } from 'firebase/firestore';
-
+import { FirebaseTestObj } from '../../../../backend/src/models/FirebaseTestObj'
 
 @Component({
   selector: 'app-uploading',
@@ -15,8 +15,8 @@ import { DocumentData } from 'firebase/firestore';
 export class UploadingComponent {
 
   filesToUpload: File[] | null = null;
-  testDB: Promise<DocumentData[]> | null = null;
-  testDBData: DocumentData[] = [];
+  testDBArray: DocumentData[] = [];
+  testDBObjects: FirebaseTestObj[] = [];
 
   constructor(private uploadService: UploadsService) {
     // this.testDB = getCases()
@@ -24,9 +24,12 @@ export class UploadingComponent {
   }
 
   async testfunc() {
-    await getCases().then(result => this.testDBData?.push(result))
-    this.testDBData.forEach(item => {
+    await getCases().then(result => this.testDBArray?.push(result))
+    this.testDBArray.forEach(item => {
       console.log(item)
+    })
+    this.testDBArray.forEach(elem => {
+      this.testDBObjects.push({test1:elem[0].test1})
     })
   }
 
