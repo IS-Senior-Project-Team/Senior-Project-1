@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UploadsService } from '../services/uploads.service';
+import {} from '../../../../backend/src/firebase/firebaseConnection';
 
 @Component({
   selector: 'app-uploading',
