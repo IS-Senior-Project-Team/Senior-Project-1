@@ -129,4 +129,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# file uploads
 /backend/uploads
+
+# firebase private info
+/backend/src/firebase
