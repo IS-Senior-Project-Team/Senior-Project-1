@@ -31,5 +31,11 @@
 
 <div id="testReadDB">
     test
-    <div id="dbItems"></div>
+    <div id="dbItems">
+        <ul>
+            <li *ngFor="let elem of testDBData">
+               {{ elem[0].test1 }}
+            </li>
+        </ul>
+    </div>
 </div>
