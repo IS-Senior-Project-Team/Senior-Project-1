@@ -1,3 +1,6 @@
 export interface FirebaseTestObj {
-    test1: string
+    firstName: string,
+    lastName: string,
+    phoneNumber: string,
+    notes: string
 }

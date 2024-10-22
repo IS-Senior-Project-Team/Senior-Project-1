@@ -1,37 +1,19 @@
 import { Component } from '@angular/core';
 import { CommonModule, NgFor, NgForOf } from '@angular/common';
 import { UploadsService } from '../services/uploads.service';
-import { getCases } from '../../../../backend/src/firebase/firebaseConnection';
-import { DocumentData } from 'firebase/firestore';
-import { FirebaseTestObj } from '../../../../backend/src/models/FirebaseTestObj'
 
 @Component({
   selector: 'app-uploading',
   standalone: true,
-  imports: [CommonModule, NgFor],
+  imports: [CommonModule],
   templateUrl: './uploading.component.html',
   styleUrls: ['./uploading.component.css']
 })
 export class UploadingComponent {
 
   filesToUpload: File[] | null = null;
-  testDBArray: DocumentData[] = [];
-  testDBObjects: FirebaseTestObj[] = [];
 
-  constructor(private uploadService: UploadsService) {
-    // this.testDB = getCases()
-    this.testfunc()
-  }
-
-  async testfunc() {
-    await getCases().then(result => this.testDBArray?.push(result))
-    this.testDBArray.forEach(item => {
-      console.log(item)
-    })
-    this.testDBArray.forEach(elem => {
-      this.testDBObjects.push({test1:elem[0].test1})
-    })
-  }
+  constructor(private uploadService: UploadsService) {}
 
   handleFileInput(event: Event) {
     const input = event.target as HTMLInputElement;

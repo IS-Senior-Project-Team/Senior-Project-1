@@ -28,5 +28,26 @@
             </ng-container>
         </tbody>
     </table>
+
+    <div id="testReadDB">
+      <div id="dbItems">
+        <table style="border: 1px black solid;">
+          <thead>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Phone #</th>
+            <th>Notes</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let elem of testDBObjects">
+              <td>{{ elem['firstName'] }}</td>
+              <td>{{ elem['lastName'] }}</td>
+              <td>{{ elem['phoneNumber'] }}</td>
+              <td>{{ elem['notes'] }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  </div>
   </div>
   
