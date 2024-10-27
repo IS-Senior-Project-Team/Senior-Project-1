@@ -1,4 +1,4 @@
-export interface FirebaseTestObj {
+export interface FirebaseContact {
     firstName: string,
     lastName: string,
     phoneNumber: string,

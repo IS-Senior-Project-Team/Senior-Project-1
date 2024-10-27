@@ -4,7 +4,7 @@ import { CasesService } from '../services/cases.service';
 import { CommonModule } from '@angular/common';
 import { getCases, getContacts } from '../../../../backend/src/firebase/firebaseConnection';
 import { DocumentData } from 'firebase/firestore';
-import { FirebaseTestObj } from '../../../../backend/src/models/FirebaseTestObj'
+import { FirebaseContact } from '../../../../backend/src/models/FirebaseTestObj'
 
 @Component({
   selector: 'app-case-management',
@@ -20,23 +20,23 @@ export class CaseManagementComponent implements OnInit {
   statuses: string[] = ['Open', 'In Progress', 'Closed']; 
 
   testDBArray: DocumentData[] = [];
-  testDBObjects: FirebaseTestObj[] = [];
+  testDBObjects: FirebaseContact[] = [];
 
   constructor(private casesService: CasesService) {}
 
   ngOnInit(): void {
     //Load case data
     this.loadCases();
-    this.testfunc()
+    this.gotFirebaseContacts()
   }
 
-  async testfunc() {
+  async gotFirebaseContacts() {
     //Get all Contacts documents
     await getContacts().then(result => this.testDBArray?.push(result))
     this.testDBArray.forEach(elem => {
       //drill down to the objects and add each to the array
-      elem['forEach']((element: FirebaseTestObj) => {
-        console.log(element)
+      elem['forEach']((element: FirebaseContact) => {
+        // console.log(element)
         this.testDBObjects.push(element)
       });
     })
