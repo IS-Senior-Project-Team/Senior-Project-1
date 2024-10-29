@@ -3,7 +3,7 @@ import cors from 'cors';
 import multer from 'multer';
 import path from 'path';
 import { postUpload } from './controllers/upload';
-
+import { getCases } from './firebase/firebaseConnection';
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -43,6 +43,10 @@ const upload = multer({
 
 app.post('/upload', upload.array('files', 5), (req: Request, res: Response) => {
     postUpload(req, res);
+});
+
+app.get('/cases', async (req: Request, res: Response) => {
+    res.json(await getCases())
 });
 
 app.get('/', upload.array('files', 5), (req: Request, res: Response) => {

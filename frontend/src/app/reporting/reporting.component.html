@@ -1,0 +1,20 @@
+<div>
+    <h1>Pet Care Outcomes Report</h1>
+  
+    <div>
+      <canvas #outcomeChart></canvas>
+    </div>
+  
+    <table>
+      <tr>
+        <th>Pet Name</th>
+        <th>Outcome</th>
+      </tr>
+      <tr *ngFor="let outcome of cases">
+        <td>{{ outcome.name }}</td>
+        <td>{{ outcome.result }}</td>
+      </tr>
+    </table>
+  
+    <button (click)="generatePDF()">Export to PDF</button>
+  </div>

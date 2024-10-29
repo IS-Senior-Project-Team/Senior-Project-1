@@ -133,4 +133,4 @@ dist
 /backend/uploads
 
 # firebase private info
-/backend/src/firebase
+firebase_secrets.ts
