@@ -1,0 +1,11 @@
+.hstack {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0px;
+    height: 100vh;
+}
+
+.routed-component {
+    flex: 1;
+}
