@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule, NgFor, NgForOf } from '@angular/common';
 import { UploadsService } from '../services/uploads.service';
+import { Papa, ParseResult } from "ngx-papaparse";
 
 @Component({
   selector: 'app-uploading',
@@ -12,19 +13,31 @@ import { UploadsService } from '../services/uploads.service';
 export class UploadingComponent {
 
   filesToUpload: File[] | null = null;
+  infoTest: ParseResult[] | null = [];
 
-  constructor(private uploadService: UploadsService) {}
+  constructor(private uploadService: UploadsService, private papa: Papa) {}
+
+  parseCSV(csvData: string | Blob){
+    let returnable = this.papa.parse(csvData)
+    return returnable
+  }
 
   handleFileInput(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input?.files) {
       this.filesToUpload = Array.from(input.files);
     }
+
+    this.filesToUpload?.forEach(file => {
+      file.text().then(result => this.infoTest?.push(this.parseCSV(result)))
+      console.log(this.infoTest)
+    })
   }
 
   uploadFileToActivity() {
     if (this.filesToUpload) {
       this.uploadService.postFiles(this.filesToUpload).subscribe(
+        // console.log(data)
         data => {
           console.log("File upload successful:", data);
         },
