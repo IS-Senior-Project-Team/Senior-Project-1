@@ -1,29 +1,58 @@
-<div>
-    <table>
-        <thead>
-            <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Phone #</th>
-                <th>Outcome</th>
-                <th>Animal Type</th>
-                <th># of Pets</th>
-                <th>Behavior Concerns</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let str of infoTest">
-                <td>{{ str.data[1][2] }}</td>
-                <td>{{ str.data[1][3] }}</td>
-                <td>{{ str.data[1][4] }}</td>
-                <td>{{ str.data[1][153] }}</td>
-                <td>{{ str.data[1][158] }}</td>
-                <td>{{ str.data[1][168] }}</td>
-                <td>{{ str.data[1][188] }}</td>
-            </tr>
-        </tbody>
-    </table>
+<div class="tableDiv" *ngFor="let item of infoTest; index as i">
+    <div *ngIf="isWaitwhileVisible">
+        <span>File {{ i+1 }}</span>
+        <table id="table1" class="table1">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Phone #</th>
+                    <th>Outcome</th>
+                    <th>Animal Type</th>
+                    <th># of Pets</th>
+                    <th>Behavior Concerns</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ item.data[1][2] }}</td>
+                    <td>{{ item.data[1][3] }}</td>
+                    <td>{{ item.data[1][4] }}</td>
+                    <td>{{ item.data[1][153] }}</td>
+                    <td>{{ item.data[1][158] }}</td>
+                    <td>{{ item.data[1][168] }}</td>
+                    <td>{{ item.data[1][188] }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
 </div>
+
+<div class="tableDiv" *ngFor="let item of infoTest; index as i">
+    <div *ngIf="isVoiceCall">
+        <span>File {{ i+1 }}</span>
+        <table id="table1" class="table1">
+            <thead>
+                <tr>
+                    <th>Phone #</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ item.data[1][2] }}</td>
+                    <td>{{ item.data[1][3] }}</td>
+                    <td>{{ item.data[1][4] }}</td>
+                    <td>{{ item.data[1][153] }}</td>
+                    <td>{{ item.data[1][158] }}</td>
+                    <td>{{ item.data[1][168] }}</td>
+                    <td>{{ item.data[1][188] }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 
 <div class="file-upload-container">
     <div class="upload-box" (click)="fileInput.click()">

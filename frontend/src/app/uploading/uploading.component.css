@@ -108,3 +108,16 @@
     border-color: white;
     border-style: none;
 }
+
+.tableDiv{
+    margin: 20px;
+    align-items: center;
+}
+.table1 {
+    border: solid black 1px;
+    margin-top: 0;
+}
+.table1 td,tr,th {
+    border: solid black 1px;
+    padding: 5px 10px;
+}

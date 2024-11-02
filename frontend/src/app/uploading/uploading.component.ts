@@ -14,6 +14,8 @@ export class UploadingComponent {
 
   filesToUpload: File[] | null = null;
   infoTest: ParseResult[] | null = [];
+  isWaitwhileVisible = false;
+  isVoiceCall = false;
 
   constructor(private uploadService: UploadsService, private papa: Papa) {}
 
@@ -31,6 +33,12 @@ export class UploadingComponent {
     this.filesToUpload?.forEach(file => {
       file.text().then(result => this.infoTest?.push(this.parseCSV(result)))
       console.log(this.infoTest)
+      if (file.name == "waitwhile example.csv") {
+        this.isWaitwhileVisible = true
+      }
+      if (file.name == "VM Log Example.xlsx") {
+        this.isVoiceCall = true
+      }
     })
   }
 
