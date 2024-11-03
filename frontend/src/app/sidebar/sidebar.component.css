@@ -1,7 +1,6 @@
 /* Container styles */
 .sidebar {
     width: 250px;
-    background-color: #f5fdf2;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -68,6 +67,7 @@
     background-color: #fff;
     color: #333333e7;
     transition: background-color 0.3s, color 0.3s;
+    text-align: left;
   }
   
   .menu-item.active {

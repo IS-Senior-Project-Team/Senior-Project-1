@@ -1,9 +1,27 @@
 <div>
-    <h1>Pet Care Outcomes Report</h1>
-  
-    <div>
-      <canvas #outcomeChart></canvas>
+    <div class="hstack">
+      <div>
+      <select class="select-menu" (change)="onStatusChange($event)">
+        <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+      </select>
+      <caption class="select-caption">Statuses</caption>
     </div>
+    <div>
+    <select class="select-menu" (change)="onStatusChange($event)">
+      <option *ngFor="let timeFrame of timeFrames" [value]="timeFrame">{{ timeFrame }}</option>
+    </select>
+    <caption class="select-caption">TimeFrames</caption>
+  </div>
+  <div>
+    <select class="select-menu" (change)="onStatusChange($event)">
+      <option *ngFor="let specie of species" [value]="specie">{{ specie }}</option>
+    </select>
+    <caption class="select-caption">Species</caption>
+  </div>
+    <button class="export-button" (click)="generatePDF()">Export to PDF</button>
+  </div>
+    <div class="card">
+      <canvas #outcomeChart></canvas>
   
     <table>
       <tr>
@@ -11,10 +29,9 @@
         <th>Outcome</th>
       </tr>
       <tr *ngFor="let outcome of cases">
-        <td>{{ outcome.name }}</td>
-        <td>{{ outcome.result }}</td>
+        <td>{{ outcome.firstName }}</td>
+        <td>{{ outcome.status }}</td>
       </tr>
     </table>
-  
-    <button (click)="generatePDF()">Export to PDF</button>
+  </div>
   </div>

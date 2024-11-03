@@ -1,0 +1,23 @@
+.hstack {
+    display: flex;
+    flex-direction: row;
+    margin-left: 40%;
+    margin-bottom: 5%;
+}
+.select-menu {
+    background-color: rgba(255, 255, 255, 0);
+    border: white;
+    margin-inline: 20px;
+    font-size: x-large;
+}
+.select-caption {
+    font-size: x-small;
+    padding-left: 22px;
+}
+.export-button {
+    background-color: #4DC959;
+    padding-block: 5px;
+    color: rgba(255, 255, 255, 0.919);
+    border-color: rgba(255, 255, 255, 0);
+    border-radius: 10px;
+}

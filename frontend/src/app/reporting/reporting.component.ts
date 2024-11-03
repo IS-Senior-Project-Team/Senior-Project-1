@@ -3,11 +3,12 @@ import { CasesService } from '../services/cases.service';
 import { Case } from '../models/case';
 import { jsPDF } from 'jspdf';
 import Chart from 'chart.js/auto';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-reporting',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './reporting.component.html',
   styleUrl: './reporting.component.css'
 })
@@ -15,23 +16,39 @@ export class ReportingComponent implements OnInit {
   @ViewChild('outcomeChart', { static: false }) outcomeChart!: ElementRef;
   cases: Case[] = [];
   chart: any;
+  timeFrame: string = "All"
+  timeFrames: string[] = ['All', 'Daily', 'Weekly', 'Monthly', "Yearly"];
 
+  specie: string = "All"
+  species: string[] = ['All', 'Adult Cat', 'Adult Dog', 'Kitten', 'Puppy']; 
+
+  status: string = "All"
+  statuses: string[] = ['All', 'Open', 'Closed']; 
   constructor(private caseService: CasesService) {}
 
   ngOnInit(): void {
-    this.caseService.getAll().subscribe((data) => {
+    this.refreshData();
+  }
+
+  refreshData(): void {
+    this.caseService.getAll(this.status == "All" ? undefined : this.status).then((data) => {
       this.cases = data;
       this.createChart();
     });
   }
-
   createChart(): void {
-    const outcomes = this.cases.map(outcome => outcome.status);
+
+    const filteredCases = this.cases.flatMap(outcome => {
+      const status = outcome.status;
+      return status !== undefined ? [outcome] : [];
+    });
+
+    const outcomes = filteredCases.map(outcome => outcome.status);
     const outcomeCounts = outcomes.reduce((acc: any, outcome: string) => {
       acc[outcome] = (acc[outcome] || 0) + 1;
       return acc;
     }, {});
-
+    
     const chartData = {
       labels: Object.keys(outcomeCounts),
       datasets: [
@@ -74,4 +91,17 @@ export class ReportingComponent implements OnInit {
 
     doc.save('pet-care-outcomes-report.pdf');
   }
+
+    // Method for updating the filters
+    onStatusChange(event: Event): void {
+      const newValue = (event.target as HTMLSelectElement).value;
+      if(this.timeFrames.includes(newValue ?? "")) {
+        this.timeFrame = newValue ?? "";
+      } else if (this.species.includes(newValue)) {
+        this.specie = newValue ?? "";
+      } else {
+        this.status = newValue ?? "";
+      }
+      this.refreshData();
+    }
 }
