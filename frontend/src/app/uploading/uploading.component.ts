@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgFor, NgForOf } from '@angular/common';
 import { UploadsService } from '../services/uploads.service';
 
 @Component({

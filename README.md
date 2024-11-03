@@ -19,4 +19,8 @@ This results on the frontend at "http://localhost:4200/" and backend at "http://
 sh bootstrap.sh
 ```
 4. Enter your password for your current device when prompted
-5. The database should be setup now! 
+5. The database should be setup now!
+
+# Firebase Connection
+Firebase connection is currently functioning, but with little features currently.
+Using firebaseConnection.ts in \backend\src\firebase\ will let you call functions to get items from firebase.
