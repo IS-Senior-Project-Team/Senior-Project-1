@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Case } from '../models/case';
 import { Observable } from 'rxjs';
+import { getCases } from './firebaseConnection';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +12,8 @@ export class CasesService {
 
   constructor(private httpClient: HttpClient) {}
 
-  getAll(): Observable<Case[]> {
-    return this.httpClient.get<Case[]>(this.apiUrl);
+  async getAll(statusFilter?: string): Promise<Case[]> {
+   return await getCases(statusFilter);
   }
 
   updateCase(caseData: Case): Observable<Case> {
