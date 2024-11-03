@@ -1,4 +1,4 @@
-<div class="case-management">
+<div class="case-management vh-100">
   <h2 class="text-center p-3">Manage Cases</h2>
 
   <button class="btn btn-secondary m-2" 
@@ -51,15 +51,15 @@
                   <td>{{ item.species }}</td>
                   <td>
                       <button *ngIf="!item.isDeleted" class="btn btn-link" (click)="editCase(item.id)">
-                        <img src="/edit-icon.png" alt="Edit" style="width: 25px; height: 25px;">
+                        <img src="../../../public/edit-icon.png" alt="Edit" style="width: 25px; height: 25px;">
                       </button>
 
                       <button class="btn btn-link" *ngIf="!item.isDeleted" (click)="deleteCase(item)">
-                          <img src="/red-trashcan-icon.png" alt="Delete" style="width: 30px; height: 30px;">
+                          <img src="../../../public/red-trashcan-icon.png" alt="Delete" style="width: 30px; height: 30px;">
                       </button>
 
                       <button class="btn btn-link" *ngIf="item.isDeleted" (click)="recoverCase(item)">
-                          <img src="/undo.png" alt="Recover" style="width: 25px; height: 25px;">
+                          <img src="../../../public/undo.png" alt="Recover" style="width: 25px; height: 25px;">
                       </button>
                   </td>
               </tr>

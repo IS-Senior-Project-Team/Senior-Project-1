@@ -6,9 +6,9 @@
       "lastName": "Patalano",
       "phoneNumber": "9047706147",
       "notes": "Lorem ipsum odor amet, consectetuer adipiscing elit. Elementum nostra ligula viverra vel vehicula hendrerit. Rhoncus mi himenaeos primis phasellus metus suspendisse in adipiscing.",
-      "status": "Surrender Appt",
-      "numOfPets": 1,
-      "species": "Puppy",
+      "status": "Found Pet",
+      "numOfPets": 3,
+      "species": "Adult Dog, Adult Cat",
       "assignedVolunteers": [
         101,
         102
@@ -32,6 +32,26 @@
       "status": "Call elevated to management",
       "numOfPets": "2",
       "species": "Adult Dog, Adult Cat",
+      "assignedVolunteers": [
+        103
+      ],
+      "createdDate": "2024-09-10T09:30:00Z",
+      "lastUpdated": "2024-09-11T14:00:00Z",
+      "priority": "Medium",
+      "location": "Mandarin, Jacksonville, FL",
+      "relatedCases": [],
+      "isDeleted": false,
+      "isExpanded": false
+    },
+    {
+      "id": "3",
+      "firstName": "George",
+      "lastName": "Washington",
+      "phoneNumber": "842-342-7436",
+      "notes": "Example phone call message.",
+      "status": "Surrender Appt",
+      "numOfPets": 1,
+      "species": "Kitten",
       "assignedVolunteers": [
         103
       ],

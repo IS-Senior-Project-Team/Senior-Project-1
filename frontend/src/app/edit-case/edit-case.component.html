@@ -73,7 +73,7 @@
             </div>
         </div>
 
-        <div style="position: fixed; bottom: 30px; left: 6%; right: 6%; display: flex; justify-content: space-between; padding: 1rem;">
+        <div style="display: flex; justify-content: space-between; margin-top: 3%;">
             <button class="btn btn-secondary" (click)="cancel()" style="width: 100px">Cancel</button>
             <button class="btn btn-primary" type="submit" style="width: 100px" (click)="save(editCaseForm)" [disabled]="editCaseForm.invalid || case.numOfPets < 0">Save</button>
         </div>
