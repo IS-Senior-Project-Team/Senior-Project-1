@@ -134,3 +134,7 @@ dist
 
 # firebase private info
 firebase_secrets.ts
+/backend/src/firebase
+
+.angular
+
