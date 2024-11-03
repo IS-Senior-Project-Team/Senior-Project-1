@@ -7,12 +7,16 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CasesService {
-  private apiUrl = 'http://localhost:3000/cases';
+  private apiUrl = 'http://localhost:8002/cases';
 
   constructor(private httpClient: HttpClient) {}
 
   getAll(): Observable<Case[]> {
     return this.httpClient.get<Case[]>(this.apiUrl);
+  }
+
+  getOne(caseId: string): Observable<Case> {
+    return this.httpClient.get<Case>(`${this.apiUrl}/${caseId}`);
   }
 
   updateCase(caseData: Case): Observable<Case> {

@@ -4,43 +4,69 @@
       "id": "1",
       "firstName": "Brayden",
       "lastName": "Patalano",
-      "phoneNumber": "123-456-7890",
-      "notes": "Found lost dog on side of Southside Blvd.",
-      "status": "Open",
-      "assignedVolunteers": [101, 102],
+      "phoneNumber": "9047706147",
+      "notes": "Lorem ipsum odor amet, consectetuer adipiscing elit. Elementum nostra ligula viverra vel vehicula hendrerit. Rhoncus mi himenaeos primis phasellus metus suspendisse in adipiscing.",
+      "status": "Surrender Appt",
+      "numOfPets": 1,
+      "species": "Puppy",
+      "assignedVolunteers": [
+        101,
+        102
+      ],
       "createdDate": "2024-09-15T10:00:00Z",
       "lastUpdated": "2024-09-17T12:30:00Z",
       "priority": "High",
       "location": "Southside Blvd, Jacksonville, FL",
-      "relatedCases": [3]
+      "relatedCases": [
+        3
+      ],
+      "isDeleted": false,
+      "isExpanded": false
     },
     {
       "id": "2",
       "firstName": "Chris",
       "lastName": "Lazzara",
       "phoneNumber": "372-446-3990",
-      "notes": "Need to rehome my dog.",
-      "status": "Closed",
-      "assignedVolunteers": [103],
+      "notes": "Need to rehome my dog.Need to rehome my dog.Need to rehome my dog.Need to rehome my dog.Need to rehome my dog.Need to rehome my dog.Need to rehome my dog.Need to rehome my dog.",
+      "status": "Call elevated to management",
+      "numOfPets": "2",
+      "species": "Adult Dog, Adult Cat",
+      "assignedVolunteers": [
+        103
+      ],
       "createdDate": "2024-09-10T09:30:00Z",
       "lastUpdated": "2024-09-11T14:00:00Z",
       "priority": "Medium",
       "location": "Mandarin, Jacksonville, FL",
-      "relatedCases": []
+      "relatedCases": [],
+      "isDeleted": false,
+      "isExpanded": false
     }
   ],
   "volunteers": [
     {
-      "id": 101,
+      "id": "101",
       "firstName": "Alice",
       "lastName": "Smith",
       "username": "alice_smith",
       "password": "hashed_password_123",
-      "preferredCenters": ["Southside", "Downtown"],
-      "skillsInterests": ["Pet Rescue", "Dog Training"],
+      "preferredCenters": [
+        "Southside",
+        "Downtown"
+      ],
+      "skillsInterests": [
+        "Pet Rescue",
+        "Dog Training"
+      ],
       "availabilityTimes": {
-        "Monday": ["9:00-12:00", "14:00-18:00"],
-        "Wednesday": ["10:00-16:00"]
+        "Monday": [
+          "9:00-12:00",
+          "14:00-18:00"
+        ],
+        "Wednesday": [
+          "10:00-16:00"
+        ]
       },
       "address": {
         "street": "123 Elm St",
@@ -48,10 +74,14 @@
         "state": "FL",
         "zip": "32207"
       },
-      "phoneNumbers": ["123-456-7891"],
+      "phoneNumbers": [
+        "123-456-7891"
+      ],
       "email": "alice.smith@example.com",
       "educationalBackground": "Animal Science",
-      "currentLicenses": ["Pet CPR"],
+      "currentLicenses": [
+        "Pet CPR"
+      ],
       "emergencyContact": {
         "name": "John Smith",
         "phoneNumber": "321-654-0987",
@@ -61,19 +91,30 @@
       "socialSecurityCardOnFile": true,
       "approvalStatus": "Approved",
       "notes": "Experienced with rescue operations.",
-      "assignedCases": [1]
+      "assignedCases": [
+        1
+      ]
     },
     {
-      "id": 102,
+      "id": "102",
       "firstName": "Bob",
       "lastName": "Johnson",
       "username": "bob_johnson",
       "password": "hashed_password_456",
-      "preferredCenters": ["Arlington"],
-      "skillsInterests": ["Cat Care", "Pet Transport"],
+      "preferredCenters": [
+        "Arlington"
+      ],
+      "skillsInterests": [
+        "Cat Care",
+        "Pet Transport"
+      ],
       "availabilityTimes": {
-        "Tuesday": ["12:00-18:00"],
-        "Thursday": ["10:00-15:00"]
+        "Tuesday": [
+          "12:00-18:00"
+        ],
+        "Thursday": [
+          "10:00-15:00"
+        ]
       },
       "address": {
         "street": "456 Oak Rd",
@@ -81,10 +122,14 @@
         "state": "FL",
         "zip": "32208"
       },
-      "phoneNumbers": ["234-567-8901"],
+      "phoneNumbers": [
+        "234-567-8901"
+      ],
       "email": "bob.johnson@example.com",
       "educationalBackground": "Veterinary Assistant",
-      "currentLicenses": ["Animal Transport Certification"],
+      "currentLicenses": [
+        "Animal Transport Certification"
+      ],
       "emergencyContact": {
         "name": "Jane Johnson",
         "phoneNumber": "987-654-3210",
@@ -94,7 +139,9 @@
       "socialSecurityCardOnFile": false,
       "approvalStatus": "Pending",
       "notes": "Great with cats and small animals.",
-      "assignedCases": [1]
+      "assignedCases": [
+        1
+      ]
     }
   ],
   "interactions": [
@@ -106,7 +153,8 @@
       "date": "2024-09-15T10:30:00Z",
       "summary": "Discussed finding a lost dog; assigned to volunteers for follow-up.",
       "actionTaken": "Created case and assigned volunteer team.",
-      "nextSteps": "Visit location to rescue the dog."
+      "nextSteps": "Visit location to rescue the dog.",
+      "id": "a4f3"
     },
     {
       "interactionId": "I-002",
@@ -116,12 +164,13 @@
       "date": "2024-09-10T11:00:00Z",
       "summary": "Client needs to rehome their dog.",
       "actionTaken": "Scheduled rehoming interview.",
-      "nextSteps": "Follow-up with potential adopters."
+      "nextSteps": "Follow-up with potential adopters.",
+      "id": "50c8"
     }
   ],
   "staffMembers": [
     {
-      "id": 1,
+      "id": "1",
       "staff_firstname": "David",
       "staff_lastname": "Fashokun",
       "staff_email": "davidfashokun@gmail.com",
