@@ -5,6 +5,7 @@ import firebase from "firebase/compat/app";
 import { firebaseConfig } from "../../../../firebase_config"
 // Required for side-effects
 import "firebase/firestore";
+import { Case } from "../models/case";
 // Follow this pattern to import other Firebase services
 // import { } from 'firebase/<service>';
 
@@ -16,12 +17,16 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
-export async function getCases() {
+export async function getCases(statusFilter: string | undefined): Promise<Case[]> {
   const casesCol = collection(db, 'cases');
-  const casesSnapshot = await getDocs(casesCol);
-  const casesList = casesSnapshot.docs.map(doc => doc.data());
-  return casesList;
+    const casesSnapshot = await getDocs(casesCol);
+    const casesList: Case[] = casesSnapshot.docs.map(doc => doc.data() as Case);
+    if (statusFilter) {
+      return casesList.filter(caseItem => caseItem.status === statusFilter);
+    }
+    return casesList;
 }
+
 
 export async function getContacts() {
   const contactsCol = collection(db, 'contacts');

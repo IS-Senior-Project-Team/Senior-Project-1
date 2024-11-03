@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { addCase, addVolunteer } = require('./firebaseConnection.ts');
+const { addCase, addVolunteer } = require('./firebaseConnection.js');
 
 // Read the JSON file
 const dbData = JSON.parse(fs.readFileSync('../../db.json', 'utf-8'));
