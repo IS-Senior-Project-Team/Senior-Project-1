@@ -3,9 +3,9 @@ import { Router } from '@angular/router';
 import { Case } from '../models/case';
 import { CasesService } from '../services/cases.service';
 import { CommonModule } from '@angular/common';
-//import { getCases, getContacts } from '../../../../backend/src/firebase/firebaseConnection';
-//import { DocumentData } from 'firebase/firestore';
-//import { FirebaseContact } from '../../../../backend/src/models/FirebaseTestObj'
+import { getCases, getContacts } from '../services/firebaseConnection';
+import { DocumentData } from 'firebase/firestore';
+import { FirebaseContact } from '../../../../backend/src/models/FirebaseTestObj'
 
 @Component({
   selector: 'app-case-management',

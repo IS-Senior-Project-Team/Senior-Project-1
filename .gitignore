@@ -132,5 +132,5 @@ dist
 # file uploads
 /backend/uploads
 
-# firebase private info
-/backend/src/firebase
+.angular
+

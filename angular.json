@@ -1,5 +1,5 @@
 {
-  "$schema": "../node_modules/@angular/cli/lib/config/schema.json",
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
@@ -13,9 +13,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/frontend",
-            "index": "src/index.html",
-            "browser": "src/main.ts",
+            "outputPath": "./dist/frontend",
+            "index": "./frontend/src/index.html",
+            "browser": "./frontend/src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -27,8 +27,8 @@
               }
             ],
             "styles": [
-              "../node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "src/styles.css"
+              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "./frontend/src/styles.css"
 ],
             "scripts": []
           },
@@ -86,7 +86,7 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "./frontend/src/styles.css"
             ],
             "scripts": []
           }

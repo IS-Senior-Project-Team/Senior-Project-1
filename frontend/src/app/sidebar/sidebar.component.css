@@ -1,0 +1,80 @@
+/* Container styles */
+.sidebar {
+    width: 250px;
+    background-color: #f5fdf2;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+  }
+  
+  /* Profile section */
+  .profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .profile-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #70c77f;
+    margin-right: 10px;
+  }
+  
+  .profile-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .profile-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .profile-email {
+    font-size: 14px;
+    color: #777;
+  }
+  
+  /* Search box */
+  .search-box {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  /* Menu styles */
+  .menu {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .menu-item {
+    padding: 12px;
+    margin-bottom: 8px;
+    width: 100%;
+    text-align: center;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #fff;
+    color: #333333e7;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .menu-item.active {
+    background-color: #b4e4b4;
+    color: #fff;
+  }
+  
+  .menu-item:hover {
+    background-color: #e0f3e0;
+  }
