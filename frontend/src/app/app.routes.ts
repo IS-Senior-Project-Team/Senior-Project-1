@@ -5,6 +5,7 @@ import { RegisterStaffComponent } from './view/register-staff/register-staff.com
 import { StaffLoginComponent } from './view/staff-login/staff-login.component';
 import { ForgotPasswordComponent } from './view/forgot-password/forgot-password.component';
 import { UploadingComponent } from './uploading/uploading.component';
+import { ReportingComponent } from './reporting/reporting.component';
 
 
 export const routes: Routes = [
@@ -35,5 +36,9 @@ export const routes: Routes = [
     {
         path: 'upload',
         component: UploadingComponent
+    },
+    {
+        path: 'report',
+        component: ReportingComponent
     }
 ];

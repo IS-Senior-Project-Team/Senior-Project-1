@@ -51,7 +51,7 @@ export class CaseManagementComponent implements OnInit {
 
   //Fetch and load all case data
   loadCases(): void {
-    this.casesService.getAll().subscribe((data: Case[]) => {
+    this.casesService.getAll().then((data: Case[]) => {
       this.cases = data;
     });
   }

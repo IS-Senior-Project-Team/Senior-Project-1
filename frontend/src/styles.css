@@ -1,1 +1,21 @@
 /* You can add global styles to this file, and also import other style files */
+
+body {
+    background-color: #EAF3EA;
+    overflow-x: hidden;
+}
+.card {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background-color: #F2FBF0;
+    height: 800px;
+    border-radius: 16px;
+    padding: 20px; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.005); 
+}
