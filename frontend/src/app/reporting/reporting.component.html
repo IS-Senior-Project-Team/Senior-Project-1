@@ -1,4 +1,8 @@
 <div>
+  <div class="export-container">
+    <button class="export-button" (click)="generatePDF()">Export to PDF</button>
+  </div>
+
     <div class="hstack">
       <div>
       <select class="select-menu" (change)="onStatusChange($event)">
@@ -18,20 +22,22 @@
     </select>
     <caption class="select-caption">Species</caption>
   </div>
-    <button class="export-button" (click)="generatePDF()">Export to PDF</button>
   </div>
     <div class="card">
-      <canvas #outcomeChart></canvas>
-  
-    <table>
-      <tr>
-        <th>Pet Name</th>
-        <th>Outcome</th>
+     <div class="canvas-container">
+        <canvas #outcomeChart></canvas>
+    </div>
+  <div class="report-container">
+    <table class="report-table" >
+      <tr class="report-row" >
+        <th class="report-col">Owner Name</th>
+        <th class="report-col">Outcome</th>
       </tr>
-      <tr *ngFor="let outcome of cases">
-        <td>{{ outcome.firstName }}</td>
-        <td>{{ outcome.status }}</td>
+      <tr class="report-row" *ngFor="let outcome of cases">
+        <td class="report-col">{{ outcome.firstName }}</td>
+        <td class="report-col">{{ outcome.status }}</td>
       </tr>
     </table>
   </div>
   </div>
+</div>

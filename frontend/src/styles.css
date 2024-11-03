@@ -5,9 +5,13 @@ body {
     overflow-x: hidden;
 }
 .card {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
     background-color: #F2FBF0;
+    height: 800px;
     border-radius: 16px;
-    padding: 50px; 
+    padding: 20px; 
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
     transition: transform 0.2s;
 }

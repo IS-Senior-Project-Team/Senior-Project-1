@@ -16,14 +16,14 @@ export class ReportingComponent implements OnInit {
   @ViewChild('outcomeChart', { static: false }) outcomeChart!: ElementRef;
   cases: Case[] = [];
   chart: any;
-  timeFrame: string = "All"
-  timeFrames: string[] = ['All', 'Daily', 'Weekly', 'Monthly', "Yearly"];
+  timeFrame: string = "All time frames"
+  timeFrames: string[] = ['All time frames', 'Daily', 'Weekly', 'Monthly', "Yearly"];
 
-  specie: string = "All"
-  species: string[] = ['All', 'Adult Cat', 'Adult Dog', 'Kitten', 'Puppy']; 
+  specie: string = "All species"
+  species: string[] = ['All species', 'Adult Cat', 'Adult Dog', 'Kitten', 'Puppy']; 
 
-  status: string = "All"
-  statuses: string[] = ['All', 'Open', 'Closed']; 
+  status: string = "All statuses"
+  statuses: string[] = ['All statuses', 'Open', 'Closed']; 
   constructor(private caseService: CasesService) {}
 
   ngOnInit(): void {
@@ -31,7 +31,7 @@ export class ReportingComponent implements OnInit {
   }
 
   refreshData(): void {
-    this.caseService.getAll(this.status == "All" ? undefined : this.status).then((data) => {
+    this.caseService.getAll(this.status == "All statuses" ? undefined : this.status).then((data) => {
       this.cases = data;
       this.createChart();
     });
