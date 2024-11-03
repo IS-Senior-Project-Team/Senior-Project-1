@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Case } from '../models/case';
 import { CasesService } from '../services/cases.service';
 import { CommonModule } from '@angular/common';
-import { getCases, getContacts } from '../../../../backend/src/firebase/firebaseConnection';
+import { getCases, getContacts } from '../services/firebaseConnection';
 import { DocumentData } from 'firebase/firestore';
 import { FirebaseContact } from '../../../../backend/src/models/FirebaseTestObj'
 
