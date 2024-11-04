@@ -1,3 +1,6 @@
+/* This file contains the styling for the reporting component */
+
+/* HStack means the container's elements are stacked left to right */
 .hstack {
     display: flex;
     flex-direction: row;

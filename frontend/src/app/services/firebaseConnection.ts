@@ -16,7 +16,7 @@ import { Case } from "../models/case";
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-
+// Get all cases
 export async function getCases(statusFilter: string | undefined): Promise<Case[]> {
   const casesCol = collection(db, 'cases');
     const casesSnapshot = await getDocs(casesCol);
@@ -27,7 +27,7 @@ export async function getCases(statusFilter: string | undefined): Promise<Case[]
     return casesList;
 }
 
-
+// Get all volunteers
 export async function getContacts() {
   const contactsCol = collection(db, 'contacts');
   const contactsSnapshot = await getDocs(contactsCol);

@@ -1,3 +1,4 @@
+// Used for authentication of staff members
 export interface StaffInfo {
     id : number;
     staff_firstname: string;

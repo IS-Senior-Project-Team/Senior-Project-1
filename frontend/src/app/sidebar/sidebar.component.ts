@@ -7,10 +7,12 @@ import { Router } from '@angular/router';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
+
 export class SidebarComponent {
 
   constructor(private router: Router) {}
 
+  // Navigate to the specified route
   navigateTo(route: string) {
     this.router.navigate([route]);
   }
