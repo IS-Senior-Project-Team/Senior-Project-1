@@ -109,6 +109,12 @@
     border-style: none;
 }
 
+.editData {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 .tableDiv{
     margin: 20px;
     align-items: center;
@@ -116,8 +122,9 @@
 .table1 {
     border: solid black 1px;
     margin-top: 0;
+    padding: 10px 5px;
 }
 .table1 td,tr,th {
-    border: solid black 1px;
+    /* border: solid black 1px; */
     padding: 5px 10px;
 }

@@ -16,8 +16,13 @@ export class UploadingComponent {
   infoTest: ParseResult[] | null = [];
   isWaitwhileVisible = false;
   isVoiceCall = false;
+  editData = false;
 
   constructor(private uploadService: UploadsService, private papa: Papa) {}
+
+  enableEditData() {
+    this.editData = true
+  }
 
   parseCSV(csvData: string | Blob){
     let returnable = this.papa.parse(csvData)
