@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core';
 import { Case } from '../models/case';
 import { Observable, from } from 'rxjs';
 import { getCases } from './firebaseConnection';
-import { getCaseById } from '../../../../backend/src/firebase/firebaseConnection';
-import { updateCase as updateCaseInFirebase } from '../../../../backend/src/firebase/firebaseConnection';
+import { getCaseById } from './firebaseConnection';
+import { updateCase as updateCaseInFirebase } from './firebaseConnection';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ import { updateCase as updateCaseInFirebase } from '../../../../backend/src/fire
 export class CasesService {
   constructor(private httpClient: HttpClient) {}
 
-  async getAll(statusFilter?: string): Promise<Case[]> {
+  async getAll(statusFilter: string = ""): Promise<Case[]> {
    return await getCases(statusFilter);
   }
 
