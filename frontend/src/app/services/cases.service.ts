@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core';
 import { Case } from '../models/case';
 import { Observable, from } from 'rxjs';
 import { getCases } from './firebaseConnection';
-import { getCaseById } from '../../../../backend/src/firebase/firebaseConnection';
-import { updateCase as updateCaseInFirebase } from '../../../../backend/src/firebase/firebaseConnection';
+import { getCaseById } from './firebaseConnection';
+import { updateCase as updateCaseInFirebase } from './firebaseConnection';
 
 @Injectable({
   providedIn: 'root'
