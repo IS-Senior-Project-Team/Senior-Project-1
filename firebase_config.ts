@@ -1,3 +1,4 @@
+// Configuration for the firebase project
 export const firebaseConfig: any = {
     apiKey: "AIzaSyAjYPCQ5wdM2DAWSRjvGSN_AQP4LrTIWb4",
     authDomain: "pawesome-test.firebaseapp.com",

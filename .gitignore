@@ -133,4 +133,5 @@ dist
 /backend/uploads
 
 .angular
-
+# A macOS specific file that stores the folder layout preferences of a folder that's annoying
+.DSStore

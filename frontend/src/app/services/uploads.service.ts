@@ -11,6 +11,8 @@ export class UploadsService {
 
   constructor(private httpClient: HttpClient) {}
 
+  // Uploads the files to the server
+  // TODO: Replace with firebase storage
   postFiles(filesToUpload: File[]): Observable<UploadResponse> {
     const formData: FormData = new FormData();
     filesToUpload.forEach(file => {
