@@ -90,12 +90,15 @@ export class EditCaseComponent implements OnInit {
     });
   }
 
-  //Fetch and load target case data to edit
   getCaseDetails(id: string): void {
-    this.casesService.getOne(this.case.id).subscribe(caseData => {
-      this.case = caseData;
-      // Clone original case for comparison if user cancels the edit
-      this.originalCase = { ...this.case }
+    this.casesService.getOne(id).subscribe(caseData => {
+      if (caseData) {
+        this.case = caseData;
+        // Clone original case for comparison if user cancels the edit
+        this.originalCase = { ...this.case };
+      } else {
+        console.error('Case not found');
+      }
     });
   }
 

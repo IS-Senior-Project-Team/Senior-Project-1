@@ -51,15 +51,15 @@
                   <td>{{ item.species }}</td>
                   <td>
                       <button *ngIf="!item.isDeleted" class="btn btn-link" (click)="editCase(item.id)">
-                        <img src="../../../public/edit-icon.png" alt="Edit" style="width: 25px; height: 25px;">
+                        <img src="/edit-icon.png" alt="Edit" style="width: 25px; height: 25px;">
                       </button>
 
                       <button class="btn btn-link" *ngIf="!item.isDeleted" (click)="deleteCase(item)">
-                          <img src="../../../public/red-trashcan-icon.png" alt="Delete" style="width: 30px; height: 30px;">
+                          <img src="/red-trashcan-icon.png" alt="Delete" style="width: 30px; height: 30px;">
                       </button>
 
                       <button class="btn btn-link" *ngIf="item.isDeleted" (click)="recoverCase(item)">
-                          <img src="../../../public/undo.png" alt="Recover" style="width: 25px; height: 25px;">
+                          <img src="/undo.png" alt="Recover" style="width: 25px; height: 25px;">
                       </button>
                   </td>
               </tr>

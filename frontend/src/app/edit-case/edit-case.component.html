@@ -27,7 +27,6 @@
                     required 
                     #phoneNumber="ngModel" 
                     placeholder="Phone Number" 
-                    pattern="^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
                 />
                 <div *ngIf="phoneNumber.invalid && (phoneNumber.dirty || phoneNumber.touched)" class="text-danger">
                     <div *ngIf="phoneNumber.errors?.['required']">Phone number is required.</div>
