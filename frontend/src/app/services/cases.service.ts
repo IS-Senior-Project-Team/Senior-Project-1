@@ -12,7 +12,7 @@ import { updateCase as updateCaseInFirebase } from '../../../../backend/src/fire
 export class CasesService {
   constructor(private httpClient: HttpClient) {}
 
-  async getAll(statusFilter?: string): Promise<Case[]> {
+  async getAll(statusFilter: string = ""): Promise<Case[]> {
    return await getCases(statusFilter);
   }
 
