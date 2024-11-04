@@ -16,11 +16,11 @@ import {
   isIndexedDBAvailable,
   isSafari,
   registerVersion
-} from "./chunk-L3SNWYHG.js";
+} from "./chunk-OBVKGOQI.js";
 import {
   __async,
   __superGet
-} from "./chunk-5K356HEJ.js";
+} from "./chunk-TWWAJFRB.js";
 
 // ../node_modules/@firebase/webchannel-wrapper/dist/bloom-blob/esm/bloom_blob_es2018.js
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
