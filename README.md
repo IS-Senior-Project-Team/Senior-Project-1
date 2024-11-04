@@ -8,7 +8,7 @@ npm install
 npm run start
 ```
 
-This results on the frontend at "http://localhost:4200/" and backend at "http://localhost:3000/" 
+This results on the frontend at "http://locastarlhost:4200/" and backend at "http://localhost:3000/" 
 
 # Database setup
 

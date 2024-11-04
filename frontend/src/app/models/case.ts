@@ -14,5 +14,9 @@ export interface Case {
     phoneNumber: string;
     notes: string;
     status: string;
+    numOfPets: number;
+    species: string;
+    isExpanded: boolean;
+    isDeleted: boolean;
 }
   

@@ -1,0 +1,81 @@
+<div class="edit-case container">
+    <h2 class="text-center p-3">Edit Pet Case #{{ case.id }}</h2>
+
+    <h3 class="text-left">Contact Details</h3>
+
+    <form #editCaseForm="ngForm">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>First Name: </label>
+                <input class="form-control" [(ngModel)]="case.firstName" name="firstName" required #firstName="ngModel" placeholder="First Name"/>
+                <div *ngIf="firstName.invalid && firstName.touched" class="text-danger">First Name is required.</div>
+            </div>
+            <div class="col-md-6">
+                <label>Last Name: </label>
+                <input class="form-control" [(ngModel)]="case.lastName" name="lastName" required #lastName="ngModel" placeholder="Last Name"/>
+                <div *ngIf="lastName.invalid && lastName.touched" class="text-danger">Last Name is required.</div>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <label>Phone Number: </label>
+                <input class="form-control" 
+                    [(ngModel)]="case.phoneNumber" 
+                    name="phoneNumber" 
+                    type="text" 
+                    required 
+                    #phoneNumber="ngModel" 
+                    placeholder="Phone Number" 
+                />
+                <div *ngIf="phoneNumber.invalid && (phoneNumber.dirty || phoneNumber.touched)" class="text-danger">
+                    <div *ngIf="phoneNumber.errors?.['required']">Phone number is required.</div>
+                    <div *ngIf="phoneNumber.errors?.['pattern']">Invalid phone number format.</div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="p-3">
+
+        <h3 class="text-left">Case Details</h3>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>Status: </label>
+                <select class="form-select" [(ngModel)]="case.status" name="status">
+                    <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label># of Pets: </label>
+                <input class="form-control" [(ngModel)]="case.numOfPets" name="numOfPets" type="number" required #numOfPets="ngModel" placeholder="Number of Pets"/>
+                <div *ngIf="numOfPets.invalid && (numOfPets.dirty || numOfPets.touched)" class="text-danger">
+                    Please enter a valid number for the number of pets.
+                </div>
+                <div *ngIf="case.numOfPets < 0 && (numOfPets.dirty || numOfPets.touched)" class="text-danger">
+                    Number of pets cannot be negative.
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <label>Species: </label>
+                <select class="form-select" [(ngModel)]="case.species" name="species">
+                    <option *ngFor="let specie of species" [value]="specie">{{ specie }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12">
+                <label>Notes: </label>
+                <textarea class="form-control" [(ngModel)]="case.notes" name="notes" placeholder="Notes" rows="6"></textarea>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 3%;">
+            <button class="btn btn-secondary" (click)="cancel()" style="width: 100px">Cancel</button>
+            <button class="btn btn-primary" type="submit" style="width: 100px" (click)="save(editCaseForm)" [disabled]="editCaseForm.invalid || case.numOfPets < 0">Save</button>
+        </div>
+    </form>
+</div>
+

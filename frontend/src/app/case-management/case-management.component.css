@@ -1,0 +1,14 @@
+
+/* Used to truncate the notes for displaying in the cases table */
+.truncate {
+    display: inline-block; /* Required for truncation */
+    max-width: 200px;
+    white-space: nowrap; /* Prevents wrapping */
+    overflow: hidden; /* Hides overflow text */
+    text-overflow: ellipsis; /* Shows ellipsis when text is too long */
+}
+
+.text-justify {
+    text-align: justify;
+}
+  
