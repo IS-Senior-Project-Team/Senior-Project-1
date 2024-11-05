@@ -1,0 +1,58 @@
+/* This file contains the styling for the reporting component */
+
+/* HStack means the container's elements are stacked left to right */
+.hstack {
+    display: flex;
+    flex-direction: row;
+    margin-top: 15%;
+}
+.select-menu {
+    background-color: rgba(255, 255, 255, 0);
+    border: white;
+    margin-inline: 20px;
+    font-size: x-large;
+}
+.select-caption {
+    font-size: x-small;
+    padding-left: 22px;
+}
+
+.export-container {
+    position: relative;
+    width: 96%;
+}
+
+.export-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #4DC959;
+    padding-block: 5px;
+    color: rgba(255, 255, 255, 0.919);
+    border-color: rgba(255, 255, 255, 0);
+    border-radius: 10px;
+}
+
+.canvas-container {
+    flex: 1;
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+}
+
+.report-container {
+    height: 600px;
+}
+
+.report-table {
+    border-collapse: collapse;
+}
+
+.report-row {
+    height: 10px;
+    margin: 100px;
+}
+
+.report-col {
+    padding-right: 25px;
+}

@@ -3,7 +3,6 @@ import cors from 'cors';
 import multer from 'multer';
 import path from 'path';
 import { postUpload } from './controllers/upload';
-
 const app = express();
 const port = process.env.PORT || 3000;
 
