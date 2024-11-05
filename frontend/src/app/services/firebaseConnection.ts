@@ -59,8 +59,6 @@ export async function getCaseById(caseId: string): Promise<Case | null> {
   return null;
 }
 
-
-
 export async function getContacts() {
   const contactsCol = collection(db, 'contacts');
   const contactsSnapshot = await getDocs(contactsCol);
