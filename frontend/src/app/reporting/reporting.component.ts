@@ -1,24 +1,30 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { CasesService } from '../services/cases.service';
 import { Case } from '../models/case';
 import { jsPDF } from 'jspdf';
-import Chart from 'chart.js/auto';
 import { CommonModule } from '@angular/common';
+import * as Highcharts from 'highcharts';
+import ExportingModule from 'highcharts/modules/exporting';
+import { HighchartsChartComponent, HighchartsChartModule } from 'highcharts-angular';
+import 'datatables.net';
+import $ from 'jquery';
+
+// Initialize the exporting module
+ExportingModule(Highcharts);
 
 @Component({
   selector: 'app-reporting',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HighchartsChartModule],
   templateUrl: './reporting.component.html',
-  styleUrl: './reporting.component.css'
+  styleUrls: ['./reporting.component.css']
 })
-export class ReportingComponent implements OnInit {
-  // ViewChild for the chart element
-  @ViewChild('outcomeChart', { static: false }) outcomeChart!: ElementRef;
-
-  // Data
+export class ReportingComponent implements OnInit, OnDestroy {
+  Highcharts: typeof Highcharts = Highcharts;
+  chartOptions: Highcharts.Options | undefined;
+  pieChartOptions: Highcharts.Options | undefined;
   cases: Case[] = [];
-  chart: any;
+  dataTable: any;
 
   // Filter values
   // Each value needs to be unique, so "All" won't work here
@@ -30,96 +36,264 @@ export class ReportingComponent implements OnInit {
 
   status: string = "All statuses"
   statuses: string[] = ['All statuses', 'Open', 'Closed']; 
+  
+  @ViewChild('casesTable', { static: false }) table!: ElementRef;
 
-  constructor(private caseService: CasesService) {}
+  public mainChartInstance: Highcharts.Chart | null = null;
+  public chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
+    this.mainChartInstance = chart;
+  };
 
-  // Called when the component is initialized, like viewDidLoad in iOS
+  constructor(private caseService: CasesService, private cd: ChangeDetectorRef) {}
+
   ngOnInit(): void {
     this.refreshData();
   }
 
-  // Method for updating the chart and table data based on filters
+  ngOnDestroy(): void {
+    // Destroy DataTable instance when the component is destroyed to prevent memory leaks
+    if (this.dataTable) {
+      this.dataTable.destroy(true);
+    }
+  }
+
   refreshData(): void {
-    this.caseService.getAll(this.status == "All statuses" ? undefined : this.status).then((data) => {
+    this.caseService.getAll().then((data) => {
       this.cases = data;
-      this.createChart();
+      this.createBarChart();
+      this.createPieChart();
+      
+      // Trigger change detection to ensure the view is updated
+      this.cd.detectChanges();
+      
+      // Reinitialize the DataTable after data is loaded and view is updated
+      this.reinitializeDataTable();
     });
   }
 
   /**
-   * Creates a chart visualization using Chart.js
+   * Initializes the DataTable only if it hasn't been initialized already.
    */
-  createChart(): void {
-
-    // flatMap returns cases where the status is not undefined
-    const filteredCases = this.cases.flatMap(outcome => {
-      const status = outcome.status;
-      return status !== undefined ? [outcome] : [];
-    });
-
-    // Get the outcomes (status) from the cases
-    const outcomes = filteredCases.map(outcome => outcome.status);
-    // Reduce (break down) the outcomes to a dictionary of counts
-    const outcomeCounts = outcomes.reduce((acc: any, outcome: string) => {
-      acc[outcome] = (acc[outcome] || 0) + 1;
-      return acc;
-    }, {});
-    
-    // Create the chart data from the outcome counts
-    const chartData = {
-      labels: Object.keys(outcomeCounts),
-      datasets: [
-        {
-          label: 'Pet Care Outcomes',
-          data: Object.values(outcomeCounts),
-        },
-      ],
-    };
-
-    // Create the bar chart
-    this.chart = new Chart(this.outcomeChart.nativeElement, {
-      type: 'bar',
-      data: chartData,
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-          },
-        },
-      },
-    });
+  initializeDataTable(): void {
+    if (!$.fn.DataTable.isDataTable(this.table.nativeElement)) {
+      console.log("Initializing DataTable...");
+      this.dataTable = $(this.table.nativeElement).DataTable({
+        pageLength: 5,
+        lengthChange: false,
+        ordering: true,
+        searching: true,
+        autoWidth: false,
+      });
+    } else {
+      console.log("DataTable already initialized.");
+    }
   }
 
-  // This does not use html rather it uses a JS library jsPDF
   /**
-   * Generates a PDF report containing the chart and case data
-   * @returns Promise that resolves when PDF generation is complete
+   * Safely reinitializes the DataTable by destroying the existing instance if it exists,
+   * then initializing it again.
+   */
+  reinitializeDataTable(): void {
+    if (this.dataTable) {
+      this.dataTable.destroy(true); // Destroy the existing instance
+      this.dataTable = null; // Reset the reference
+    }
+    this.initializeDataTable(); // Initialize DataTable again
+  }
+
+  /**
+   * Generates a PDF report containing the chart and table data.
    */
   async generatePDF(): Promise<void> {
     const doc = new jsPDF();
     doc.text('Pet Care Outcomes Report', 10, 10);
 
-    // Convert chart to image
-    const chartImage = this.outcomeChart.nativeElement.toDataURL('image/png', 1.0);
-    doc.addImage(chartImage, 'PNG', 10, 20, 180, 100);
+    if (this.mainChartInstance) {
+      try {
+        // Get SVG from the chart instance
+        const svg = this.mainChartInstance.getSVG();
 
-    // Add table
-    let y = 130;
+        // Convert SVG to a PNG image
+        const imgData = await this.convertSVGToImage(svg);
+
+        // Add the image to the PDF
+        doc.addImage(imgData, 'PNG', 10, 20, 180, 100);
+      } catch (error) {
+        console.error("Error converting SVG to image:", error);
+      }
+    } else {
+      console.error("Chart instance is not available.");
+    }
+
+    // Add table data
+    let yPosition = 130;
     this.cases.forEach((outcome, index) => {
-      doc.text(`${index + 1}. ${outcome.lastName}: ${outcome.status}`, 10, y);
-      y += 10;
+      doc.text(`${index + 1}. ${outcome.firstName}: ${outcome.status}`, 10, yPosition);
+      yPosition += 10;
     });
 
+    // Save the PDF
     doc.save('pet-care-outcomes-report.pdf');
   }
 
-    /**
+  /**
+   * Converts SVG string to a PNG image data URL.
+   * @param svg - The SVG string from the chart.
+   * @returns A promise that resolves to the image data URL.
+   */
+  convertSVGToImage(svg: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          const pngData = canvas.toDataURL('image/png', 1.0);
+          resolve(pngData);
+        } else {
+          reject(new Error("Could not get canvas context."));
+        }
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = (err) => {
+        reject(err);
+      };
+      img.src = url;
+    });
+  }
+
+  getOutcomeCounts(): { [key: string]: number } {
+    return this.cases.reduce((acc: any, outcome: Case) => {
+      acc[outcome.status] = (acc[outcome.status] || 0) + 1;
+      return acc;
+    }, {});
+  }
+
+  createBarChart(): void {
+    const outcomeCounts = this.getOutcomeCounts();
+    const categories = Object.keys(outcomeCounts);
+    const data = Object.values(outcomeCounts).map(count => Number(count));
+
+    this.chartOptions = {
+      chart: {
+        type: 'column',
+        backgroundColor: 'rgba(0,0,0,0)',
+        height: 300,
+      },
+      title: {
+        text: 'Cases this week',
+        align: 'left',
+        style: {
+          fontSize: '18px',
+          fontWeight: 'bold',
+          color: '#333333'
+        }
+      },
+      xAxis: {
+        categories: categories,
+        title: {
+          text: null,
+        },
+        labels: {
+          style: {
+            color: '#666666'
+          }
+        }
+      },
+      yAxis: {
+        min: 0,
+        title: {
+          text: null,
+        },
+        gridLineColor: '#e0e0e0',
+        labels: {
+          style: {
+            color: '#666666'
+          }
+        }
+      },
+      legend: {
+        enabled: false,
+      },
+      plotOptions: {
+        column: {
+          borderRadius: 5,
+          pointPadding: 0.2,
+          groupPadding: 0.1,
+          color: '#4DC959',
+        }
+      },
+      series: [
+        {
+          name: 'Cases',
+          type: 'column',
+          data: data,
+          color: '#4DC959',
+        },
+      ],
+    };
+  }
+
+  createPieChart(): void {
+    const outcomeCounts = this.getOutcomeCounts();
+    const pieData = Object.entries(outcomeCounts).map(([name, value]) => ({
+      name,
+      y: value,
+    }));
+
+    this.pieChartOptions = {
+      chart: {
+        type: 'pie',
+        backgroundColor: 'rgba(0,0,0,0)',
+      },
+      title: {
+        text: 'Case distribution',
+        align: 'left',
+        style: {
+          fontSize: '18px',
+          fontWeight: 'bold',
+          color: '#333333'
+        }
+      },
+      tooltip: {
+        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>',
+      },
+      accessibility: {
+        enabled: false,
+      },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          dataLabels: {
+            enabled: true,
+            format: '{point.name}: {point.y}',
+            style: {
+              color: '#666666',
+            }
+          },
+          colors: ['#4DC959', '#85E085', '#A9E6A9', '#CCECCC']
+        },
+      },
+      series: [
+        {
+          name: 'Cases',
+          type: 'pie',
+          data: pieData,
+        },
+      ],
+    };
+  }
+     /**
      * Updates filters based on select element changes and refreshes data
      * @param event The change event from the select element (see reporting html file for more info)
      */
-    onStatusChange(event: Event): void {
+     onStatusChange(event: Event): void {
       const newValue = (event.target as HTMLSelectElement).value;
 
       // Update the filter value from the html element and refresh the data
