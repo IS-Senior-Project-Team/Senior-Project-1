@@ -6,6 +6,8 @@ import { CommonModule } from '@angular/common';
 import { getCases, getContacts } from '../services/firebaseConnection';
 import { DocumentData } from 'firebase/firestore';
 import { FirebaseContact } from '../../../../backend/src/models/FirebaseTestObj'
+import { Config } from 'datatables.net'
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-case-management',
@@ -20,6 +22,8 @@ export class CaseManagementComponent implements OnInit {
   cases: Case[] = [];
   showDeleted: boolean = false; // Toggle to show/hide deleted cases
   showDeletedMessage = false; // Control visibility of the delete button message
+  dtoptions: Config = {};
+  dttrigger: Subject<any> = new Subject<any>();
 
   /*
   testDBArray: DocumentData[] = [];
@@ -31,6 +35,7 @@ export class CaseManagementComponent implements OnInit {
   ngOnInit(): void {
     //Load case data
     this.loadCases();
+    this.dttrigger.next(null)
     //this.gotFirebaseContacts()
   }
 
