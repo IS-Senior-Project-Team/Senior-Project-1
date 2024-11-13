@@ -5,7 +5,7 @@
   "main": "index.ts",
   "private": true,
   "scripts": {
-    "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\"",
+    "start": "npm run start-frontend",
     "start-backend": "nodemon backend/src/index.ts",
     "start-frontend": "cd frontend && ng serve",
     "build": "npm run build-frontend",

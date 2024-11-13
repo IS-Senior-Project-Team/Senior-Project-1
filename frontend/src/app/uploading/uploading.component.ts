@@ -17,6 +17,7 @@ export class UploadingComponent {
   isWaitwhileVisible = false;
   isVoiceCall = false;
   editData = false;
+  checkData = true;
 
   constructor(private uploadService: UploadsService, private papa: Papa) {}
 
@@ -47,6 +48,8 @@ export class UploadingComponent {
     })
   }
 
+
+  //Will not need for current, need to overwrite button
   uploadFileToActivity() {
     if (this.filesToUpload) {
       this.uploadService.postFiles(this.filesToUpload).subscribe(
