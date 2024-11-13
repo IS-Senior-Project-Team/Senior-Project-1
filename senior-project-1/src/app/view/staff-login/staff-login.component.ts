@@ -15,24 +15,24 @@ export class StaffLoginComponent {
 
   constructor (private router : Router, private authSvc : AuthService) {}
 
-  username: string = '';
+  email: string = '';
   password: string = '';
   errorMessage: string = '';
 
 
   loginUser() {
-    if (!this.username || !this.password) {
+    if (!this.email || !this.password) {
       this.errorMessage = 'Please enter both username and password';
       return;
     }
-    this.authSvc.loginUser(this.username, this.password).subscribe({
+    this.authSvc.loginUser(this.email, this.password).subscribe({
       next: (isLoggedIn) => {
         if (isLoggedIn) {
           this.router.navigate(['case-management']);
         } else {
           alert('Invalid username or password')
           this.errorMessage = 'Invalid username or password';
-          this.username = '';
+          this.email = '';
           this.password = '';
         }
       },

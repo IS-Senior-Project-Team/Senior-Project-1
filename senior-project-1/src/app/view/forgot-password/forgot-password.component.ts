@@ -42,6 +42,10 @@ export class ForgotPasswordComponent {
       }
     });
   }
+  
+  toggleLogin () {
+    this.router.navigate(['login'])
+  }
 
 
 }

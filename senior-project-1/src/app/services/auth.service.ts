@@ -45,16 +45,18 @@ export class AuthService {
     );
   }
 
-  loginUser ( username: string, password: string) : Observable<any> {
+  loginUser ( email: string, password: string) : Observable<any> {
     
-    return this.httpClient.get<StaffInfo[]>(`http://localhost:3000/staffMembers?staff_username=${username}&staff_password=${password}`).pipe(
+    return this.httpClient.get<StaffInfo[]>(`http://localhost:3000/staffMembers?staff_email=${email}&staff_password=${password}`).pipe(
       map(users => {
         if (users.length > 0) {
           sessionStorage.setItem('loggedInUser', JSON.stringify(users[0]));
+          console.log(sessionStorage.getItem('loggedInUser'))
+          sessionStorage.setItem('userId', users[0].id.toString()); // Optionally store just the ID
           return true;
         } else {
           // No matching user found
-          console.log("Invalid username or password")
+          console.log("Invalid email or password")
           return false;
         }
       }),
@@ -90,7 +92,7 @@ export class AuthService {
           const userId = String(user.id);
           user.staff_password = newPassword;
 
-          return this.httpClient.post<StaffInfo>(`http://localhost:3000/staffMembers/?${userId}`, user).pipe(
+          return this.httpClient.post<StaffInfo>(`http://localhost:3000/staffMembers/?${userId}`, user).pipe( //SHOULD BE PATCH ==> FIX LATER
             map(updatedUser => updatedUser),
             catchError(err => {
               console.error('Error updating password:', err);
@@ -108,4 +110,16 @@ export class AuthService {
     );
   }
 
+  getCurrentUserProfile(): Observable<StaffInfo> {
+    const loggedInUser = sessionStorage.getItem('loggedInUser');//TRY TO CHANGE LOGGEDIN USER TO USERID INSTEAD SINCE THE ID IS ALREADY POPULATED AFTER LOGIN
+    if (!loggedInUser) {
+      throw new Error('User not logged in.');
+    }
+    // const userId = JSON.parse(loggedInUser);
+    const userId = JSON.parse(loggedInUser).id; 
+    // const user = JSON.parse(loggedInUser);
+    // const userId = typeof user.id === 'string' ? parseInt(user.id, 10) : user.id;
+    
+    return this.httpClient.get<StaffInfo>(`http://localhost:3000/staffMembers/${userId}`);
+  }
 }

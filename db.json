@@ -19,7 +19,7 @@
   ],
   "staffMembers": [
     {
-      "id": 1,
+      "id": "1",
       "staff_firstname": "David",
       "staff_lastname": "Fashokun",
       "staff_email": "davidfashokun@gmail.com",
@@ -27,6 +27,91 @@
       "staff_password": "password",
       "staff_address": "",
       "staff_phone": "9047145794"
+    },
+    {
+      "id": 2,
+      "staff_firstname": "fash",
+      "staff_lastname": "david",
+      "staff_email": "him@email",
+      "staff_username": "david",
+      "staff_password": "password",
+      "staff_address": [
+        {
+          "street": "3451 Saland Way",
+          "city": "Jacksonville",
+          "state": "FL",
+          "zip_code": "32246"
+        }
+      ],
+      "staff_phone": "9045555555"
+    },
+    {
+      "id": 3,
+      "staff_firstname": "Daniel",
+      "staff_lastname": "Fashokun",
+      "staff_email": "fash@email",
+      "staff_username": "fash",
+      "staff_password": "password",
+      "staff_address": [
+        {
+          "street": "3451 Salad Way",
+          "city": "Jacksonville",
+          "state": "FL",
+          "zip_code": "32213"
+        }
+      ],
+      "staff_phone": "5555555555"
+    },
+    {
+      "id": 4,
+      "staff_firstname": "Micah",
+      "staff_lastname": "van Meur",
+      "staff_email": "micah@email",
+      "staff_username": "mvm",
+      "staff_password": "password",
+      "staff_address": [
+        {
+          "street": "123 W Street",
+          "city": "Jacksonville",
+          "state": "FL",
+          "zip_code": "12345"
+        }
+      ],
+      "staff_phone": "1234567890"
+    },
+    {
+      "id": 5,
+      "staff_firstname": "David",
+      "staff_lastname": "Bartholomew",
+      "staff_email": "dee@email",
+      "staff_username": "bmew",
+      "staff_password": "123262366",
+      "staff_address": [
+        {
+          "street": "123 W Street",
+          "city": "Jacksonville",
+          "state": "FL",
+          "zip_code": "32223"
+        }
+      ],
+      "staff_phone": "9041234567"
+    },
+    {
+      "id": 4,
+      "staff_firstname": "Micah",
+      "staff_lastname": "van Meur",
+      "staff_email": "micah@email",
+      "staff_username": "mvm",
+      "staff_password": "password123",
+      "staff_address": [
+        {
+          "street": "123 W Street",
+          "city": "Jacksonville",
+          "state": "FL",
+          "zip_code": "12345"
+        }
+      ],
+      "staff_phone": "1234567890"
     }
   ]
 }

@@ -1,0 +1,30 @@
+<div class="profile-container" *ngIf="staffProfile; else loadingOrError">
+    <div class="profile-header">
+        <h2>Your Account</h2>
+    </div>
+    <div class="profile-details">
+    <p><strong>First Name:</strong> {{ staffProfile.staff_firstname }}</p>
+    <p><strong>Last Name:</strong> {{ staffProfile.staff_lastname }}</p>
+    <p><strong>Email:</strong> {{ staffProfile.staff_email }}</p>
+    <p><strong>Username:</strong> {{ staffProfile.staff_username }}</p>
+    <p><strong>Phone:</strong> {{ staffProfile.staff_phone }}</p>
+    <div *ngIf="staffProfile?.staff_address">
+        <h3>Address:</h3>
+        <p *ngFor="let address of staffProfile.staff_address">
+          {{ address.street }}, {{ address.city }}, {{ address.state }}, {{ address.zip_code }}
+        </p>
+    </div>
+  </div>
+  <button class="btn btn-danger custom-margin-top" (click)="toggleCases()">Go Back</button>
+  <button class="btn btn-primary custom-margin-top">Edit</button>
+</div>
+
+  
+  
+  <ng-template #loadingOrError>
+    <div *ngIf="errorMessage; else loading">
+      <p class="error">{{ errorMessage }}</p>
+    </div>
+    <ng-template #loading>
+      <p>Loading profile...</p>
+    </ng-template>

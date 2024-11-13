@@ -1,3 +1,16 @@
+<mat-toolbar>
+  <!-- <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span>My App</span> -->
+  <span class="example-spacer"></span>
+  <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
+    <mat-icon (click)="logout()">logout</mat-icon>
+  </button>
+  <button [routerLink]="['/account']" mat-icon-button class="example-icon" aria-label="Example icon-button with share icon">
+    <mat-icon >account_circle</mat-icon>
+  </button>
+</mat-toolbar>
 <div class="case-management">
     <h2>Manage Cases</h2>
      <table class="table opaque-bg" *ngIf="cases.length > 0">

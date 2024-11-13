@@ -22,8 +22,8 @@ export class RegisterStaffComponent {
     staff_email: '',
     staff_username: '',
     staff_password: '',
-    staff_address: '',
-    staff_phone: 0
+    staff_address: [{street:"",city:"",state:"",zip_code:undefined}],
+    staff_phone: undefined
   }
   errorMessage:string = '';
 
