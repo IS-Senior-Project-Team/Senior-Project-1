@@ -60,7 +60,7 @@
         <div class="upload-icon">
             <span>+</span>
         </div>
-        <p>Drag & drop or click to choose files</p>
+        <p>Click to choose files</p>
     </div>
 
     <input type="file" 
@@ -71,7 +71,8 @@
            (change)="handleFileInput($event)"
            style="display: none;">
     
-    <div class="file-item" *ngFor="let file of filesToUpload">
+    <!-- Commented out section for listing files and removing - maybe temporary -->
+    <!-- <div class="file-item" *ngFor="let file of filesToUpload">
         <div class="file-info">
             <span class="file-icon">📄</span>
             <div class="file-details">
@@ -82,8 +83,8 @@
         <div class="file-actions">
             <button class="delete-btn" (click)="removeFile(file)">🗑</button>
         </div>
-    </div>
-    <button class="upload-file-btn" accept=".csv" [disabled]="filesToUpload?.length == 0 || filesToUpload == null" (click)="uploadFileToActivity()">Upload</button>
+    </div> -->
+    <button class="upload-file-btn" accept=".csv" [disabled]="filesToUpload?.length == 0 || filesToUpload == null" (click)="upload()">Upload</button>
 </div>
 
 <div id="dataViewer" *ngIf="checkData">

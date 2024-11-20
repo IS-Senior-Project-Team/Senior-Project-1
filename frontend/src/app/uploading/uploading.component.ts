@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule, NgFor, NgForOf } from '@angular/common';
 import { UploadsService } from '../services/uploads.service';
 import { Papa, ParseResult } from "ngx-papaparse";
+import { Case } from '../models/case';
+import { CasesService } from '../services/cases.service';
 
 @Component({
   selector: 'app-uploading',
@@ -17,9 +19,9 @@ export class UploadingComponent {
   isWaitwhileVisible = false;
   isVoiceCall = false;
   editData = false;
-  checkData = true;
+  checkData = false;
 
-  constructor(private uploadService: UploadsService, private papa: Papa) {}
+  constructor(private uploadService: UploadsService, private papa: Papa, private caseService: CasesService) {}
 
   enableEditData() {
     this.editData = true
@@ -50,19 +52,36 @@ export class UploadingComponent {
 
 
   //Will not need for current, need to overwrite button
-  uploadFileToActivity() {
-    if (this.filesToUpload) {
-      this.uploadService.postFiles(this.filesToUpload).subscribe(
-        // console.log(data)
-        data => {
-          console.log("File upload successful:", data);
-        },
-        error => {
-          console.error("File upload error:", error);
-        }
-      );
-    }
+  async upload() {
+    let uploadCase: Case;
+    let successfulUpload = await this.caseService.createCase( //Need to make this grab information (with the use of regex) from the page; id is expected to be overwritten
+      {
+          id: "100",
+          firstName: "test",
+          lastName: "lastNameTest",
+          phoneNumber: "1234567890",
+          notes: "test notes",
+          status: "Open",
+          numOfPets: 1,
+          species: "Dog",
+          isExpanded: false,
+          isDeleted: false
+      }
+    );
   }
+  // uploadFileToActivity() {
+  //   if (this.filesToUpload) {
+  //     this.uploadService.postFiles(this.filesToUpload).subscribe(
+  //       // console.log(data)
+  //       data => {
+  //         console.log("File upload successful:", data);
+  //       },
+  //       error => {
+  //         console.error("File upload error:", error);
+  //       }
+  //     );
+  //   }
+  // }
 
   removeFile(file: File) {
     const index = this.filesToUpload?.indexOf(file);
