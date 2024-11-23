@@ -1,103 +1,106 @@
 {
-  "hash": "54823eef",
-  "configHash": "8fb76e16",
-  "lockfileHash": "ca80f344",
-  "browserHash": "1c34c684",
+  "hash": "38fc2ef0",
+  "configHash": "37764af3",
+  "lockfileHash": "c6ac0f65",
+  "browserHash": "6ad54430",
   "optimized": {
     "@angular/common": {
       "src": "../../../../../../node_modules/@angular/common/fesm2022/common.mjs",
       "file": "@angular_common.js",
-      "fileHash": "f9e5ac20",
+      "fileHash": "f09d7248",
       "needsInterop": false
     },
     "@angular/common/http": {
       "src": "../../../../../../node_modules/@angular/common/fesm2022/http.mjs",
       "file": "@angular_common_http.js",
-      "fileHash": "f0f48f34",
+      "fileHash": "4b5411fb",
       "needsInterop": false
     },
     "@angular/core": {
       "src": "../../../../../../node_modules/@angular/core/fesm2022/core.mjs",
       "file": "@angular_core.js",
-      "fileHash": "a34143a6",
+      "fileHash": "0d96b136",
       "needsInterop": false
     },
     "@angular/forms": {
       "src": "../../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
       "file": "@angular_forms.js",
-      "fileHash": "9e3b6802",
+      "fileHash": "37907bd7",
       "needsInterop": false
     },
     "@angular/platform-browser": {
       "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
       "file": "@angular_platform-browser.js",
-      "fileHash": "2e39b583",
+      "fileHash": "1d192c9b",
       "needsInterop": false
     },
     "@angular/router": {
       "src": "../../../../../../node_modules/@angular/router/fesm2022/router.mjs",
       "file": "@angular_router.js",
-      "fileHash": "588ea7a2",
+      "fileHash": "5a00374e",
       "needsInterop": false
     },
     "chart.js/auto": {
       "src": "../../../../../../node_modules/chart.js/auto/auto.js",
       "file": "chart__js_auto.js",
-      "fileHash": "33a35b6d",
+      "fileHash": "3d85a461",
       "needsInterop": false
     },
     "firebase/analytics": {
       "src": "../../../../../../node_modules/firebase/analytics/dist/esm/index.esm.js",
       "file": "firebase_analytics.js",
-      "fileHash": "3e0270fa",
+      "fileHash": "21236b9e",
       "needsInterop": false
     },
     "firebase/app": {
       "src": "../../../../../../node_modules/firebase/app/dist/esm/index.esm.js",
       "file": "firebase_app.js",
-      "fileHash": "d8e8e6a1",
+      "fileHash": "3a1b4fc1",
       "needsInterop": false
     },
     "firebase/firestore": {
       "src": "../../../../../../node_modules/firebase/firestore/dist/esm/index.esm.js",
       "file": "firebase_firestore.js",
-      "fileHash": "edb763f0",
+      "fileHash": "360069bd",
       "needsInterop": false
     },
     "jspdf": {
       "src": "../../../../../../node_modules/jspdf/dist/jspdf.es.min.js",
       "file": "jspdf.js",
-      "fileHash": "c066f13a",
+      "fileHash": "44cb247e",
       "needsInterop": false
     },
     "ngx-papaparse": {
       "src": "../../../../../../node_modules/ngx-papaparse/fesm2022/ngx-papaparse.mjs",
       "file": "ngx-papaparse.js",
-      "fileHash": "3a4bcf60",
+      "fileHash": "2f9df073",
       "needsInterop": false
     },
     "rxjs": {
       "src": "../../../../../../node_modules/rxjs/dist/esm5/index.js",
       "file": "rxjs.js",
-      "fileHash": "bf4958f2",
+      "fileHash": "30b6f983",
+      "needsInterop": false
+    },
+    "xlsx": {
+      "src": "../../../../../../node_modules/xlsx/xlsx.mjs",
+      "file": "xlsx.js",
+      "fileHash": "4f6c7517",
       "needsInterop": false
     }
   },
   "chunks": {
-    "html2canvas.esm-5FL2HQ32": {
-      "file": "html2canvas__esm-5FL2HQ32.js"
-    },
-    "purify.es-T7XRDMOL": {
-      "file": "purify__es-T7XRDMOL.js"
-    },
     "index.es-UHHBRIO4": {
       "file": "index__es-UHHBRIO4.js"
     },
     "chunk-QZOA7BLV": {
       "file": "chunk-QZOA7BLV.js"
     },
-    "chunk-VAF4SHK2": {
-      "file": "chunk-VAF4SHK2.js"
+    "html2canvas.esm-5FL2HQ32": {
+      "file": "html2canvas__esm-5FL2HQ32.js"
+    },
+    "purify.es-T7XRDMOL": {
+      "file": "purify__es-T7XRDMOL.js"
     },
     "chunk-WI2KPVIX": {
       "file": "chunk-WI2KPVIX.js"
@@ -113,6 +116,9 @@
     },
     "chunk-5SMUZN2I": {
       "file": "chunk-5SMUZN2I.js"
+    },
+    "chunk-VAF4SHK2": {
+      "file": "chunk-VAF4SHK2.js"
     },
     "chunk-TWWAJFRB": {
       "file": "chunk-TWWAJFRB.js"
