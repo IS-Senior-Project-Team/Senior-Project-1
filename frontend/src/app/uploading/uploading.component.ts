@@ -39,7 +39,6 @@ export class UploadingComponent {
   editData(index: number) {
     let file: File = this.filesToUpload[index]
     this.enableEditData()
-    console.log(index)
 
 
 
