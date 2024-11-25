@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
+import $ from 'jquery';
+import 'datatables.net';
+import 'datatables.net-buttons';
+import 'datatables.net-buttons-dt';
 import { Router } from '@angular/router';
 import { Case } from '../models/case';
 import { CasesService } from '../services/cases.service';
@@ -17,47 +21,138 @@ import { Subject } from 'rxjs';
   styleUrl: './case-management.component.css',
   providers: [CasesService]
 })
-export class CaseManagementComponent implements OnInit {
+export class CaseManagementComponent implements OnInit, AfterViewInit, AfterViewChecked {
+  @ViewChild('dataTable', { static: false }) dataTable!: ElementRef;
 
   cases: Case[] = [];
   showDeleted: boolean = false; // Toggle to show/hide deleted cases
   showDeletedMessage = false; // Control visibility of the delete button message
-  dtoptions: Config = {};
-  dttrigger: Subject<any> = new Subject<any>();
+  private dtInitialized = false; // Track the DataTable initialization state
 
-  /*
-  testDBArray: DocumentData[] = [];
-  testDBObjects: FirebaseContact[] = [];
-  */
-
-  constructor(private router: Router, private casesService: CasesService) {}
+  constructor(private router: Router, private casesService: CasesService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     //Load case data
     this.loadCases();
-    this.dttrigger.next(null)
-    //this.gotFirebaseContacts()
+    this.bindTableEvents();
   }
 
-  /*
-  // Test method for Firebase implementation
-  async gotFirebaseContacts() {
-    //Get all Contacts documents
-    await getContacts().then(result => this.testDBArray?.push(result))
-    this.testDBArray.forEach(elem => {
-      //drill down to the objects and add each to the array
-      elem['forEach']((element: FirebaseContact) => {
-        // console.log(element)
-        this.testDBObjects.push(element)
+  ngOnDestroy() {
+    $('body').off('click', '[data-action="edit"]');
+    $('body').off('click', '[data-action="delete"]');
+    $('body').off('click', '[data-action="recover"]');
+  }
+  
+  ngAfterViewInit() {
+    this.cdr.detectChanges();
+  }
+  
+  ngAfterViewChecked() {
+    if (this.dataTable && !this.dtInitialized) {
+      this.initDataTable();
+    }
+  }
+
+  private bindTableEvents(): void {
+    $('body').on('click', '[data-action="edit"]', (event) => {
+      const caseId = $(event.currentTarget).data('id');
+      this.editCase(caseId);
+    });
+
+    $('body').on('click', '[data-action="delete"]', (event) => {
+      const row = $(event.currentTarget).closest('tr');
+      const rowData = $(this.dataTable.nativeElement)
+        .DataTable()
+        .row(row)
+        .data();
+      this.deleteCase(rowData);
+    });
+
+    $('body').on('click', '[data-action="recover"]', (event) => {
+      const row = $(event.currentTarget).closest('tr');
+      const rowData = $(this.dataTable.nativeElement)
+        .DataTable()
+        .row(row)
+        .data();
+      this.recoverCase(rowData);
+    });
+  }
+
+  private renderActions(caseItem: Case): string {
+    if (caseItem.isDeleted) {
+      return `
+        <button class="btn btn-link" data-action="recover" data-id="${caseItem.id}">
+          <img src="undo.png" alt="Recover" style="width: 25px; height: 25px;">
+        </button>`;
+    } else {
+      return `
+        <button class="btn btn-link" data-action="edit" data-id="${caseItem.id}">
+          <img src="edit-icon.png" alt="Edit" style="width: 25px; height: 25px;">
+        </button>
+        <button class="btn btn-link" data-action="delete" data-id="${caseItem.id}">
+          <img src="red-trashcan-icon.png" alt="Delete" style="width: 25px; height: 25px;">
+        </button>`;
+    }
+  }
+
+  private initDataTable(): void {
+    if (this.dataTable) {
+      $(this.dataTable.nativeElement).DataTable().destroy(); // Destroy existing instance
+      $(this.dataTable.nativeElement).DataTable({
+        data: this.displayedCases,
+        columns: [
+          { data: 'firstName' },
+          { data: 'lastName' },
+          { data: 'phoneNumber' },
+          { data: 'notes' },
+          { data: 'status' },
+          { data: 'numOfPets' },
+          { data: 'species' },
+          {
+            data: null,
+            orderable: false,
+            searchable: false,
+            render: (data: any, type: any, row: any) => this.renderActions(row)
+          }
+        ],
+        pageLength: 5,
+        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+        language: {
+          lengthMenu: "Display _MENU_ records per page",
+          zeroRecords: "Nothing Found",
+          info: "Showing page _PAGE_ of _PAGES_",
+          infoEmpty: "No records available",
+          infoFiltered: "(filtered from _MAX_ total records)"
+        },
+        layout: {
+          topStart: 'pageLength',
+          topEnd: {
+            search: {
+              placeholder: 'Search'
+            }
+          }
+        }
       });
-    })
+      this.dtInitialized = true;
+    } else {
+      console.error('DataTable element not found.');
+    }
   }
-  */
 
+  private reInitDataTable(): void {
+    if (this.dataTable) {
+      const dataTableInstance = $(this.dataTable.nativeElement).DataTable();
+      dataTableInstance.clear();
+      dataTableInstance.rows.add(this.displayedCases);
+      dataTableInstance.draw();
+    }
+  }
+  
   //Fetch and load all case data
   loadCases(): void {
     this.casesService.getAll().then((data: Case[]) => {
       this.cases = data;
+      this.reInitDataTable(); // Reinitialize the DataTable after data is loaded
     });
   }
 
@@ -68,16 +163,9 @@ export class CaseManagementComponent implements OnInit {
   // Method to toggle the showDeleted 
   toggleShowDeleted() {
     this.showDeleted = !this.showDeleted;
+    this.reInitDataTable(); // Reinitialize the DataTable when toggling the view
   }
 
-  // Method to toggle the deleted cases message
-  toggleDeletedMessage() {
-    if (this.showDeletedMessage == true) {
-      this.showDeletedMessage = false;
-    } else {
-      this.showDeletedMessage = true;
-    }
-  }
 
   // Check if there are any deleted cases
   hasDeletedCases(): boolean {
@@ -94,7 +182,9 @@ export class CaseManagementComponent implements OnInit {
     if (confirmDelete) {
       // set the case's deleted flag to true
       caseItem.isDeleted = true;
-      this.casesService.updateCase(caseItem).subscribe();
+      this.casesService.updateCase(caseItem).subscribe(() => {
+        this.reInitDataTable(); // Reinitialize the DataTable after deleting a case
+      });
     } else {
       console.log('Delete case canceled.')
     }
@@ -107,12 +197,13 @@ export class CaseManagementComponent implements OnInit {
     if (confirmRecover) {
       // set the case's deleted flag to true
       caseItem.isDeleted = false;
-      this.casesService.updateCase(caseItem).subscribe();
-
-      // Check if all deleted cases have been recovered
-      if (!this.hasDeletedCases()) {
-        this.showDeleted = false; // Reset the showDeleted flag
-      }
+      this.casesService.updateCase(caseItem).subscribe(() => {
+        if (!this.hasDeletedCases()) {
+          this.showDeleted = false;
+        }
+        this.reInitDataTable(); // Reinitialize the DataTable after recovering a case
+        window.location.reload();
+      });
     } else {
       console.log('Recover case canceled')
     }
@@ -127,11 +218,13 @@ export class CaseManagementComponent implements OnInit {
   get displayedCases() {
     // Return deleted cases if showDeleted is active or "true"
     // Return regular cases if showDeleted is not active or "false"
-    return this.showDeleted ? this.cases.filter(item => item.isDeleted) : this.cases.filter(item => !item.isDeleted);
+    const filteredCases = this.showDeleted ? this.cases.filter(item => item.isDeleted) : this.cases.filter(item => !item.isDeleted);
+    return filteredCases;
   }
 
   // Get the amount/count of deleted cases
   get deletedCasesCount() {
     return this.cases.filter(item => item.isDeleted).length;
   }
+
 }

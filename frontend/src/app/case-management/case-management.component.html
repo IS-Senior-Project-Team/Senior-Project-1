@@ -1,28 +1,22 @@
 
 <div class="case-management vh-100 p-3">
-  <h2 class="text-center p-3">Manage Pet Cases</h2>
 
-  <button class="btn btn-secondary m-2" 
-          (click)="toggleShowDeleted()" 
-          [disabled]="!hasDeletedCases()">
-      {{ showDeleted ? 'Hide' : 'Show' }} Deleted Cases
-  </button>
+  <div class="card shadow-sm" *ngIf="displayedCases.length > 0">
+    <div class="card-body">
+      <h2 class="text-center p-3">Manage Pet Cases</h2>
 
-  <p class="m-2">
-    Deleted cases: {{ deletedCasesCount }}
+      <div class="d-flex justify-content-start mb-3">
+        <button class="btn btn-secondary" 
+                (click)="toggleShowDeleted()" 
+                [disabled]="!hasDeletedCases()">
+            {{ showDeleted ? 'Hide' : 'Show' }} Deleted Cases
+        </button>
+      </div>
 
-    <span *ngIf="deletedCasesCount === 0 && showDeletedMessage === true"> 
-      - The button is disabled when there are 0 deleted cases.
-    </span>
-
-    <button *ngIf="deletedCasesCount === 0" class="btn btn-link" (click)="toggleDeletedMessage()">
-      {{ showDeletedMessage ? 'Hide' : 'Show' }} Message
-    </button>
-  </p>
-
-  <table datatable [dtOptions]="dtoptions" [dtTrigger]="dttrigger" id="cases-table" class="table-striped" style="width:100%" *ngIf="displayedCases.length > 0">
-      <thead>
-          <tr class="text-center">
+      <div class="table-responsive">
+        <table #dataTable class="display table table-striped table-hover mb-0" style="width:100%">
+          <thead>
+            <tr class="text-center">
               <th scope="col">First Name</th>
               <th scope="col">Last Name</th>
               <th scope="col">Phone Number</th>
@@ -31,64 +25,53 @@
               <th scope="col"># of Pets</th>
               <th scope="col">Species</th>
               <th scope="col">Actions</th>
-          </tr>
-      </thead>
-      <tbody>
-          <ng-container *ngFor="let item of displayedCases">
-              <tr [class.table-danger]="item.isDeleted" class="text-center">
-                  <td>{{ item.firstName }}</td>
-                  <td>{{ item.lastName }}</td>
-                  <td>{{ item.phoneNumber }}</td>
-                  <td>
-                      <div [ngClass]="{'truncate': !item.isExpanded}" class="text-justify">
-                          {{ item.notes }}
-                      </div>
-                      <button *ngIf="item.notes.length > 0" (click)="toggleReadMore(item)" class="btn btn-link">
-                          {{ item.isExpanded ? 'Show Less' : 'Read More' }}
-                      </button>
-                  </td>
-                  <td>{{ item.status }}</td>
-                  <td>{{ item.numOfPets }}</td>
-                  <td>{{ item.species }}</td>
-                  <td>
-                      <button *ngIf="!item.isDeleted" class="btn btn-link" (click)="editCase(item.id)">
-                        <img src="/edit-icon.png" alt="Edit" style="width: 25px; height: 25px;">
-                      </button>
-
-                      <button class="btn btn-link" *ngIf="!item.isDeleted" (click)="deleteCase(item)">
-                          <img src="/red-trashcan-icon.png" alt="Delete" style="width: 30px; height: 30px;">
-                      </button>
-
-                      <button class="btn btn-link" *ngIf="item.isDeleted" (click)="recoverCase(item)">
-                          <img src="/undo.png" alt="Recover" style="width: 25px; height: 25px;">
-                      </button>
-                  </td>
-              </tr>
-          </ng-container>
-      </tbody>
-  </table>
-</div>
-
-    <!--
-    <div id="testReadDB">
-      <div id="dbItems">
-        <table style="border: 1px black solid;">
-          <thead>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Phone #</th>
-            <th>Notes</th>
+            </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let elem of testDBObjects">
-              <td>{{ elem['firstName'] }}</td>
-              <td>{{ elem['lastName'] }}</td>
-              <td>{{ elem['phoneNumber'] }}</td>
-              <td>{{ elem['notes'] }}</td>
-            </tr>
+            <ng-container *ngFor="let item of displayedCases">
+              <tr [class.table-danger]="item.isDeleted" class="text-center">
+                <td>{{ item.firstName }}</td>
+                <td>{{ item.lastName }}</td>
+                <td>{{ item.phoneNumber }}</td>
+                <td>
+                  <div [ngClass]="{'truncate': !item.isExpanded}" class="text-justify">
+                    {{ item.notes }}
+                  </div>
+                  <button *ngIf="item.notes.length > 0" 
+                          (click)="toggleReadMore(item)" 
+                          class="btn btn-link p-0">
+                    {{ item.isExpanded ? 'Show Less' : 'Read More' }}
+                  </button>
+                </td>
+                <td>{{ item.status }}</td>
+                <td>{{ item.numOfPets }}</td>
+                <td>{{ item.species }}</td>
+                <td>
+                  <div class="d-flex justify-content-center gap-2">
+                    <button *ngIf="!item.isDeleted" 
+                            class="btn btn-link p-1" 
+                            (click)="editCase(item.id)">
+                      <img src="edit-icon.png" alt="Edit" style="width: 25px; height: 25px;">
+                    </button>
+
+                    <button *ngIf="!item.isDeleted" 
+                            class="btn btn-link p-1" 
+                            (click)="deleteCase(item)">
+                      <img src="red-trashcan-icon.png" alt="Delete" style="width: 25px; height: 25px;">
+                    </button>
+
+                    <button *ngIf="item.isDeleted" 
+                            class="btn btn-link p-1" 
+                            (click)="recoverCase(item)">
+                      <img src="undo.png" alt="Recover" style="width: 25px; height: 25px;">
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
           </tbody>
         </table>
       </div>
     </div>
-    -->
-  
+  </div>
+</div>
