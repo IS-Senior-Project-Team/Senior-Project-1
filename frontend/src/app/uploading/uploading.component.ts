@@ -27,7 +27,7 @@ export class UploadingComponent {
   CSVType = 'text/csv';
 
   constructor(private uploadService: UploadsService, private papa: Papa, private caseService: CasesService) {}
-  
+
   enableEditData() {
     this.isEditingData = true
   }
@@ -35,16 +35,15 @@ export class UploadingComponent {
   disableEditData() {
     this.isEditingData = false
   }
-  
+
   editData(index: number) {
     let file: File = this.filesToUpload[index]
     this.enableEditData()
-    console.log(index)
 
-    
+
 
     // file.text().then(result => this.infoTest?.push(this.parseCSV(result)))
-    
+
 
     // <td>{{ item.data[1][2] }}</td>
     // <td>{{ item.data[1][3] }}</td>
@@ -74,9 +73,13 @@ export class UploadingComponent {
   }
 
   handleFileInput(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input?.files) {
-      this.filesToUpload = Array.from(input.files);
+    debugger;
+    const input = event.currentTarget as HTMLInputElement;
+    const fileList: FileList | null = input.files;
+
+    if (fileList) {
+      const files = Array.from(fileList);
+      this.filesToUpload = files
       // for(let file of Array.from(input?.files)) {
       //   this.filesToUpload.push(file);
       // }
@@ -132,7 +135,7 @@ export class UploadingComponent {
     if (confirmation) {
       // console.log(index);
       if ((index ?? -2) > -1) {
-        this.filesToUpload?.splice((index ?? 0), 1); 
+        this.filesToUpload?.splice((index ?? 0), 1);
       }
     }
 
@@ -143,7 +146,7 @@ export class UploadingComponent {
   //   const index = this.filesToUpload?.indexOf(file);
   //    // Check if the file is found in the array
   //   if ((index ?? -2) > -1) {
-  //     this.filesToUpload?.splice((index ?? 0), 1); 
+  //     this.filesToUpload?.splice((index ?? 0), 1);
   //   }
   // }
 }
