@@ -16,7 +16,7 @@ import { CasesService } from '../services/cases.service';
 export class UploadingComponent {
 
   filesToUpload: File[] = [];
-  infoTest: ParseResult[] | null = [];
+  parsedCSVs: ParseResult[] | null = [];
   cases: Case[] = [];
   isWaitwhileVisible = false;
   isVoiceCall = false;
