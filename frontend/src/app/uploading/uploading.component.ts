@@ -17,6 +17,7 @@ export class UploadingComponent {
 
   filesToUpload: File[] = [];
   parsedCSVs: ParseResult[] | null = [];
+  parsedFiles: JSON | null = null;
   cases: Case[] = [];
   isWaitwhileVisible = false;
   isVoiceCall = false;
@@ -65,15 +66,48 @@ export class UploadingComponent {
   }
 
   parseXLSX(file: File) {
-    const fileBuffer = file.arrayBuffer().then(undefined) //broken
-    let excel = XLSX.read(file.arrayBuffer)
-    file.arrayBuffer()
+    // const fileBuffer = file.arrayBuffer().then(undefined) //broken
+    // let excel = XLSX.read(file.arrayBuffer)
+    // file.arrayBuffer()
     // console.log('State: ')
     // console.log(fileBuffer)
+    let workBook: XLSX.WorkBook;
+    let jsonData: JSON[] = [];
+    const reader = new FileReader();
+    // const file = ev.target.files[0];
+    reader.onload = (event) => {
+      // debugger;
+      const data = reader.result;
+      workBook = XLSX.read(data, { type: 'binary' });
+      jsonData = XLSX.utils.sheet_to_json(workBook.Sheets["VM log"]);
+
+      let line1 = JSON.parse(JSON.stringify(jsonData[0]))
+      let line2 = JSON.parse(JSON.stringify(jsonData[1]))
+      console.log("jsonData:")
+      console.log(line1);
+      console.log(line2);
+  
+      let c: Case = {
+        id: "",
+        firstName: "",
+        lastName: "",
+        phoneNumber: String(line2["Phone Number"]),
+        notes: line1["Message"],
+        status: line1["Status"],
+        numOfPets: line1["# Pets (if PSN/RH)"],
+        species: line1["Species"],
+        isExpanded: false,
+        isDeleted: false
+      }
+      // this.cases.push(c)
+    }
+    reader.readAsBinaryString(file);
+    // jsonData = JSON.parse(JSON.stringify(jsonData));
+    // jsonData = JSON.stringify(jsonData)
   }
 
   handleFileInput(event: Event) {
-    debugger;
+    // debugger;
     const input = event.currentTarget as HTMLInputElement;
     const fileList: FileList | null = input.files;
 
