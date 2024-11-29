@@ -131,10 +131,16 @@
     border: solid black 1px;
     margin-top: 0;
     padding: 10px 5px;
+    /* width: 80%; */
 }
 .table1 td,tr,th {
     /* border: solid black 1px; */
+
     padding: 5px 10px;
+}
+.tableFileInfo {
+    /* width: auto; */
+    /* width: 100px; */
 }
 
 .fileCard {
@@ -182,6 +188,13 @@
     width: 75px;
     margin-left: 0;
 }
+.applyButton {
+    background-color: #00ffff;
+    color: black;
+    width: 130px;
+    /* padding: 5px 5px 5px 5px; */
+    margin-left: 0;
+}
 
 #dataViewer {
     width: 60vw;
@@ -197,7 +210,7 @@
 }
 
 .scrollArea {
-    height: 95%;
+    height: 90%;
     overflow-y: auto;
     margin-bottom: 10px;
     background-color: white;

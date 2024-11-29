@@ -5,6 +5,7 @@ import { Papa, ParseResult } from "ngx-papaparse";
 import * as XLSX from "xlsx";
 import { Case } from '../models/case';
 import { CasesService } from '../services/cases.service';
+import { CaseFile } from '../models/caseFile';
 
 @Component({
   selector: 'app-uploading',
@@ -17,15 +18,17 @@ export class UploadingComponent {
 
   filesToUpload: File[] = [];
   parsedCSVs: ParseResult[] | null = [];
-  parsedFiles: JSON | null = null;
-  cases: Case[] = [];
-  isWaitwhileVisible = false;
-  isVoiceCall = false;
+  // parsedFiles: JSON | null = null;
+  // isWaitwhileVisible = false;
+  // isVoiceCall = false;
   isEditingData = false;
   checkData = false;
-  currentFile: File | null = null;
+  files: CaseFile[] = [];
+  currentFileName: string = "";
+  currentFile: Case[] = [];
   XLSXType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   CSVType = 'text/csv';
+  phoneShape = /[0-9]{10}$/;
 
   constructor(private uploadService: UploadsService, private papa: Papa, private caseService: CasesService) {}
 
@@ -39,13 +42,65 @@ export class UploadingComponent {
 
   editData(index: number) {
     let file: File = this.filesToUpload[index]
+    
+    this.currentFileName = file.name
+    this.currentFile = this.files[index].cases
     this.enableEditData()
-
-
-
     // file.text().then(result => this.infoTest?.push(this.parseCSV(result)))
+  }
+  
+  cancel(){
+    let confirmAlert = confirm("Are you sure you want to cancel?")
+    if (confirmAlert) { this.disableEditData() }
+  }
 
+  apply() {
+    let confirmAlert = confirm("Are you sure you want to apply the changes?")
+    if (confirmAlert) { this.disableEditData() }
+  }
+  
+  async parseCSV(file: File){
+    let returnable = this.papa.parse(await file.text())
+    let thisFile: CaseFile = {name: file.name, cases: []}
+    let data = returnable.data
+    // console.log(data)
+    for(let row = 1; row < returnable.data.length-1; row++){
+      // debugger;
+      let phoneNum: string = data[row][4]
+      let phoneExec: RegExpExecArray | null = this.phoneShape.exec(phoneNum)
+      if (phoneExec != null) { phoneNum = phoneExec[0] } 
+      else { phoneNum = "" }
+      // console.log("phoneNum: " + phoneExec?.[0])
 
+      // (phoneExec == null) ? "" : this.phoneShape.exec(phoneNum)?.[1]
+
+      let c: Case = {
+        id: "",
+        firstName: data[row][2],
+        lastName: data[row][3],
+        phoneNumber: phoneNum,
+        notes: "",
+        status: data[row][153],
+        numOfPets: data[row][168],
+        species: data[row][158],
+        isExpanded: false,
+        isDeleted: false
+      }
+      // console.log(c)
+      thisFile.cases.push(c)
+    }
+    this.files.push(thisFile)
+
+    console.log('CaseFiles:')
+    console.log(this.files)
+
+    // <th>First Name</th>
+    // <th>Last Name</th>
+    // <th>Phone #</th>
+    // <th>Outcome</th>
+    // <th>Animal Type</th>
+    // <th># of Pets</th>
+    // <th>Behavior Concerns</th>
     // <td>{{ item.data[1][2] }}</td>
     // <td>{{ item.data[1][3] }}</td>
     // <td>{{ item.data[1][4] }}</td>
@@ -55,59 +110,48 @@ export class UploadingComponent {
     // <td>{{ item.data[1][188] }}</td>
   }
 
-  cancel(){
-    let confirmAlert = confirm("Are you sure you want to cancel?")
-    if (confirmAlert) { this.disableEditData() }
-  }
-
-  parseCSV(file: Blob){
-    let returnable = this.papa.parse(file)
-    return returnable
-  }
-
   parseXLSX(file: File) {
-    // const fileBuffer = file.arrayBuffer().then(undefined) //broken
-    // let excel = XLSX.read(file.arrayBuffer)
-    // file.arrayBuffer()
-    // console.log('State: ')
-    // console.log(fileBuffer)
     let workBook: XLSX.WorkBook;
     let jsonData: JSON[] = [];
     const reader = new FileReader();
-    // const file = ev.target.files[0];
     reader.onload = (event) => {
-      // debugger;
       const data = reader.result;
       workBook = XLSX.read(data, { type: 'binary' });
       jsonData = XLSX.utils.sheet_to_json(workBook.Sheets["VM log"]);
 
-      let line1 = JSON.parse(JSON.stringify(jsonData[0]))
-      let line2 = JSON.parse(JSON.stringify(jsonData[1]))
-      console.log("jsonData:")
-      console.log(line1);
-      console.log(line2);
+      // In this spot, startingLine would need to be held (more likely held in firebase) to get the current line that is being read. 
+      // From there, the xlsx would be parsed and read line by line and the last line that was read would be recorded.
+      let startingLine = 0;
+      const thisFile: CaseFile = {name: file.name, cases: []} // Create a CaseFile object that holds the name of the file it is based off of and the cases in that file
+      for(let i = startingLine; i < jsonData.length; i += 2){
+        let line1 = JSON.parse(JSON.stringify(jsonData[i]))
+        let line2 = JSON.parse(JSON.stringify(jsonData[i+1]))
+          // console.log("jsonData:")
+          // console.log(line1);
+          // console.log(line2);
   
-      let c: Case = {
-        id: "",
-        firstName: "",
-        lastName: "",
-        phoneNumber: String(line2["Phone Number"]),
-        notes: line1["Message"],
-        status: line1["Status"],
-        numOfPets: line1["# Pets (if PSN/RH)"],
-        species: line1["Species"],
-        isExpanded: false,
-        isDeleted: false
+        //Create the Case that is pushed to the CaseFile object
+        let c: Case = {
+          id: "",
+          firstName: "",
+          lastName: "",
+          phoneNumber: String(line2["Phone Number"]),
+          notes: line1["Message"],
+          status: line1["Status"],
+          numOfPets: line1["# Pets (if PSN/RH)"],
+          species: line1["Species"],
+          isExpanded: false,
+          isDeleted: false
+        }
+        thisFile.cases.push(c) // Push all of the cases to the CaseFile object
       }
-      // this.cases.push(c)
+      this.files.push(thisFile) // Push the CaseFile object to this.files so that the index can be used for populating the edit data modal
+
     }
     reader.readAsBinaryString(file);
-    // jsonData = JSON.parse(JSON.stringify(jsonData));
-    // jsonData = JSON.stringify(jsonData)
   }
 
   handleFileInput(event: Event) {
-    // debugger;
     const input = event.currentTarget as HTMLInputElement;
     const fileList: FileList | null = input.files;
 
@@ -129,9 +173,11 @@ export class UploadingComponent {
       }
     });
 
+    // console.log('CaseFiles:')
+    // console.log(this.files)
   }
-
-
+  
+  
   async upload() {
     let uploadCase: Case;
     let successfulUpload = await this.caseService.createCase( //Need to make this grab information (with the use of regex) from the page; id is expected to be overwritten
@@ -165,6 +211,7 @@ export class UploadingComponent {
   // }
 
   removeFile(index: number) {
+    // Need to add more to this, removing the file from this.files as well
     let confirmation = confirm('Are you sure you want to remove this file?')
     if (confirmation) {
       // console.log(index);
