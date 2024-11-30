@@ -29,6 +29,16 @@ export class UploadingComponent {
   XLSXType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   CSVType = 'text/csv';
   phoneShape = /[0-9]{10}$/;
+  species = ["Cat", "Dog", "Kitten", "Puppy"];
+  statuses = ["Already Rehomed", "Asked for more info", "Bad # or No VM", 
+    "Duplicate", "Found Pet", "Keeping-Behavior", "Keeping- Medical", 
+    "Keeping- Other", "Kitten Pack & S/N", "LM with Info", "Lost Pet", 
+    "No Show Appt", "Not PSN", "Open", "Owner Surrender Intake", "PSN Boarding", 
+    "Rehome Attempt", "Rehome Confirmed", "Reunited", "Surrender Appt", 
+    "Surrender Denied", "Walk-in Surrender Attempt", "Walk-in- Stray Attempt", 
+    "Walk-In- OS Intake", "Walk-in- Stray Intake", "Walk-in- Other", 
+    "Call elevated to management", "ACPS"];
+
 
   constructor(private uploadService: UploadsService, private papa: Papa, private caseService: CasesService) {}
 
@@ -90,24 +100,7 @@ export class UploadingComponent {
       thisFile.cases.push(c)
     }
     this.files.push(thisFile)
-
-    console.log('CaseFiles:')
-    console.log(this.files)
-
-    // <th>First Name</th>
-    // <th>Last Name</th>
-    // <th>Phone #</th>
-    // <th>Outcome</th>
-    // <th>Animal Type</th>
-    // <th># of Pets</th>
-    // <th>Behavior Concerns</th>
-    // <td>{{ item.data[1][2] }}</td>
-    // <td>{{ item.data[1][3] }}</td>
-    // <td>{{ item.data[1][4] }}</td>
-    // <td>{{ item.data[1][153] }}</td>
-    // <td>{{ item.data[1][158] }}</td>
-    // <td>{{ item.data[1][168] }}</td>
-    // <td>{{ item.data[1][188] }}</td>
+    console.log('Got CSV')
   }
 
   parseXLSX(file: File) {
@@ -146,12 +139,19 @@ export class UploadingComponent {
         thisFile.cases.push(c) // Push all of the cases to the CaseFile object
       }
       this.files.push(thisFile) // Push the CaseFile object to this.files so that the index can be used for populating the edit data modal
-
+      console.log('Got XLSX')
     }
     reader.readAsBinaryString(file);
   }
 
   handleFileInput(event: Event) {
+    // console.log('CaseFiles:')
+    // console.log(this.files)
+    
+    // Clear the files lists so that the wrong case files are not still listed
+    this.files = []
+
+
     const input = event.currentTarget as HTMLInputElement;
     const fileList: FileList | null = input.files;
 
@@ -166,15 +166,13 @@ export class UploadingComponent {
     this.filesToUpload.forEach(file => {
       if (file.type == this.XLSXType) {
         this.parseXLSX(file)
-        console.log('Got XLSX')
+        
       } else if (file.type == this.CSVType) {
         this.parseCSV(file)
-        console.log('Got CSV')
+        
       }
     });
 
-    // console.log('CaseFiles:')
-    // console.log(this.files)
   }
   
   

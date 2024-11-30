@@ -96,33 +96,44 @@
         </div>
     </div>
 
-    <div id="dataViewer" *ngIf="isEditingData">
+    <div id="data-viewer" *ngIf="isEditingData">
         <h3>{{ currentFileName }}</h3>
-        <div class="scrollArea">
+        <div id="scroll-area">
             <table id="table1" class="table1">
                 <thead>
                     <tr>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Phone #</th>
-                        <th>Status</th>
-                        <th>Species</th>
-                        <th># of Pets</th>
-                        <th>Message</th>
+                        <th style="width: 130px; min-width: 110px;">First Name</th>
+                        <th style="width: 130px; min-width: 110px;">Last Name</th>
+                        <th style="width: 130px; min-width: 110px;">Phone #</th>
+                        <th style="width: 160px; min-width: 150px;">Status</th>
+                        <th style="width: 80px;">Species</th>
+                        <th style="width: 25px;"># of Pets</th>
+                        <th style="width: 25%; min-width: 300px;">Message/Notes</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <div *ngFor="let row of currentFile; index as i">
-                        <tr>
-                            <td><input class="tableFileInfo" type="text" name="" id="" value="{{ currentFile[i].firstName }}"></td>
-                            <td><input class="tableFileInfo" type="text" name="" id="" value="{{ currentFile[i].lastName }}"></td>
-                            <td><input class="tableFileInfo" type="text" name="" id="" value="{{ currentFile[i].phoneNumber }}"></td>
-                            <td><input class="tableFileInfo" type="text" name="" id="" value="{{ currentFile[i].status }}"></td> <!-- This row should be a drop down  -->
-                            <td><input class="tableFileInfo" type="text" name="" id="" value="{{ currentFile[i].species }}"></td> <!-- This row should be a drop down  -->
-                            <td><input class="tableFileInfo" type="text" name="" id="" value="{{ currentFile[i].numOfPets }}"></td>
-                            <td><input class="tableFileInfo" type="text" name="" id="" value="{{ (currentFile[i].notes.length > 10) ? currentFile[i].notes.substring(0, 10).concat('...') : currentFile[i].notes }}"></td>
-                        </tr>
-                    </div>
+                    <tr *ngFor="let row of currentFile; index as i">
+                        <td><input class="" type="text" name="" id="" value="{{ currentFile[i].firstName }}"></td>
+                        <td><input class="" type="text" name="" id="" value="{{ currentFile[i].lastName }}"></td>
+                        <td><input class="" type="text" name="" id="" value="{{ currentFile[i].phoneNumber }}"></td>
+                        <td>
+                            <!-- <input class="" type="text" name="" id="" value="{{ currentFile[i].species }}"> -->
+                             <select name="" id="" [selectedIndex]="species.indexOf(currentFile[i].species)">
+                                <option *ngFor="let s of statuses" value="{{s}}">{{s}}</option>
+                            </select>
+                        </td>
+                        <td>
+                            <!-- <input class="" type="text" name="" id="" value="{{ currentFile[i].status }}"> -->
+                            <select name="" id="" [selectedIndex]="statuses.indexOf(currentFile[i].status)">
+                                <option *ngFor="let s of species" value="{{s}}">{{s}}</option>
+                            </select>
+                        </td>
+                        <td><input class="" type="text" name="" id="" value="{{ currentFile[i].numOfPets }}"></td> <!-- This column would be better as a number spinner.. -->
+                        <!-- <td><input class="" type="text" name="" id="" value="{{ (currentFile[i].notes.length > 30) ? currentFile[i].notes.substring(0, 30).concat('...') : currentFile[i].notes }}"></td> -->
+                        <td><input class="" type="text" name="" id="" value="{{ currentFile[i].notes }}"></td>
+                            <!-- .concat may not be the best in the above since it changes the value of the text field, which would be what is sent up to database. 
+                             May be best just to let the message stay the same as original data, and let the user move back and forth in the text field as they need to, which may be uncommon anyways -->
+                    </tr>
                 </tbody>
             </table>
         </div>

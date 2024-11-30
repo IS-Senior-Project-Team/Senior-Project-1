@@ -128,19 +128,20 @@
     align-items: center;
 }
 .table1 {
-    border: solid black 1px;
+    /* border: solid black 1px; */
     margin-top: 0;
-    padding: 10px 5px;
-    /* width: 80%; */
+    padding: 10px 10px;
+    width: 100%;
 }
 .table1 td,tr,th {
-    /* border: solid black 1px; */
-
-    padding: 5px 10px;
+    padding: 5px 5px;
 }
-.tableFileInfo {
-    /* width: auto; */
-    /* width: 100px; */
+.table1 th,tbody {
+    border: solid black 1px ;
+}
+td > input[type='text'],select {
+    width: 100%;
+    height: 30px;
 }
 
 .fileCard {
@@ -189,19 +190,19 @@
     margin-left: 0;
 }
 .applyButton {
-    background-color: #00ffff;
+    background-color: #418DF8;
     color: black;
     width: 130px;
     /* padding: 5px 5px 5px 5px; */
     margin-left: 0;
 }
 
-#dataViewer {
-    width: 60vw;
-    height: 80vh;
+#data-viewer {
+    width: 70vw;
+    height: 90vh;
     position: absolute;
-    top: 10%;
-    left: 15%;
+    top: 0;
+    left: 10%;
     z-index: 1;
     background-color: whitesmoke;
     border-radius: 20px;
@@ -209,7 +210,7 @@
     box-shadow: 0px 10px 20px gray;
 }
 
-.scrollArea {
+#scroll-area {
     height: 90%;
     overflow-y: auto;
     margin-bottom: 10px;
