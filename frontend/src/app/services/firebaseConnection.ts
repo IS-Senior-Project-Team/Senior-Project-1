@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc, query, where } from 'firebase/firestore';
 import { Case } from '../models/case';
 import firebase from "firebase/compat/app";
 // Required for side-effects
@@ -41,6 +41,7 @@ export async function getCases(statusFilter: string | undefined): Promise<Case[]
     return casesList;
 }
 
+/*
 // Gets a case from Firebase by id 
 export async function getCaseById(caseId: string): Promise<Case | null> {
   console.log(`Fetching case with stored case ID: ${caseId}`);
@@ -57,6 +58,29 @@ export async function getCaseById(caseId: string): Promise<Case | null> {
 
   console.log("No such document!");
   return null;
+}
+*/
+
+// Gets a case from Firebase by id 
+export async function getCaseById(caseId: string): Promise<Case | null> {
+  console.log(`Fetching case with stored case ID: ${caseId}`);
+  
+  const casesCol = collection(db, 'cases');
+  const q = query(casesCol, where("id", "==", caseId));
+  const querySnapshot = await getDocs(q)
+
+  if (querySnapshot) {
+    let caseData  = {};
+
+    querySnapshot.forEach(doc => {
+      caseData = { id: doc.id, ...doc.data() }
+    });
+  
+    return caseData as Case;
+  } else {
+    console.log("No such document!");
+    return null;
+  }
 }
 
 export async function getContacts() {
