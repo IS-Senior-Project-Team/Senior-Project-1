@@ -26,7 +26,6 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
 
   cases: Case[] = [];
   showDeleted: boolean = false; // Toggle to show/hide deleted cases
-  showDeletedMessage = false; // Control visibility of the delete button message
   private dtInitialized = false; // Track the DataTable initialization state
 
   constructor(private router: Router, private casesService: CasesService, private cdr: ChangeDetectorRef) {}
@@ -104,7 +103,19 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
           { data: 'firstName' },
           { data: 'lastName' },
           { data: 'phoneNumber' },
-          { data: 'notes' },
+          { 
+            data: 'notes',
+            render: function(data, type, row) {
+              // For display type, truncate the text if too long
+              if (type === 'display') {
+                return data && data.length > 75 
+                  ? `<span title="${data}">${data.substring(0, 75)}...</span>` 
+                  : data;
+              }
+              // For sorting, filtering, and other types, return full data
+              return data;
+            }
+          },
           { data: 'status' },
           { data: 'numOfPets' },
           { data: 'species' },
@@ -156,9 +167,11 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     });
   }
 
+  /*
   toggleReadMore(item: Case) {
     item.isExpanded = !item.isExpanded; // Toggle the expanded state for the specific item
   }
+  */
 
   // Method to toggle the showDeleted 
   toggleShowDeleted() {
