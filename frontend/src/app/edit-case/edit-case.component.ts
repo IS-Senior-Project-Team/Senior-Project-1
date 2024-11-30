@@ -63,7 +63,10 @@ export class EditCaseComponent implements OnInit {
     "Adult Dog",
     "Adult Cat",
     "Puppy",
-    "Kitten",
+    "Kitten"
+  ]
+
+  /*
     "Adult Dog, Adult Cat",
     "Adult Dog, Puppy",
     "Adult Dog, Kitten",
@@ -75,7 +78,7 @@ export class EditCaseComponent implements OnInit {
     "Adult Dog, Puppy, Kitten",
     "Adult Cat, Puppy, Kitten",
     "Adult Dog, Adult Cat, Puppy, Kitten",
-  ]
+  */
 
   // Initialize originalCase to later store the original case values
   private originalCase!: Case;
