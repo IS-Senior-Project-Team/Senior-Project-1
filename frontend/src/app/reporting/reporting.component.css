@@ -1,58 +1,162 @@
-/* This file contains the styling for the reporting component */
-
-/* HStack means the container's elements are stacked left to right */
-.hstack {
+/* Container for Export Button and Selectors */
+.export-selectors-container {
     display: flex;
-    flex-direction: row;
-    margin-top: 15%;
-}
-.select-menu {
-    background-color: rgba(255, 255, 255, 0);
-    border: white;
-    margin-inline: 20px;
-    font-size: x-large;
-}
-.select-caption {
-    font-size: x-small;
-    padding-left: 22px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Export Button */
 .export-container {
-    position: relative;
-    width: 96%;
+    padding-right: 15px; 
 }
 
 .export-button {
-    position: absolute;
-    top: 0;
-    right: 0;
     background-color: #4DC959;
-    padding-block: 5px;
-    color: rgba(255, 255, 255, 0.919);
-    border-color: rgba(255, 255, 255, 0);
-    border-radius: 10px;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: medium;
+    transition: background-color 0.3s;
 }
 
-.canvas-container {
-    flex: 1;
-    display: flex; 
-    justify-content: center; 
+.export-button:hover {
+    background-color: #45b34d;
+}
+
+/* Container for Export Button and Selectors */
+.export-selectors-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Export Button */
+.export-button {
+    background-color: #4DC959;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: medium;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.export-button:hover {
+    background-color: #45b34d;
+}
+
+/* Selectors Styling */
+.selectors {
+    display: flex;
+    gap: 15px;
+}
+
+.select-wrapper {
+    display: flex;
+    flex-direction: column;
     align-items: center;
 }
 
-.report-container {
-    height: 600px;
+/* Dropdown Styling */
+.select-menu {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    font-size: large;
+    color: #333;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
+.select-menu:focus {
+    outline: none;
+    border-color: #4DC959; /* Highlight color */
+}
+
+/* Caption Styling */
+.select-caption {
+    font-size: 0.85em;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Main chart styling */
+.main-chart-card {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+/* Horizontal stack layout for pie chart and table */
+.hstack {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    align-items: stretch;
+}
+
+/* Card container for pie chart and table */
+.card-container {
+    flex: 1;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+}
+
+/* DataTable styling */
 .report-table {
+    width: 100%;
     border-collapse: collapse;
+    font-size: medium;
+    text-align: left;
+    margin: 0;
 }
 
-.report-row {
-    height: 10px;
-    margin: 100px;
+.report-table thead th {
+    background-color: transparent;
+    color: #333;
+    padding: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: small;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.report-table tbody tr {
+    background-color: #f4f4f4;
+}
+
+.report-table tbody tr:nth-child(even) {
+    background-color: #e9e9e9;
+}
+
+.report-table tbody tr:hover {
+    background-color: #d9f2e6;
 }
 
 .report-col {
-    padding-right: 25px;
+    padding: 12px 15px;
 }
+

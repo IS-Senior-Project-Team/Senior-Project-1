@@ -16,6 +16,7 @@ export class UploadsService {
   postFiles(filesToUpload: File[]): Observable<UploadResponse> {
     const formData: FormData = new FormData();
     filesToUpload.forEach(file => {
+      // console.log(file)
       formData.append('files', file, file.name);
     });
 
