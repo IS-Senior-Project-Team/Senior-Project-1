@@ -41,6 +41,7 @@ export async function getCases(statusFilter: string | undefined): Promise<Case[]
     return casesList;
 }
 
+/*
 // Gets a case from Firebase by id 
 export async function getCaseById(caseId: string): Promise<Case | null> {
   console.log(`Fetching case with stored case ID: ${caseId}`);
@@ -57,6 +58,29 @@ export async function getCaseById(caseId: string): Promise<Case | null> {
 
   console.log("No such document!");
   return null;
+}
+*/
+
+// Gets a case from Firebase by id 
+export async function getCaseById(caseId: string): Promise<Case | null> {
+  console.log(`Fetching case with stored case ID: ${caseId}`);
+  
+  const casesCol = collection(db, 'cases');
+  const q = query(casesCol, where("id", "==", caseId));
+  const querySnapshot = await getDocs(q)
+
+  if (querySnapshot) {
+    let caseData  = {};
+
+    querySnapshot.forEach(doc => {
+      caseData = { id: doc.id, ...doc.data() }
+    });
+  
+    return caseData as Case;
+  } else {
+    console.log("No such document!");
+    return null;
+  }
 }
 
 //Get the highest value in the id property of all Cases, used to assign IDs to new Cases

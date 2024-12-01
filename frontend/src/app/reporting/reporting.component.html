@@ -1,43 +1,99 @@
-<div>
+<div class="export-selectors-container">
+  <!-- Export to PDF Button -->
   <div class="export-container">
     <button class="export-button" (click)="generatePDF()">Export to PDF</button>
   </div>
 
-    <div class="hstack">
-      <div>
+  <!-- Selectors for Status, TimeFrames, and Species -->
+  <div class="selectors">
+    <div class="select-wrapper">
       <select class="select-menu" (change)="onStatusChange($event)">
         <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
       </select>
       <caption class="select-caption">Statuses</caption>
     </div>
-    <div>
-    <select class="select-menu" (change)="onStatusChange($event)">
-      <option *ngFor="let timeFrame of timeFrames" [value]="timeFrame">{{ timeFrame }}</option>
-    </select>
-    <caption class="select-caption">TimeFrames</caption>
-  </div>
-  <div>
-    <select class="select-menu" (change)="onStatusChange($event)">
-      <option *ngFor="let specie of species" [value]="specie">{{ specie }}</option>
-    </select>
-    <caption class="select-caption">Species</caption>
-  </div>
-  </div>
-    <div class="card">
-     <div class="canvas-container">
-        <canvas #outcomeChart></canvas>
+    <div class="select-wrapper">
+      <select class="select-menu" (change)="onStatusChange($event)">
+        <option *ngFor="let timeFrame of timeFrames" [value]="timeFrame">{{ timeFrame }}</option>
+      </select>
+      <caption class="select-caption">TimeFrames</caption>
     </div>
-  <div class="report-container">
-    <table class="report-table" >
-      <tr class="report-row" >
-        <th class="report-col">Owner Name</th>
-        <th class="report-col">Outcome</th>
-      </tr>
-      <tr class="report-row" *ngFor="let outcome of cases">
-        <td class="report-col">{{ outcome.firstName }}</td>
-        <td class="report-col">{{ outcome.status }}</td>
-      </tr>
-    </table>
+    <div class="select-wrapper">
+      <select class="select-menu" (change)="onStatusChange($event)">
+        <option *ngFor="let specie of species" [value]="specie">{{ specie }}</option>
+      </select>
+      <caption class="select-caption">Species</caption>
+    </div>
   </div>
+</div>
+
+<div class="export-selectors-container">
+  <!-- Export to PDF Button -->
+  <div class="export-container">
+    <button class="export-button" (click)="generatePDF()">Export to PDF</button>
+  </div>
+
+  <!-- Selectors for Status, TimeFrames, and Species -->
+  <div class="selectors">
+    <div class="select-wrapper">
+      <select class="select-menu" (change)="onStatusChange($event)">
+        <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+      </select>
+      <caption class="select-caption">Statuses</caption>
+    </div>
+    <div class="select-wrapper">
+      <select class="select-menu" (change)="onStatusChange($event)">
+        <option *ngFor="let timeFrame of timeFrames" [value]="timeFrame">{{ timeFrame }}</option>
+      </select>
+      <caption class="select-caption">TimeFrames</caption>
+    </div>
+    <div class="select-wrapper">
+      <select class="select-menu" (change)="onStatusChange($event)">
+        <option *ngFor="let specie of species" [value]="specie">{{ specie }}</option>
+      </select>
+      <caption class="select-caption">Species</caption>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="card">
+  <!-- Main Bar Chart Container with #mainChart reference -->
+  <div *ngIf="chartOptions" class="canvas-container main-chart-card" #mainChart>
+    <highcharts-chart
+      [Highcharts]="Highcharts"
+      [options]="chartOptions"
+      style="width: 100%; height: 300px; display: block;">
+    </highcharts-chart>
+  </div>
+
+  <!-- Horizontal Stack for Pie Chart and Table -->
+  <div class="hstack">
+    <!-- Pie Chart Container -->
+    <div *ngIf="pieChartOptions" class="card-container">
+      <highcharts-chart
+        [Highcharts]="Highcharts"
+        [options]="pieChartOptions"
+        style="width: 100%; height: 300px; display: block;">
+      </highcharts-chart>
+    </div>
+
+    <!-- Table Container -->
+    <div class="card-container">
+      <table #casesTable class="report-table display" style="width:100%">
+        <thead>
+          <tr>
+            <th>Owner Name</th>
+            <th>Outcome</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let outcome of cases">
+            <td>{{ outcome.firstName }}</td>
+            <td>{{ outcome.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
