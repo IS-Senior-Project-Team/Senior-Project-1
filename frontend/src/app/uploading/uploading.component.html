@@ -1,6 +1,6 @@
 <div class="body">
-    <div class="tableDiv" *ngFor="let item of parsedCSVs; index as i">
-        <!-- <div *ngIf="isWaitwhileVisible">
+    <!-- <div class="tableDiv" *ngFor="let item of parsedCSVs; index as i">
+        <div *ngIf="isWaitwhileVisible">
             <span>File {{ i+1 }}    </span>
             <span class="editData" (click)="enableEditData()">Edit Data</span>
             <table id="table1" class="table1">
@@ -27,9 +27,9 @@
                     </tr>
                 </tbody>
             </table>
-        </div> -->
+        </div>
 
-    </div>
+    </div> -->
     
     <!-- <div class="tableDiv" *ngFor="let item of parsedCSVs; index as i">
         <div *ngIf="isVoiceCall">
@@ -113,24 +113,24 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let row of currentFile; index as i">
-                        <td><input class="" type="text" name="" id="" value="{{ currentFile[i].firstName }}"></td>
-                        <td><input class="" type="text" name="" id="" value="{{ currentFile[i].lastName }}"></td>
-                        <td><input class="" type="text" name="" id="" value="{{ currentFile[i].phoneNumber }}"></td>
+                        <td><input class="" type="text" name="" id="{{i}}FirstName" value="{{ row.firstName }}"></td>
+                        <td><input class="" type="text" name="" id="{{i}}LastName" value="{{ row.lastName }}"></td>
+                        <td><input class="" type="text" name="" id="{{i}}PhoneNumber" value="{{ row.phoneNumber }}"></td>
                         <td>
                             <!-- <input class="" type="text" name="" id="" value="{{ currentFile[i].species }}"> -->
-                             <select name="" id="" [selectedIndex]="species.indexOf(currentFile[i].species)">
+                             <select name="" id="{{i}}Species" [selectedIndex]="species.indexOf(row.species)">
                                 <option *ngFor="let s of statuses" value="{{s}}">{{s}}</option>
                             </select>
                         </td>
                         <td>
                             <!-- <input class="" type="text" name="" id="" value="{{ currentFile[i].status }}"> -->
-                            <select name="" id="" [selectedIndex]="statuses.indexOf(currentFile[i].status)">
+                            <select name="" id="{{i}}Status" [selectedIndex]="statuses.indexOf(row.status)">
                                 <option *ngFor="let s of species" value="{{s}}">{{s}}</option>
                             </select>
                         </td>
-                        <td><input class="" type="text" name="" id="" value="{{ currentFile[i].numOfPets }}"></td> <!-- This column would be better as a number spinner.. -->
+                        <td><input class="" type="text" name="" id="{{i}}NumPets" value="{{ row.numOfPets }}"></td> <!-- This column would be better as a number spinner.. -->
                         <!-- <td><input class="" type="text" name="" id="" value="{{ (currentFile[i].notes.length > 30) ? currentFile[i].notes.substring(0, 30).concat('...') : currentFile[i].notes }}"></td> -->
-                        <td><input class="" type="text" name="" id="" value="{{ currentFile[i].notes }}"></td>
+                        <td><input class="" type="text" name="" id="{{i}}Notes" value="{{ row.notes }}"></td>
                             <!-- .concat may not be the best in the above since it changes the value of the text field, which would be what is sent up to database. 
                              May be best just to let the message stay the same as original data, and let the user move back and forth in the text field as they need to, which may be uncommon anyways -->
                     </tr>
