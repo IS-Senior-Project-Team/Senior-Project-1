@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Case } from '../models/case';
 import { Observable, from } from 'rxjs';
-import { getCases } from './firebaseConnection';
-import { getCaseById } from './firebaseConnection';
+import { getCases, getCaseById } from './firebaseConnection';
+import { createDoc } from './firebaseConnection';
 import { updateCase as updateCaseInFirebase } from './firebaseConnection';
 
 @Injectable({
@@ -25,5 +25,10 @@ export class CasesService {
   updateCase(caseData: Case): Observable<void> {
     // Convert the promise to an Observable
     return from(updateCaseInFirebase(caseData));
+  }
+
+  //Create a case based off Case data
+  async createCase(caseData: Case): Promise<boolean> {
+    return await createDoc(caseData);
   }
 }

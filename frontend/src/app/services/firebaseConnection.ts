@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc, query, where } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc, query, where, addDoc, DocumentReference, CollectionReference } from 'firebase/firestore';
 import { Case } from '../models/case';
 import firebase from "firebase/compat/app";
 // Required for side-effects
@@ -83,6 +83,30 @@ export async function getCaseById(caseId: string): Promise<Case | null> {
   }
 }
 
+//Get the highest value in the id property of all Cases, used to assign IDs to new Cases
+export async function getCaseHighestID() {
+  const casesCol = collection(db, 'cases');
+  const casesColSnapshot = await getDocs(casesCol);
+  let highestID: string = "";
+  for (let doc of casesColSnapshot.docs) {
+    console.log(doc.id + " " + typeof(doc.id));
+    if (doc.data()['id'] > highestID) {
+      highestID = doc.data()['id'];
+    }
+  }
+  console.log(highestID);
+  return highestID;
+  // casesColSnapshot.docs.sort((a,b) => {
+  //   if (b.id['id'] < a.id) {
+  //     return 1
+  //   }
+  // })
+
+  // let query = query(casesCol, where('id', '==', "1"))
+  // const specific = await getDocs(,casesCol);
+  // const highestValueCase = await casesCol.orderBy('id').limit(1).get();
+}
+
 export async function getContacts() {
   const contactsCol = collection(db, 'contacts');
   const contactsSnapshot = await getDocs(contactsCol);
@@ -117,4 +141,19 @@ export async function updateCase(caseData: Case): Promise<void> {
   await updateDoc(caseRef, data as { [key: string]: any });
 
   console.log(`Case with Firestore document ID ${caseRef.id} updated successfully`);
+}
+
+//Create a case based off information provided from CSV or Excel Sheet data
+export async function createDoc(caseData: Case): Promise<boolean> {
+  let highestID: string = await getCaseHighestID();
+  const casesCol: CollectionReference = collection(db, 'cases');
+
+  let newDoc: DocumentReference | null = null;
+  // UNCOMMENT THE BELOW LINE TO ENABLE UPLOADING
+  // newDoc = await addDoc(casesCol, caseData);
+  if (newDoc == null) {
+    return false;
+  }
+
+  return true;
 }
