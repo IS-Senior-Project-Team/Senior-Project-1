@@ -1,37 +1,5 @@
 <div class="body">
     <!-- <div class="tableDiv" *ngFor="let item of parsedCSVs; index as i">
-        <div *ngIf="isWaitwhileVisible">
-            <span>File {{ i+1 }}    </span>
-            <span class="editData" (click)="enableEditData()">Edit Data</span>
-            <table id="table1" class="table1">
-                <thead>
-                    <tr>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Phone #</th>
-                        <th>Outcome</th>
-                        <th>Animal Type</th>
-                        <th># of Pets</th>
-                        <th>Behavior Concerns</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><input type="text" name="" id="" value="{{ item.data[1][2] }}" [readOnly]="editData"></td>
-                        <td><input type="text" name="" id="" value="{{ item.data[1][3] }}" [readOnly]="editData"></td>
-                        <td><input type="text" name="" id="" value="{{ item.data[1][4] }}" [readOnly]="editData"></td>
-                        <td><input type="text" name="" id="" value="{{ item.data[1][153] }}" [readOnly]="editData"></td>
-                        <td><input type="text" name="" id="" value="{{ item.data[1][158] }}" [readOnly]="editData"></td>
-                        <td><input type="text" name="" id="" value="{{ item.data[1][168] }}" [readOnly]="editData"></td>
-                        <td><input type="text" name="" id="" value="{{ item.data[1][188] }}" [readOnly]="editData"></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-    </div> -->
-    
-    <!-- <div class="tableDiv" *ngFor="let item of parsedCSVs; index as i">
         <div *ngIf="isVoiceCall">
             <span>File {{ i+1 }}</span>
             <table id="table1" class="table1">
@@ -87,7 +55,7 @@
     <button class="upload-file-btn" accept=".csv" [disabled]="filesToUpload.length == 0 || filesToUpload == null" (click)="upload()">Upload</button>
   </div>
 
-    <div class="fileCard" *ngFor="let file of filesToUpload; index as i">
+    <div class="fileCard" *ngFor="let file of files; index as i">
             <h3>File {{ i+1 }}</h3>
             <span class="fileTitle">{{ file.name }}</span>
             <div class="alignRight center">
@@ -106,33 +74,28 @@
                         <th style="width: 130px; min-width: 110px;">Last Name</th>
                         <th style="width: 130px; min-width: 110px;">Phone #</th>
                         <th style="width: 160px; min-width: 150px;">Status</th>
-                        <th style="width: 80px;">Species</th>
+                        <th style="width: 120px; min-width: 100px;">Species</th>
                         <th style="width: 25px;"># of Pets</th>
                         <th style="width: 25%; min-width: 300px;">Message/Notes</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let row of currentFile; index as i">
-                        <td><input class="" type="text" name="" id="{{i}}FirstName" value="{{ row.firstName }}"></td>
-                        <td><input class="" type="text" name="" id="{{i}}LastName" value="{{ row.lastName }}"></td>
-                        <td><input class="" type="text" name="" id="{{i}}PhoneNumber" value="{{ row.phoneNumber }}"></td>
+                        <td><input type="text" [(ngModel)]="row.firstName"></td>
+                        <td><input type="text" [(ngModel)]="row.lastName"></td>
+                        <td><input type="text" [(ngModel)]="row.phoneNumber"></td>
                         <td>
-                            <!-- <input class="" type="text" name="" id="" value="{{ currentFile[i].species }}"> -->
-                             <select name="" id="{{i}}Species" [selectedIndex]="species.indexOf(row.species)">
+                            <select [(ngModel)]="row.status">
                                 <option *ngFor="let s of statuses" value="{{s}}">{{s}}</option>
                             </select>
                         </td>
                         <td>
-                            <!-- <input class="" type="text" name="" id="" value="{{ currentFile[i].status }}"> -->
-                            <select name="" id="{{i}}Status" [selectedIndex]="statuses.indexOf(row.status)">
+                            <select [(ngModel)]="row.species">
                                 <option *ngFor="let s of species" value="{{s}}">{{s}}</option>
                             </select>
                         </td>
-                        <td><input class="" type="text" name="" id="{{i}}NumPets" value="{{ row.numOfPets }}"></td> <!-- This column would be better as a number spinner.. -->
-                        <!-- <td><input class="" type="text" name="" id="" value="{{ (currentFile[i].notes.length > 30) ? currentFile[i].notes.substring(0, 30).concat('...') : currentFile[i].notes }}"></td> -->
-                        <td><input class="" type="text" name="" id="{{i}}Notes" value="{{ row.notes }}"></td>
-                            <!-- .concat may not be the best in the above since it changes the value of the text field, which would be what is sent up to database. 
-                             May be best just to let the message stay the same as original data, and let the user move back and forth in the text field as they need to, which may be uncommon anyways -->
+                        <td><input type="text" [(ngModel)]="row.numOfPets"></td>
+                        <td><input type="text" [(ngModel)]="row.notes"></td>
                     </tr>
                 </tbody>
             </table>

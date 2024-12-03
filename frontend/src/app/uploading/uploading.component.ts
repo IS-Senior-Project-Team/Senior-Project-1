@@ -6,11 +6,12 @@ import * as XLSX from "xlsx";
 import { Case } from '../models/case';
 import { CasesService } from '../services/cases.service';
 import { CaseFile } from '../models/caseFile';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-uploading',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './uploading.component.html',
   styleUrls: ['./uploading.component.css']
 })
@@ -27,7 +28,7 @@ export class UploadingComponent {
   XLSXType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   CSVType = 'text/csv';
   phoneShape = /[0-9]{10}$/;
-  species = ["Cat", "Dog", "Kitten", "Puppy"];
+  species = ["Adult Cat", "Adult Dog", "Cat", "Dog", "Kitten", "Puppy"];
   statuses = ["Already Rehomed", "Asked for more info", "Bad # or No VM", 
     "Duplicate", "Found Pet", "Keeping-Behavior", "Keeping- Medical", 
     "Keeping- Other", "Kitten Pack & S/N", "LM with Info", "Lost Pet", 
@@ -67,32 +68,32 @@ export class UploadingComponent {
     if (!confirmAlert) { return } // Cancel the changes and keep the modal open
     
     // Apply changes to the cases
-    let index = this.index
-    this.files[index].cases.forEach( (currCase, i) => {
-      debugger
-      let firstName: string = document.getElementById(i+"FirstName")?.nodeValue?.toString() ?? "Found null first"
-      let lastName: string = document.getElementById(i+"LastName")?.nodeValue?.toString() ?? "Found null last"
-      let phoneNumber: string = document.getElementById(i+"PhoneNumber")?.nodeValue?.toString() ?? "Found null phone"
-      let notes: string = document.getElementById(i+"Notes")?.nodeValue?.toString() ?? "Found null note"
-      let status: string = document.getElementById(i+"Status")?.nodeValue?.toString() ?? "Found null status"
-      let numberOfPets: string = document.getElementById(i+"NumPets")?.nodeValue?.toString() ?? "Found null numPets"
-      let species: string = document.getElementById(i+"Species")?.nodeValue?.toString() ?? "Found null species"
+    // let index = this.index
+    // this.files[index].cases.forEach( (currCase, i) => {
+      // debugger
+      // let firstName: string = document.getElementById(i+"FirstName")?.nodeValue?.toString() ?? "Found null first"
+      // let lastName: string = document.getElementById(i+"LastName")?.nodeValue?.toString() ?? "Found null last"
+      // let phoneNumber: string = document.getElementById(i+"PhoneNumber")?.nodeValue?.toString() ?? "Found null phone"
+      // let notes: string = document.getElementById(i+"Notes")?.nodeValue?.toString() ?? "Found null note"
+      // let status: string = document.getElementById(i+"Status")?.nodeValue?.toString() ?? "Found null status"
+      // let numberOfPets: string = document.getElementById(i+"NumPets")?.nodeValue?.toString() ?? "Found null numPets"
+      // let species: string = document.getElementById(i+"Species")?.nodeValue?.toString() ?? "Found null species"
   
-      let c: Case = {
-        id: "",
-        firstName: firstName,
-        lastName: lastName,
-        phoneNumber: phoneNumber,
-        notes: notes,
-        status: status,
-        numOfPets: parseInt(numberOfPets),
-        species: species,
-        isExpanded: false,
-        isDeleted: false
-      }
+    //   let c: Case = {
+    //     id: "",
+    //     firstName: firstName,
+    //     lastName: lastName,
+    //     phoneNumber: phoneNumber,
+    //     notes: notes,
+    //     status: status,
+    //     numOfPets: parseInt(numberOfPets),
+    //     species: species,
+    //     isExpanded: false,
+    //     isDeleted: false
+    //   }
   
-      this.files[index].cases[i] = c
-    })
+    //   this.files[index].cases[i] = c
+    // })
     
     console.log(this.currentFile)
     this.disableEditData()
@@ -130,9 +131,6 @@ export class UploadingComponent {
     }
     this.files.push(thisFile)
     console.log('Got CSV')
-
-    console.log("parseCSV print")
-    console.log(this.files)
   }
 
   parseXLSX(file: File) {
@@ -140,6 +138,7 @@ export class UploadingComponent {
     let jsonData: JSON[] = [];
     const reader = new FileReader();
     reader.onload = (event) => {
+      debugger
       const data = reader.result;
       workBook = XLSX.read(data, { type: 'binary' });
       jsonData = XLSX.utils.sheet_to_json(workBook.Sheets["VM log"]);
@@ -179,7 +178,7 @@ export class UploadingComponent {
   handleFileInput(event: Event) {
     // console.log('CaseFiles:')
     // console.log(this.files)
-    
+
     // Clear the files lists so that the wrong case files are not still listed
     this.files = []
 
@@ -195,13 +194,13 @@ export class UploadingComponent {
       // }
     }
 
-    this.filesToUpload.forEach(file => {
+    this.filesToUpload.forEach((file, i) => {
       if (file.type == this.XLSXType) {
         this.parseXLSX(file)
-        
       } else if (file.type == this.CSVType) {
-        this.parseCSV(file)
-        
+        this.parseCSV(file) 
+      } else {
+        this.removeFile(i, false)
       }
     });
 
@@ -255,39 +254,18 @@ export class UploadingComponent {
 
     return true
   }
-  // Old method
-  // uploadFileToActivity() {
-  //   if (this.filesToUpload) {
-  //     this.uploadService.postFiles(this.filesToUpload).subscribe(
-  //       // console.log(data)
-  //       data => {
-  //         console.log("File upload successful:", data);
-  //       },
-  //       error => {
-  //         console.error("File upload error:", error);
-  //       }
-  //     );
-  //   }
-  // }
 
-  removeFile(index: number) {
-    // Need to add more to this, removing the file from this.files as well
-    let confirmation = confirm('Are you sure you want to remove this file?')
+  removeFile(index: number, showPrompt: boolean = true) {
+    let confirmation = true
+    if (showPrompt) {
+      // Need to add more to this, removing the file from this.files as well
+      confirmation = confirm('Are you sure you want to remove this file?')
+    }
     if (confirmation) {
-      // console.log(index);
       if ((index ?? -2) > -1) {
         this.filesToUpload?.splice((index ?? 0), 1);
       }
     }
 
   }
-
-  // Old method
-  // removeFile(file: File) {
-  //   const index = this.filesToUpload?.indexOf(file);
-  //    // Check if the file is found in the array
-  //   if ((index ?? -2) > -1) {
-  //     this.filesToUpload?.splice((index ?? 0), 1);
-  //   }
-  // }
 }
