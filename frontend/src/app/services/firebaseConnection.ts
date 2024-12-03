@@ -30,17 +30,22 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
-// Get all cases
-export async function getCases(statusFilter: string | undefined): Promise<Case[]> {
+// Get all cases with an optional status filter
+export async function getCases(statusFilter?: string): Promise<Case[]> {
   const casesCol = collection(db, 'cases');
-    const casesSnapshot = await getDocs(casesCol);
-    const casesList: Case[] = casesSnapshot.docs.map(doc => doc.data() as Case);
-    if (statusFilter) {
-      return casesList.filter(caseItem => caseItem.status === statusFilter);
-    }
-    return casesList;
+  
+  // Build a query based on the filter
+  const q = statusFilter 
+    ? query(casesCol, where("status", "==", statusFilter)) // Add the filter condition
+    : query(casesCol); // No filter, fetch all
+  
+  const casesSnapshot = await getDocs(q);
+  
+  // Map the documents to the Case type
+  const casesList: Case[] = casesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Case));
+  
+  return casesList;
 }
-
 /*
 // Gets a case from Firebase by id 
 export async function getCaseById(caseId: string): Promise<Case | null> {
