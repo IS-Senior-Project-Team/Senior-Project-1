@@ -1,3 +1,11 @@
+.body {
+    /* border: red solid 1px; */
+    margin-right: 20px;
+    position: absolute;
+    top: 5%;
+    width: 85%;
+}
+
 .file-upload-container {
     width: 400px;
     margin: 20px auto;
@@ -120,11 +128,91 @@
     align-items: center;
 }
 .table1 {
-    border: solid black 1px;
+    /* border: solid black 1px; */
     margin-top: 0;
-    padding: 10px 5px;
+    padding: 10px 10px;
+    width: 100%;
 }
 .table1 td,tr,th {
-    /* border: solid black 1px; */
-    padding: 5px 10px;
+    padding: 5px 5px;
+}
+.table1 th,tbody {
+    border: solid black 1px ;
+}
+td > input[type='text'],select {
+    width: 100%;
+    height: 30px;
+}
+
+.fileCard {
+    border-radius: 20px;
+    height: 100px;
+    background-color: white;
+    box-shadow: 0px 5px 10px gray;
+    padding: 10px 20px;
+    margin: 5px 20%;
+    align-items: center;
+}
+
+.center {
+    position: relative;
+    top: -20%;
+}
+
+.fileTitle {
+    /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: medium; */
+}
+
+.alignRight {
+    float: right;
+}
+
+.fileButton {
+    height: 30px;
+    /* width: 75px; */
+    margin-left: 15px; /* Don't forget this line exists lol */
+}
+.editButton {
+    background-color: blue;
+    color: white;
+    width: 100px;
+}
+.deleteButton {
+    background-color: red;
+    color: white;
+    width: 75px;
+}
+.cancelButton {
+    background-color: grey;
+    color: black;
+    width: 75px;
+    margin-left: 0;
+}
+.applyButton {
+    background-color: #418DF8;
+    color: black;
+    width: 130px;
+    /* padding: 5px 5px 5px 5px; */
+    margin-left: 0;
+}
+
+#data-viewer {
+    width: 70vw;
+    height: 90vh;
+    position: absolute;
+    top: 0;
+    left: 10%;
+    z-index: 1;
+    background-color: whitesmoke;
+    border-radius: 20px;
+    padding: 35px;
+    box-shadow: 0px 10px 20px gray;
+}
+
+#scroll-area {
+    height: 90%;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    background-color: white;
 }

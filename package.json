@@ -5,13 +5,13 @@
   "main": "index.ts",
   "private": true,
   "scripts": {
-    "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\"",
+    "start": "npm run start-frontend",
     "start-backend": "nodemon backend/src/index.ts",
     "start-frontend": "cd frontend && ng serve",
     "build": "npm run build-frontend",
     "build-backend": "tsc -p backend/tsconfig.json",
     "build-frontend": "cd frontend && ng build",
-    "test": "concurrently \"npm run test-backend\" \"npm run test-frontend\"",
+    "test": "npm run test-frontend",
     "test-backend": "cd backend && mocha",
     "test-frontend": "cd frontend && ng test",
     "serve": "node backend/dist/index.js",
@@ -31,7 +31,6 @@
     "angular-datatables": "^18.0.0",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.6",
-    "concurrently": "^9.0.1",
     "datatables.net": "^2.1.8",
     "datatables.net-bs5": "^2.0.3",
     "datatables.net-buttons": "^3.2.0",
@@ -52,6 +51,7 @@
     "pg": "^8.12.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.14.10"
   },
   "devDependencies": {
