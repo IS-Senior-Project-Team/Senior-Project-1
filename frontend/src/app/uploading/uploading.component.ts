@@ -168,13 +168,12 @@ export class UploadingComponent {
         this.removeFile(i, false)
       }
     });
-
   }
   
   allCasesValid(): boolean {
     // If there are any fields that are required to be filled, it would be checked here
 
-
+    
     return true
   }
 

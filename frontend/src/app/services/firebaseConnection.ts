@@ -149,7 +149,6 @@ export async function createDoc(caseData: Case): Promise<boolean> {
   const casesCol: CollectionReference = collection(db, 'cases');
 
   let newDoc: DocumentReference | null = null;
-  // UNCOMMENT THE BELOW LINE TO ENABLE UPLOADING
   newDoc = await addDoc(casesCol, caseData);
   if (newDoc == null) {
     return false;
