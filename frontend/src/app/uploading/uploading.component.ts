@@ -28,7 +28,7 @@ export class UploadingComponent {
   XLSXType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   CSVType = 'text/csv';
   phoneShape = /[0-9]{10}$/;
-  species = ["Adult Cat", "Adult Dog", "Cat", "Dog", "Kitten", "Puppy"];
+  species = ["Adult Cat", "Adult Dog", "Cat", "Dog", "Kitten", "Puppy", "Infant Cat", "Infant Dog"];
   statuses = ["Already Rehomed", "Asked for more info", "Bad # or No VM", 
     "Duplicate", "Found Pet", "Keeping-Behavior", "Keeping- Medical", 
     "Keeping- Other", "Kitten Pack & S/N", "LM with Info", "Lost Pet", 
@@ -55,7 +55,6 @@ export class UploadingComponent {
     this.currentFile = this.files[index].cases
     this.index = index
     this.enableEditData()
-    // file.text().then(result => this.infoTest?.push(this.parseCSV(result)))
   }
   
   cancel(){
@@ -64,36 +63,9 @@ export class UploadingComponent {
   }
 
   apply() {
-    let confirmAlert = confirm("Are you sure you want to apply the changes?")
-    if (!confirmAlert) { return } // Cancel the changes and keep the modal open
-    
-    // Apply changes to the cases
-    // let index = this.index
-    // this.files[index].cases.forEach( (currCase, i) => {
-      // debugger
-      // let firstName: string = document.getElementById(i+"FirstName")?.nodeValue?.toString() ?? "Found null first"
-      // let lastName: string = document.getElementById(i+"LastName")?.nodeValue?.toString() ?? "Found null last"
-      // let phoneNumber: string = document.getElementById(i+"PhoneNumber")?.nodeValue?.toString() ?? "Found null phone"
-      // let notes: string = document.getElementById(i+"Notes")?.nodeValue?.toString() ?? "Found null note"
-      // let status: string = document.getElementById(i+"Status")?.nodeValue?.toString() ?? "Found null status"
-      // let numberOfPets: string = document.getElementById(i+"NumPets")?.nodeValue?.toString() ?? "Found null numPets"
-      // let species: string = document.getElementById(i+"Species")?.nodeValue?.toString() ?? "Found null species"
-  
-    //   let c: Case = {
-    //     id: "",
-    //     firstName: firstName,
-    //     lastName: lastName,
-    //     phoneNumber: phoneNumber,
-    //     notes: notes,
-    //     status: status,
-    //     numOfPets: parseInt(numberOfPets),
-    //     species: species,
-    //     isExpanded: false,
-    //     isDeleted: false
-    //   }
-  
-    //   this.files[index].cases[i] = c
-    // })
+    // The 2 lines below are not needed, as NgModel updates the data in the CaseFile on change
+    // let confirmAlert = confirm("Are you sure you want to apply the changes?")
+    // if (!confirmAlert) { return } // Cancel the changes and keep the modal open
     
     console.log(this.currentFile)
     this.disableEditData()
@@ -108,11 +80,7 @@ export class UploadingComponent {
       // debugger;
       let phoneNum: string = data[row][4]
       let phoneExec: RegExpExecArray | null = this.phoneShape.exec(phoneNum)
-      if (phoneExec != null) { phoneNum = phoneExec[0] } 
-      else { phoneNum = "" }
-      // console.log("phoneNum: " + phoneExec?.[0])
-
-      // (phoneExec == null) ? "" : this.phoneShape.exec(phoneNum)?.[1]
+      phoneExec != null ? phoneNum = phoneExec[0] : phoneNum = ""
 
       let c: Case = {
         id: "",
@@ -138,7 +106,7 @@ export class UploadingComponent {
     let jsonData: JSON[] = [];
     const reader = new FileReader();
     reader.onload = (event) => {
-      debugger
+      // debugger
       const data = reader.result;
       workBook = XLSX.read(data, { type: 'binary' });
       jsonData = XLSX.utils.sheet_to_json(workBook.Sheets["VM log"]);
@@ -150,9 +118,6 @@ export class UploadingComponent {
       for(let i = startingLine; i < jsonData.length; i += 2){
         let line1 = JSON.parse(JSON.stringify(jsonData[i]))
         let line2 = JSON.parse(JSON.stringify(jsonData[i+1]))
-          // console.log("jsonData:")
-          // console.log(line1);
-          // console.log(line2);
   
         //Create the Case that is pushed to the CaseFile object
         let c: Case = {
@@ -206,56 +171,60 @@ export class UploadingComponent {
 
   }
   
-  
+  allCasesValid(): boolean {
+    // If there are any fields that are required to be filled, it would be checked here
+
+
+    return true
+  }
+
   async upload(): Promise<boolean> {
     // debugger
     console.log("Upload print")
     console.log(this.files)
-    let uploadCase: Case;
+    // let uploadCase: Case;
     let successfulUpload;
 
     // TEMP SETUP, gets the first Case of the first CaseFile and uploads it, checking 
     if (this.files[0].cases[0] == undefined) { 
       return false
     } else {
-      uploadCase = this.files[0].cases[0]
-      uploadCase.id = new Date().getTime().toString(); // Get a unique number for the id (seems to have an impact on the system's ability to record the deleted cases)
+      // uploadCase = this.files[0].cases[0]
+      // uploadCase.id = new Date().getTime().toString() // Get a unique number for the id (seems to have an impact on the system's ability to record the deleted cases)
       // if (!allCasesValid()) { halt upload and show required fields }
-      successfulUpload = await this.caseService.createCase(uploadCase);
+      let errorLevel: boolean;
+      this.files.forEach(caseFile => { 
+        caseFile.cases.forEach(async uploadCase => {
+          uploadCase.id = new Date().getTime().toString()
+          errorLevel = await this.caseService.createCase(uploadCase)
+          if (errorLevel == false) { return uploadCase }
+          return true
+        })
+      })
+      // successfulUpload = await this.caseService.createCase(uploadCase);
     }
     
-    console.log("successfulUpload: " + successfulUpload)
+    console.log("Successful Upload?: " + successfulUpload)
     // Loop through each CaseFile that is being stored in "files" and upload all of the cases and upload them using firebaseConnection
     
     // Initial thought process of uploading and confirmation of upload status
     /*
-    let errorLevel: boolean;
-    this.files.forEach(caseFile => { 
-      caseFile.cases.forEach(async uploadCase => {
-        errorLevel = await this.caseService.createCase(uploadCase)
-        if (errorLevel == false) { return uploadCase }
-      })
-    })
+    
     */
        
-       // {
-       //     id: "100",
-       //     firstName: "test",
-       //     lastName: "lastNameTest",
-       //     phoneNumber: "1234567890",
-       //     notes: "test notes",
-       //     status: "Open",
-       //     numOfPets: 1,
-       //     species: "Dog",
-       //     isExpanded: false,
-       //     isDeleted: false
-       // }
+   // Clear the upload queue
+   this.filesToUpload = []
+   this.files = []
 
+   // Alert the user that the upload was succesful
+   alert("The upload was successful! Find the cases you uploaded in the \"Cases\" tab.")
 
+   // Signify that all Cases were uploaded successfully
     return true
   }
 
   removeFile(index: number, showPrompt: boolean = true) {
+    // debugger
     let confirmation = true
     if (showPrompt) {
       // Need to add more to this, removing the file from this.files as well
@@ -264,8 +233,23 @@ export class UploadingComponent {
     if (confirmation) {
       if ((index ?? -2) > -1) {
         this.filesToUpload?.splice((index ?? 0), 1);
+        this.files?.splice((index ?? 0), 1);
       }
     }
-
+    
   }
 }
+
+// ---TEST CASE FOR TESTING---
+// {
+//     id: "100",
+//     firstName: "test",
+//     lastName: "lastNameTest",
+//     phoneNumber: "1234567890",
+//     notes: "test notes",
+//     status: "Open",
+//     numOfPets: 1,
+//     species: "Dog",
+//     isExpanded: false,
+//     isDeleted: false
+// }
