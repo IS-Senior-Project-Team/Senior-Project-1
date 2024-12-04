@@ -41,6 +41,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   public mainChartInstance: Highcharts.Chart | null = null;
   public chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
+    console.log('Chart initialized:', chart);
     this.mainChartInstance = chart;
   };
 
@@ -58,7 +59,13 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   refreshData(): void {
-    this.caseService.getAll().then((data) => {
+    var newStatus: string | undefined = undefined;
+    if(this.status == "All statuses") {
+      newStatus = undefined;
+    } else {
+      newStatus = this.status;
+    }
+    this.caseService.getAll(newStatus).then((data) => {
       this.cases = data;
       this.createBarChart();
       this.createPieChart();
@@ -67,7 +74,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       this.cd.detectChanges();
       
       // Reinitialize the DataTable after data is loaded and view is updated
-      this.reinitializeDataTable();
+      this.initializeDataTable();
     });
   }
 
@@ -87,18 +94,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
     } else {
       console.log("DataTable already initialized.");
     }
-  }
-
-  /**
-   * Safely reinitializes the DataTable by destroying the existing instance if it exists,
-   * then initializing it again.
-   */
-  reinitializeDataTable(): void {
-    if (this.dataTable) {
-      this.dataTable.destroy(true); // Destroy the existing instance
-      this.dataTable = null; // Reset the reference
-    }
-    this.initializeDataTable(); // Initialize DataTable again
   }
 
   /**
