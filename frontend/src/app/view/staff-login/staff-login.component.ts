@@ -15,32 +15,39 @@ export class StaffLoginComponent {
 
   constructor (private router : Router, private authSvc : AuthService) {}
 
-  username: string = '';
+  email: string = '';
   password: string = '';
   errorMessage: string = '';
 
 
   loginUser() {
-    if (!this.username || !this.password) {
-      this.errorMessage = 'Please enter both username and password';
+    if (!this.email || !this.password) {
+      this.errorMessage = 'Please enter both email and password';
       return;
     }
-    this.authSvc.loginUser(this.username, this.password).subscribe({
-      next: (isLoggedIn) => {
-        if (isLoggedIn) {
-          this.router.navigate(['case-management']);
-        } else {
-          alert('Invalid username or password')
-          this.errorMessage = 'Invalid username or password';
-          this.username = '';
-          this.password = '';
-        }
-      },
-      error: (err) => {
-        console.error('Login error:', err);
-        this.errorMessage = 'An error occurred during login';
-      }
-    });
+    this.authSvc.loginUser(this.email, this.password)
+    //this.router.navigate(['case-management'])
+    
+    //Clearing entry after login
+    this.email = "";
+    this.password = "";
+
+    // .subscribe({
+    //   next: (isLoggedIn) => {
+    //     if (isLoggedIn) {
+    //       this.router.navigate(['case-management']);
+    //     } else {
+    //       alert('Invalid username or password')
+    //       this.errorMessage = 'Invalid username or password';
+    //       this.username = '';
+    //       this.password = '';
+    //     }
+    //   },
+    //   error: (err) => {
+    //     console.error('Login error:', err);
+    //     this.errorMessage = 'An error occurred during login';
+    //   }
+    // });
   }
   
   toggleRegister() {

@@ -2,8 +2,9 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc } from 'firebase/firestore';
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail } from "firebase/auth";
 import { Case } from '../models/case';
-import firebase from "firebase/compat/app";
+
 // Required for side-effects
 import "firebase/firestore";
 // Follow this pattern to import other Firebase services
@@ -33,12 +34,12 @@ const db = getFirestore(app);
 // Get all cases
 export async function getCases(statusFilter: string | undefined): Promise<Case[]> {
   const casesCol = collection(db, 'cases');
-    const casesSnapshot = await getDocs(casesCol);
-    const casesList: Case[] = casesSnapshot.docs.map(doc => doc.data() as Case);
-    if (statusFilter) {
-      return casesList.filter(caseItem => caseItem.status === statusFilter);
-    }
-    return casesList;
+  const casesSnapshot = await getDocs(casesCol);
+  const casesList: Case[] = casesSnapshot.docs.map(doc => doc.data() as Case);
+  if (statusFilter) {
+    return casesList.filter(caseItem => caseItem.status === statusFilter);
+  }
+  return casesList;
 }
 
 // Gets a case from Firebase by id 
@@ -46,10 +47,10 @@ export async function getCaseById(caseId: string): Promise<Case | null> {
   console.log(`Fetching case with stored case ID: ${caseId}`);
   const casesCol = collection(db, 'cases');
   const casesSnapshot = await getDocs(casesCol);
-  
+
   for (const doc of casesSnapshot.docs) {
     const caseData = { id: doc.id, ...doc.data() };
-    if (caseData.id === caseId) { 
+    if (caseData.id === caseId) {
       console.log("Case found:", caseData);
       return caseData as Case;
     }
@@ -94,3 +95,129 @@ export async function updateCase(caseData: Case): Promise<void> {
 
   console.log(`Case with Firestore document ID ${caseRef.id} updated successfully`);
 }
+
+// This will create a staff member based on the email and temporary password set by admin.
+// An email will then be sent for staff member to make changes and complete account creation
+const auth = getAuth();
+
+export function createUser (email: string, password: string) 
+{ 
+  createUserWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    // Signed up 
+   
+    const staffData = {
+      email : email,
+      firstName : "",
+      lastName: "",
+      address: "",                  //<<<<<<======= GOING TO CHANGE THIS TO AN STAFF ADDRESS ARRAY LATER
+      phoneNumber : ""
+    }
+
+    //Supposed to send email with creation
+
+    sendEmailVerification(userCredential.user)
+    .then(() => {
+      alert("Email verification link sent. Please click \"Forgot Password\" link upon first login to reset your password and complete your account profile")
+    }); 
+
+
+  // Adding users to firestore
+    const user = userCredential.user;
+    const docRef = doc(db, "staffMembers", user.uid)
+    setDoc(docRef, staffData)
+    .catch((error)=>{
+      console.log("Error writing document", error)
+    })
+
+    alert('Account has been created successfully!')
+    // ...
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    if(errorCode ==='/auth/email-already-exists'){
+      alert("Email address already exists!")
+    }
+    else {
+      alert("Sorry, unable to create staff member")
+    }
+    const errorMessage = error.message;
+  });
+}
+
+  auth.onAuthStateChanged((currentUser) => {
+    console.log("After Verification",currentUser)
+  });
+
+export function loginUser (email : string, password: string) {
+
+//  ADD A FUNCTIONALITY LATER ON THAT CHECKS IF USER IS VERIFIED BEFORE LETTING THEM LOGIN
+//    set the login function to check if the user's email is verified or not, the property is inside the firebase user, user.isEmailVerified, or something like that.
+//   And then if it's not redirect to a "Pending Verification" page
+
+  signInWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    // Signed in 
+    const user = userCredential.user;
+    sessionStorage.setItem('loggedInUser',user.uid)
+    alert("You are now logged in")
+    // router.navigate(['case-management'])
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    if (errorCode==="auth/invalid-credential") {
+      alert ("Invalid Email or Password")
+    }
+    else if (errorCode==='auth/user-not-found') {
+      alert ("Account does not exist")
+    }
+    const errorMessage = error.message;
+  });
+}
+
+export async function forgotPassword (email: string) {
+  // TODO: Stop redirecting to login if email does not exist
+  //       Stop displaying 2 alerts if the email does not exist because it is invalid
+  if (await checkEmailExists(email) == false) {
+    return ;
+  }
+  sendPasswordResetEmail(auth, email)
+  .then(() => {
+    alert("A password reset link has been sent to your email, ")
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    if(errorCode ==="auth/invalid-email") {
+      alert("Error resetting password. Please enter a valid email")
+    }
+    const errorMessage = error.message;
+    // ..
+  });
+}
+
+async function checkEmailExists(email: string) {
+  try {
+    const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+
+    if (signInMethods.length > 0) {
+      // Email exists, proceed with password reset
+      return true; 
+    } else {
+      alert("Email does not exist. Please try again")
+      return false; 
+    }
+  } catch (error) {
+    console.error("Error checking email:", error);
+    return false;
+  }
+}
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    const uid = user.uid;
+    // ...
+  } else {
+    // User is signed out
+    // ...
+  }
+});

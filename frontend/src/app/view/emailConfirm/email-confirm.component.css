@@ -1,0 +1,57 @@
+/* Center the confirmation page */
+.confirmation-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    /* background-color: #f3f4f6; */
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Style the confirmation card */
+  .confirmation-card {
+    text-align: center;
+    max-width: 400px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+  }
+  
+  /* Main title */
+  .confirmation-card h2 {
+    color: #4caf50; /* Green for success */
+    margin-bottom: 20px;
+  }
+  
+  /* Text styles */
+  .info-text {
+    font-size: 16px;
+    color: #555555;
+    margin: 10px 0;
+  }
+  
+  .info-text.highlight {
+    font-weight: bold;
+    color: #f57c00; /* Orange for emphasis */
+  }
+  
+  /* Login button styling */
+  .login-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .login-btn:hover {
+    background-color: #45a045;
+  }
+  

@@ -1,6 +1,6 @@
 // Used for authentication of staff members
 export interface StaffInfo {
-    id : number;
+    uid : string;
     staff_firstname: string;
     staff_lastname: string;
     staff_username: string;

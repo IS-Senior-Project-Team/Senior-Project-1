@@ -1,0 +1,22 @@
+   <div class="account-profile-page">
+    <div class="header">
+      <h3>{{ userProfile.name }} Account Profile</h3>
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  
+    <div class="content">
+      <h4>Contact Information</h4>
+      <p><strong>Phone:</strong> {{ userProfile.phone }}</p>
+      <p><strong>Email:</strong> {{ userProfile.email }}</p>
+  
+      <p><strong>First Name:</strong> {{ userProfile.firstName }}</p>
+      <p><strong>Last Name:</strong> {{ userProfile.lastName }}</p>
+      <p><strong>Address:</strong> {{ userProfile.address }}</p>
+    
+    <div style="display: flex; justify-content: space-between;">  
+      <button class="close-btn" style="margin-right: 10pt;">Close</button>
+      <button class="edit-btn">Edit</button>
+    </div>
+    </div>
+  </div>
+  
