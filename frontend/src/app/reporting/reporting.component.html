@@ -26,11 +26,11 @@
       <caption class="select-caption">Species</caption>
     </div>
   </div>
+  <div class="fade-overlay" aria-hidden="true"></div>
 </div>
 
 <!-- Main Content -->
 <div class="card-container">
-  <div class="spacer"></div>
   <!-- Main Bar Chart Container with #mainChart reference -->
   <div *ngIf="chartOptions" class="canvas-container main-chart-card" #mainChart>
     <highcharts-chart
@@ -70,4 +70,5 @@
       </table>
     </div>
   </div>
+ 
 </div>

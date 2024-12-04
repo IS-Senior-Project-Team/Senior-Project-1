@@ -4,15 +4,32 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    background-color: #f9f9f9;
     border-radius: 0; 
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     position: sticky; 
     top: 0; 
     z-index: 1000;
     width: 100%; 
     height: 90px;
+    
 }
+
+.scroll-content-container {
+    position: relative;
+    overflow-y: auto; 
+    height: calc(100vh - 60px);
+}
+
+.fade-overlay {
+    position: absolute;
+    top: 80px;
+    left: 0;
+    width: 100%;
+    height: 100px; 
+    background: linear-gradient(to top, rgba(234, 243, 234, 0) 0%, #EAF3EA 100%);
+    pointer-events: none;
+    z-index: 1001; 
+}
+
 /* Export Button */
 .export-container {
     padding-right: 15px; 
@@ -25,9 +42,8 @@
     align-items: center;
     padding: 15px 20px;
     margin-bottom: 20px;
-    background-color: #f9f9f9;
+    background-color: #EAF3EA;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Export Button */
@@ -86,6 +102,7 @@
 .card-container {
     flex-direction: column;
     width: 100%;
+    margin-inline: 1%;
 }
 /* Main chart styling */
 .main-chart-card {
@@ -95,6 +112,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     width: 100%;
+    
 }
 
 /* Horizontal stack layout for pie chart and table */
@@ -103,10 +121,11 @@
     gap: 20px;
     margin-top: 20px;
     align-items: stretch;
+    
 }
 
 .spacer {
-    height: 260px;
+    height: 225px;
 }
 
 /* Card container for pie chart and table */
@@ -120,6 +139,7 @@
     align-items: center;
     justify-content: center;
     min-width: 0;
+
 }
 
 /* DataTable styling */

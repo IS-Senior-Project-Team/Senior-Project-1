@@ -1,9 +1,9 @@
-.body {
-    /* border: red solid 1px; */
+.uploading-body {
     margin-right: 20px;
+    height: 100%;
+    width: 100%;
     position: absolute;
-    top: 5%;
-    width: 85%;
+    background-color: #EAF3EA;
 }
 
 .file-upload-container {

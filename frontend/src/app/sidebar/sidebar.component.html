@@ -6,13 +6,31 @@
         <div class="profile-email"></div>
       </div>
     </div>
-  
-    <input type="text" class="search-box" placeholder="Search" />
-  
+    
     <div class="menu">
-        <a class="menu-item" (click)="navigateTo('/report')">Reports</a>
-        <a class="menu-item" (click)="navigateTo('/case-management')">Cases</a>
-        <a class="menu-item" (click)="navigateTo('/upload')">Uploads</a>
-        <a class="menu-item" (click)="navigateTo('/account')">Accounts</a>
+      <button
+        class="menu-item"
+        [class.active]="isActive('/report')"
+        (click)="navigateTo('/report')">
+        Reports
+      </button>
+      <button
+        class="menu-item"
+        [class.active]="isActive('/case-management')"
+        (click)="navigateTo('/case-management')">
+        Cases
+      </button>
+      <button
+        class="menu-item"
+        [class.active]="isActive('/upload')"
+        (click)="navigateTo('/upload')">
+        Uploads
+      </button>
+      <button
+        class="menu-item"
+        [class.active]="isActive('/accounts')"
+        (click)="navigateTo('/accounts')">
+        Accounts
+      </button>
     </div>
 </div>
