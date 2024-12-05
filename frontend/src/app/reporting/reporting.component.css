@@ -10,13 +10,7 @@
     z-index: 1000;
     width: 100%; 
     height: 90px;
-    
-}
-
-.scroll-content-container {
-    position: relative;
-    overflow-y: auto; 
-    height: calc(100vh - 60px);
+    background-color: #EAF3EA;
 }
 
 .fade-overlay {
@@ -35,17 +29,6 @@
     padding-right: 15px; 
 }
 
-/* Container for Export Button and Selectors */
-.export-selectors-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    margin-bottom: 20px;
-    background-color: #EAF3EA;
-    border-radius: 8px;
-}
-
 /* Export Button */
 .export-button {
     background-color: #4DC959;
@@ -56,7 +39,7 @@
     cursor: pointer;
     font-size: medium;
     font-weight: bold;
-    margin-bottom: 30px;
+    margin-bottom: 45px;
     transition: background-color 0.3s;
 }
 

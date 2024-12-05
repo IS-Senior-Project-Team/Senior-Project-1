@@ -59,20 +59,24 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   refreshData(): void {
-    var newStatus: string | undefined = undefined;
-    if(this.status == "All statuses") {
-      newStatus = undefined;
-    } else {
-      newStatus = this.status;
-    }
-    this.caseService.getAll(newStatus).then((data) => {
+    let newStatus: string | undefined = undefined;
+    let newSpecie: string | undefined = undefined;
+    let newTimeFrame: string | undefined = undefined;
+  
+    // Handle "All" options for each filter
+    newStatus = this.status !== "All statuses" ? this.status : undefined;
+    newSpecie = this.specie !== "All species" ? this.specie : undefined;
+    newTimeFrame = this.timeFrame !== "All time frames" ? this.timeFrame : undefined;
+  
+    // Query the service with all filters
+    this.caseService.getAll(newStatus, newSpecie, newTimeFrame).then((data) => {
       this.cases = data;
       this.createBarChart();
       this.createPieChart();
-      
+  
       // Trigger change detection to ensure the view is updated
       this.cd.detectChanges();
-      
+  
       // Reinitialize the DataTable after data is loaded and view is updated
       this.initializeDataTable();
     });
@@ -290,7 +294,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
      */
      onStatusChange(event: Event): void {
       const newValue = (event.target as HTMLSelectElement).value;
-
+      console.log('Filter changed:', newValue);
       // Update the filter value from the html element and refresh the data
       // Includes is like contains in Swift
       if(this.timeFrames.includes(newValue ?? "")) {
