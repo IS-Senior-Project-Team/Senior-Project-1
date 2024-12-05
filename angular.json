@@ -23,17 +23,19 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "./frontend/public"
               }
             ],
             "styles": [
-              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
               "./frontend/src/styles.css",
-              "./node_modules/datatables.net-dt/css/dataTables.dataTables.css"
-],
+              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "./node_modules/datatables.net-dt/css/dataTables.dataTables.css",
+              "./node_modules/datatables.net-buttons-dt/css/buttons.dataTables.css"
+            ],
             "scripts": [
-              "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/datatables.net/js/dataTables.min.mjs"
+              "./node_modules/jquery/dist/jquery.min.js",
+              "./node_modules/datatables.net/js/dataTables.min.js",
+              "./node_modules/datatables.net-buttons/js/dataTables.buttons.min.js"
             ]
           },
           "configurations": {
@@ -102,5 +104,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }
