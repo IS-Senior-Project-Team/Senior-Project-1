@@ -8,6 +8,7 @@ import ExportingModule from 'highcharts/modules/exporting';
 import { HighchartsChartComponent, HighchartsChartModule } from 'highcharts-angular';
 import 'datatables.net';
 import $ from 'jquery';
+import { STATUSES, SPECIES } from '../Constants';
 
 // Initialize the exporting module
 ExportingModule(Highcharts);
@@ -32,10 +33,10 @@ export class ReportingComponent implements OnInit, OnDestroy {
   timeFrames: string[] = ['All time frames', 'Daily', 'Weekly', 'Monthly', "Yearly"];
 
   specie: string = "All species"
-  species: string[] = ['All species', 'Adult Cat', 'Adult Dog', 'Kitten', 'Puppy']; 
+  species: string[];
 
   status: string = "All statuses"
-  statuses: string[] = ['All statuses', 'Open', 'Closed']; 
+  statuses: string[];
   
   @ViewChild('casesTable', { static: false }) table!: ElementRef;
 
@@ -45,7 +46,10 @@ export class ReportingComponent implements OnInit, OnDestroy {
     this.mainChartInstance = chart;
   };
 
-  constructor(private caseService: CasesService, private cd: ChangeDetectorRef) {}
+  constructor(private caseService: CasesService, private cd: ChangeDetectorRef) {
+    this.statuses = ['All statuses', ...STATUSES];
+    this.species = ['All species', ...SPECIES];
+  }
 
   ngOnInit(): void {
     this.refreshData();
@@ -88,6 +92,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   initializeDataTable(): void {
     if (!$.fn.DataTable.isDataTable(this.table.nativeElement)) {
       console.log("Initializing DataTable...");
+      this.dataTable.clear();
       this.dataTable = $(this.table.nativeElement).DataTable({
         pageLength: 5,
         lengthChange: false,
@@ -95,6 +100,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
         searching: true,
         autoWidth: false,
       });
+      this.dataTable.draw();
     } else {
       console.log("DataTable already initialized.");
     }
@@ -185,7 +191,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
         height: 300,
       },
       title: {
-        text: 'Cases this week',
+        text: 'Cases Statuses',
         align: 'left',
         style: {
           fontSize: '18px',
