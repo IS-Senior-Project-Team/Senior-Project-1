@@ -13,5 +13,5 @@ import { CaseManagementComponent } from './case-management/case-management.compo
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'frontend';
+  title = 'Jax Humane Dashboard';
 }

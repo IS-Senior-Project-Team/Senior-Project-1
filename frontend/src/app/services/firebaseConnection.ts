@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc, query, where, addDoc, DocumentReference, CollectionReference } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc, query, where, addDoc, DocumentReference, CollectionReference, Timestamp } from 'firebase/firestore';
 import { Case } from '../models/case';
 import firebase from "firebase/compat/app";
 // Required for side-effects
@@ -30,17 +30,56 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
-// Get all cases
-export async function getCases(statusFilter: string | undefined): Promise<Case[]> {
-  const casesCol = collection(db, 'cases');
-    const casesSnapshot = await getDocs(casesCol);
-    const casesList: Case[] = casesSnapshot.docs.map(doc => doc.data() as Case);
-    if (statusFilter) {
-      return casesList.filter(caseItem => caseItem.status === statusFilter);
-    }
-    return casesList;
-}
+// Get all cases with an optional status filter
+export async function getCases(
+  status?: string,
+  specie?: string,
+  timeFrame?: string
+  ): Promise<Case[]> {
+    const casesCollection = collection(db, 'cases');
+    let q = query(casesCollection);
 
+    // Apply status filter
+    if (status) {
+      q = query(q, where('status', '==', status));
+    }
+
+    // Apply species filter
+    if (specie) {
+      q = query(q, where('species', '==', specie));
+    }
+
+    // Apply timeFrame filter
+    if (timeFrame) {
+      const now = new Date();
+      let startDate: Date | null = null;
+      let endDate: Date = now;
+
+      switch (timeFrame) {
+        case 'Daily':
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          break;
+        case 'Weekly':
+          startDate = new Date(now);
+          startDate.setDate(now.getDate() - 7);
+          break;
+        case 'Monthly':
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          break;
+        case 'Yearly':
+          startDate = new Date(now.getFullYear(), 0, 1);
+          break;
+      }
+
+      if (startDate) {
+        q = query(q, where('createdDate', '>=', Timestamp.fromDate(startDate)));
+        q = query(q, where('createdDate', '<=', Timestamp.fromDate(endDate)));
+      }
+    }
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Case));
+  }
 /*
 // Gets a case from Firebase by id 
 export async function getCaseById(caseId: string): Promise<Case | null> {

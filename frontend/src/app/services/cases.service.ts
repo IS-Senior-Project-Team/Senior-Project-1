@@ -11,9 +11,13 @@ import { updateCase as updateCaseInFirebase } from './firebaseConnection';
 })
 export class CasesService {
   constructor(private httpClient: HttpClient) {}
-
-  async getAll(statusFilter: string = ""): Promise<Case[]> {
-   return await getCases(statusFilter);
+  
+  async getAll(
+    status: string | undefined = undefined,
+    specie: string = "",
+    timeFrame: string = "All time frames"
+  ): Promise<Case[]> {
+    return await getCases(status, specie, timeFrame);
   }
 
   getOne(caseId: string): Observable<Case | null> {
