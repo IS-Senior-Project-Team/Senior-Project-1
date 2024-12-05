@@ -108,6 +108,8 @@
     border-radius: 16px;
     border-color: white;
     border-style: none;
+    width: 100px;
+    height: 40px;
 }
 .upload-file-btn:disabled {
     color: rgba(255, 255, 255, 0.908);
@@ -115,6 +117,8 @@
     border-radius: 16px;
     border-color: white;
     border-style: none;
+    width: 100px;
+    height: 40px;
 }
 
 .editData {
@@ -191,7 +195,7 @@ td > input[type='text'],select {
 }
 .applyButton {
     background-color: #418DF8;
-    color: black;
+    color: white;
     width: 130px;
     /* padding: 5px 5px 5px 5px; */
     margin-left: 0;
