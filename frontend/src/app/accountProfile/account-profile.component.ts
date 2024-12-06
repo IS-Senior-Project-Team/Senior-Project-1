@@ -1,31 +1,126 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormGroup, FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
+import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { currentUserProfile, updateUser } from '../services/firebaseConnection';
+import { Observable } from 'rxjs';
+import { StaffInfo } from '../models/staff-info';
+import { FormControl, NonNullableFormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'app-account-profile',
   standalone: true,
-  imports: [],
+  imports: [FormsModule, NgIf, ReactiveFormsModule],
   templateUrl: './account-profile.component.html',
   styleUrl: './account-profile.component.css'
 })
-export class AccountProfileComponent {
-  
-  loggedInUser : boolean | null = null;
-  constructor(private router: Router, private authSvc: AuthService) {}
-  userProfile = {
-    name: 'Pat Ink',
-    email: 'patink23@gmail.com',
-    phone: '1234567890',
-    firstName: 'Pat',
-    lastName: 'Ink',
-    address: '123 W Street, Jacksonville, Florida, 12345'
-  };
+export class AccountProfileComponent implements OnInit {
+  loggedInUser: boolean | null = null;
+  currentUserProfile$: Promise<StaffInfo | null> = currentUserProfile(); // Observable for user profile data
+  staffInfo: StaffInfo | null = null
+  staffName : string = ''
+  isEditing: boolean = false; // Track if the form is in edit mode
+  profileForm : FormGroup
 
-  logout () {
-    // TODO: Add an event listener that checks if a user is logged in or not to display the button appropriately
-    this.loggedInUser = this.authSvc.isLoggedIn() //Populating loggedInUser field to check if theres a logged in user
-    this.authSvc.logoutUser();
+  constructor(private router: Router, private authSvc: AuthService, private fb: NonNullableFormBuilder) {
+    this.profileForm = this.fb.group({
+      uid: [''],
+      email: [''],
+      firstname: [''],
+      lastname: [''],
+      phoneNumber: [''],
+      address: [''],
+    });
   }
 
+  async ngOnInit(): Promise<void> {
+    try {
+      const profile = await currentUserProfile();
+      if (profile) {
+        this.staffInfo = profile;
+        console.log(profile)
+        this.profileForm.patchValue(profile); // Populate form with user data
+        console.log(this.profileForm.value)
+      } else {
+        console.error('No profile found for the current user.');
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+    }
+  }
+
+  toggleEdit(): void {
+    this.isEditing = !this.isEditing;
+
+    if (!this.isEditing) {
+      // If exiting edit mode, reset the form to the original values
+      this.profileForm.patchValue(this.staffInfo!);
+    }
+  }
+  async saveProfile(): Promise<void> {
+    if (this.profileForm.valid) {
+      const updatedUser = { ...this.staffInfo, ...this.profileForm.value } as StaffInfo;
+  
+      if (!updatedUser.uid) {
+        alert('User UID is missing. Unable to update profile.');
+        return;
+      }
+  
+      try {
+        await updateUser(updatedUser).toPromise();
+        this.staffInfo = updatedUser; // Update local data
+        this.isEditing = false;
+        alert('Profile updated successfully!');
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('Failed to update profile. Please try again later.');
+      }
+    } else {
+      alert('Please fill out all required fields before saving.');
+    }
+  }
+  
+
+  // async saveProfile(): Promise<void> {
+  //   if (this.profileForm.valid) {
+  //     const updatedUser = { ...this.staffInfo, ...this.profileForm.value } as StaffInfo;
+
+  //     try {
+  //       await updateUser(updatedUser).toPromise(); // Update Firestore with the new values
+  //       this.staffInfo = updatedUser; // Update the local data
+  //       this.isEditing = false; // Exit edit mode
+  //       alert('Profile updated successfully!');
+  //     } catch (error) {
+  //       console.error('Error updating profile:', error);
+  //       alert('Failed to update profile. Please try again later.');
+  //     }
+  //   } else {
+  //     alert('Please fill out all required fields before saving.');
+  //   }
+  // }
+
+  logout(): void {
+    // TODO: Add an event listener that checks if a user is logged in or not to display the button appropriately
+    this.loggedInUser = null; // Set to null on logout
+    this.authSvc.logoutUser();
+  }
 }
+
+  // this.currentUserProfile$ = currentUserProfile(); // Initialize with the current user profile observable
+  // ngOnInit(): void {
+  //   // Subscribe to the observable to populate the form fields
+  //   this.currentUserProfile$.subscribe((profile) => {
+  //     if (profile) {
+  //       this.staffInfo = profile;
+  //     }
+  //   });
+  // }
+
+  // ngOnInit(): void {
+  //   // Subscribe to the observable to populate the form fields
+  //   this.currentUserProfile$.subscribe((profile) => {
+  //     this.profileForm.patchValue({ ...profile })
+  //   });
+  // }

@@ -1,4 +1,4 @@
-   <div class="account-profile-page">
+<!-- <div class="account-profile-page">
     <div class="header">
       <h3>{{ userProfile.name }} Account Profile</h3>
       <button class="logout-btn" (click)="logout()">Logout</button>
@@ -19,4 +19,118 @@
     </div>
     </div>
   </div>
+   -->
+<!-- 
+   <div class="profile-container">
+    <h1>Account Profile</h1>
   
+    <form *ngIf="userProfile" class="profile-form">
+      <label for="firstName">First Name:</label>
+      <input
+        type="text"
+        id="firstName"
+        [(ngModel)]="staffInfo.staff_firstName"
+        name="firstName"
+        readonly
+      />
+  
+      <label for="lastName">Last Name:</label>
+      <input
+        type="text"
+        id="lastName"
+        [(ngModel)]="staffInfo.staff_lastName"
+        name="lastName"
+        readonly
+      />
+  
+      <label for="email">Email:</label>
+      <input
+        type="email"
+        id="email"
+        [(ngModel)]="staffInfo.staff_email"
+        name="email"
+        readonly
+      />
+  
+      <label for="phone">Phone Number:</label>
+      <input
+        type="text"
+        id="phone"
+        [(ngModel)]="staffInfo.staff_phoneNumber"
+        name="phone"
+        readonly
+      />
+  
+      <label for="address">Address:</label>
+      <textarea
+        id="address"
+        [(ngModel)]="staffInfo.staff_address"
+        name="address"
+        readonly
+      ></textarea>
+  
+      <label for="displayName">Display Name/User Name:</label>
+      <input
+        type="text"
+        id="displayName"
+        [(ngModel)]="staffInfo?.staff_username || ''"
+        name="displayName"
+        readonly
+      />
+    </form>
+
+    <p *ngIf="!userProfile"><em>Loading profile information...</em></p>
+  
+    <button class="logout-btn" (click)="logout()">Logout</button>
+  </div>
+   -->
+
+<div class="account-profile-page">
+    <div class="header">
+        <h1>Account Profile</h1>
+        <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+
+    <div class="content">
+        <!-- Ensure userProfile exists before rendering the form -->
+        <form *ngIf="staffInfo" [formGroup]="profileForm" class="profile-form">
+            <div class="row">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" formControlName="firstname" [readonly]="!isEditing" />
+
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" formControlName="lastname" [readonly]="!isEditing" />
+            </div>
+            <div class="row">
+                <label for="email">Email:</label>
+                <input type="email" id="email" formControlName="email" [readonly]="!isEditing" />
+
+                <label for="phone">Phone Number:</label>
+                <input type="text" id="phone" formControlName="phoneNumber" [readonly]="!isEditing" />
+            </div>
+            <div class="row">
+                <label for="address">Address:</label>
+                <textarea id="address" formControlName="address" [readonly]="!isEditing"></textarea>
+            </div>
+
+            <div class="actions" style="display: flex; justify-content: space-between;">
+                <button type="button" (click)="toggleEdit()">
+                  {{ isEditing ? 'Cancel' : 'Edit' }}
+                </button>
+                <button
+                  type="button"
+                  *ngIf="isEditing"
+                  (click)="saveProfile()"
+                  class="save-btn"
+                >
+                  Save
+                </button>
+              </div>
+        </form>
+    </div>
+
+    <!-- Fallback if no profile is found -->
+    <p *ngIf="!staffInfo"><em>Loading profile information...</em></p>
+
+
+</div>

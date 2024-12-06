@@ -31,23 +31,6 @@ export class StaffLoginComponent {
     //Clearing entry after login
     this.email = "";
     this.password = "";
-
-    // .subscribe({
-    //   next: (isLoggedIn) => {
-    //     if (isLoggedIn) {
-    //       this.router.navigate(['case-management']);
-    //     } else {
-    //       alert('Invalid username or password')
-    //       this.errorMessage = 'Invalid username or password';
-    //       this.username = '';
-    //       this.password = '';
-    //     }
-    //   },
-    //   error: (err) => {
-    //     console.error('Login error:', err);
-    //     this.errorMessage = 'An error occurred during login';
-    //   }
-    // });
   }
   
   toggleRegister() {

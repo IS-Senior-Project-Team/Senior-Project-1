@@ -74,6 +74,10 @@ export class AuthService {
     return tempPassword;
   }
 
+  navigateTo (path: string) {
+    this.router.navigate([path])
+  }
+
   logoutUser(): void {
     sessionStorage.removeItem('loggedInUser');
     this.router.navigate(['/login']);
@@ -83,25 +87,8 @@ export class AuthService {
     return !!sessionStorage.getItem('loggedInUser');
   }
 
-  //  loginUser ( username: string, password: string) : Observable<any> {
-  //   return this.httpClient.get<StaffInfo[]>(`http://localhost:3000/staffMembers?staff_username=${username}&staff_password=${password}`).pipe(
-  //     map(users => {
-  //       if (users.length > 0) {
-  //         sessionStorage.setItem('loggedInUser', JSON.stringify(users[0]));
-  //         return true;
-  //       } else {
-  //         // No matching user found
-  //         console.log("Invalid username or password")
-  //         return false;
-  //       }
-  //     }),
-  //     catchError(err => {
-  //       console.error('Error logging in user:', err);
-  //       return err;
-  //     })
-  //   );
-  // }
-    // checkCredentials() {
+
+  // checkCredentials() {
   //   if (!sessionStorage.getItem("loggedInUser")) {
   //     alert("Access restricted. Please login")
   //     this.router.navigate(['login'])
@@ -131,11 +118,15 @@ export class AuthService {
   // From there, they can also edit fill in their account information (Maybe include a message that tells them they should update their profile later?)
 
   //TODO:
-  //  Complete forgot password function to update user password upon first login (DONE)
-  //  Add created users to firestore as staff members (DONE)
-  //  Fix email verifications status (DONE)
-  //  Edit Account Profile
-
+  //  Edit Account Profile (Maybe do it by making the fields in account profile editable and then have a save button OR make the fields unlocked and then a save&cancel button)
+  //  Develop admin dashboard and implement manage users to direct to lists of user and a create account button/redirect to register
+  // Add admin account using a checkbox and check firebase options
+  // Add guards for reports page to only be acessible by admin
+  // Deactivate/ Delete Accounts functionality for specific user accounts/profiles (will have to get the selected user instead of logged in user to view their profile 
+  //                                                                              OR include the buttons on the accounts list and include a search button to search for staff) 
+  // Include filters for staff based on account status
+  // Upload Histoty (Last to be implemented) 
+  // Fix input validations, error messages, and alerts
 
 
 }
