@@ -5,7 +5,7 @@ import { CasesService } from '../services/cases.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { STATUSES, SPECIES } from '../Constants';
+import { STATUSES, SPECIES } from '../constants';
 
 @Component({
   selector: 'app-edit-case',

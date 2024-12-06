@@ -8,7 +8,7 @@ import ExportingModule from 'highcharts/modules/exporting';
 import { HighchartsChartComponent, HighchartsChartModule } from 'highcharts-angular';
 import 'datatables.net';
 import $ from 'jquery';
-import { STATUSES, SPECIES } from '../Constants';
+import { STATUSES, SPECIES } from '../constants';
 
 // Initialize the exporting module
 ExportingModule(Highcharts);
