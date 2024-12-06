@@ -41,6 +41,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   public mainChartInstance: Highcharts.Chart | null = null;
   public chartCallback: Highcharts.ChartCallbackFunction = (chart) => {
+    console.log('Chart initialized:', chart);
     this.mainChartInstance = chart;
   };
 
@@ -58,16 +59,26 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   refreshData(): void {
-    this.caseService.getAll().then((data) => {
+    let newStatus: string | undefined = undefined;
+    let newSpecie: string | undefined = undefined;
+    let newTimeFrame: string | undefined = undefined;
+  
+    // Handle "All" options for each filter
+    newStatus = this.status !== "All statuses" ? this.status : undefined;
+    newSpecie = this.specie !== "All species" ? this.specie : undefined;
+    newTimeFrame = this.timeFrame !== "All time frames" ? this.timeFrame : undefined;
+  
+    // Query the service with all filters
+    this.caseService.getAll(newStatus, newSpecie, newTimeFrame).then((data) => {
       this.cases = data;
       this.createBarChart();
       this.createPieChart();
-      
+  
       // Trigger change detection to ensure the view is updated
       this.cd.detectChanges();
-      
+  
       // Reinitialize the DataTable after data is loaded and view is updated
-      this.reinitializeDataTable();
+      this.initializeDataTable();
     });
   }
 
@@ -87,18 +98,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
     } else {
       console.log("DataTable already initialized.");
     }
-  }
-
-  /**
-   * Safely reinitializes the DataTable by destroying the existing instance if it exists,
-   * then initializing it again.
-   */
-  reinitializeDataTable(): void {
-    if (this.dataTable) {
-      this.dataTable.destroy(true); // Destroy the existing instance
-      this.dataTable = null; // Reset the reference
-    }
-    this.initializeDataTable(); // Initialize DataTable again
   }
 
   /**
@@ -295,7 +294,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
      */
      onStatusChange(event: Event): void {
       const newValue = (event.target as HTMLSelectElement).value;
-
+      console.log('Filter changed:', newValue);
       // Update the filter value from the html element and refresh the data
       // Includes is like contains in Swift
       if(this.timeFrames.includes(newValue ?? "")) {

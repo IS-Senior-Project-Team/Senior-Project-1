@@ -1,11 +1,19 @@
+html, body {
+    background-color: #EAF3EA;
+    height: 100%;
+    margin: 0;
+    overscroll-behavior: none;
+}
+
 .hstack {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 0px;
-    height: 100vh;
+    background-color: #EAF3EA;
 }
 
 .routed-component {
     flex: 1;
+    margin-left: 250px;
 }
