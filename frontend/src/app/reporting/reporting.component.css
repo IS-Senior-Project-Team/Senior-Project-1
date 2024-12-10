@@ -81,40 +81,35 @@
     color: #666;
     margin-top: 5px;
 }
-
-.card-container {
-    flex-direction: column;
-    width: 100%;
-    margin-inline: 1%;
-}
 /* Main chart styling */
 .main-chart-card {
     padding: 20px;
     background-color: #f9f9f9;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
     width: 100%;
     
 }
 
 /* Horizontal stack layout for pie chart and table */
-.hstack {
+.vstack {
     display: flex;
-    gap: 20px;
-    margin-top: 20px;
     align-items: stretch;
-    
+    padding-bottom: 5%;
 }
 
 .spacer {
     height: 225px;
 }
-
+.reports-container {
+    background-color: #EAF3EA;
+}
 /* Card container for pie chart and table */
 .card-container {
+    flex-direction: column;
     flex: 1;
     padding: 20px;
+    margin-top: 3%;
     background-color: #f9f9f9;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
