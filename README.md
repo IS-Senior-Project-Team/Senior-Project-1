@@ -1,6 +1,6 @@
 # **Senior Project 1 - Team Pawesome**
 
-![TeamPawesome-About.png](https://res.craft.do/user/full/23a03a79-af5e-1af9-b4ff-27170389b6b1/doc/B195940E-0436-4CAA-84EF-1CA55B969F0A/E4DAF445-595B-4633-AEB4-6F7A28BF8D5C_2/VvmUWPLUZGr7VcibevGz4KVLtijJFxu3ih5yP7vN4Bcz/TeamPawesome-About.png)
+![TeamPawesome-About.png](https://res.craft.do/user/full/23a03a79-af5e-1af9-b4ff-27170389b6b1/doc/B195940E-0436-4CAA-84EF-1CA55B969F0A/74F89A58-3F93-41F9-9116-C147A24C4A30_2/SxLe5r844odZ07EUILRxUJbqrMwLxuyLW0htygRFDPEz/TeamPawesome-About.png)
 
 **About Team Pawesome**
 
