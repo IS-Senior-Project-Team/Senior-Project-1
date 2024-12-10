@@ -31,7 +31,7 @@ export const routes: Routes = [
     {
         canActivate: [adminGuard],
         path: 'add-case',
-        component: AddCaseComponent
+        component: EditCaseComponent
     },
     {
         path: 'register',
