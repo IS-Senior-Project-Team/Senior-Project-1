@@ -15,6 +15,7 @@ import { UserListComponent } from './view/usersList/users-list.component';
 import { AdminProfileViewComponent } from './admin-acct-profile/admin-profile-view.component';
 
 
+
 export const routes: Routes = [
 
     {
@@ -29,6 +30,10 @@ export const routes: Routes = [
     },
     {
         canActivate: [adminGuard],
+        path: 'add-case',
+        component: AddCaseComponent
+    },
+    {
         path: 'register',
         component: RegisterStaffComponent
     },
