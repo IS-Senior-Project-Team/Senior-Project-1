@@ -14,11 +14,11 @@ Welcome to **Team Pawesome**, a project designed to streamline and enhance the m
 
 **Technology Stack:**
 
-• **Frontend**: Angular, HTML, CSS
+- **Frontend**: Angular, HTML, CSS
 
-• **Backend**: Firebase + nodejs
+- **Backend**: Firebase + nodejs
 
-• **Version Control**: GitHub
+-   **Version Control**: GitHub
 
 **Starting the Project**
 
@@ -35,9 +35,9 @@ To run the application locally, follow these steps:
 
 3. The application will now be available at the following URLs:
 
-• Frontend: [http://localhost:4200/](http://localhost:4200/)
+- Frontend: [http://localhost:4200/](http://localhost:4200/)
 
-• Backend (optional): [http://localhost:3000/](http://localhost:3000/)
+- Backend (optional): [http://localhost:3000/](http://localhost:3000/)
 
 **Firebase Connection**
 
@@ -45,5 +45,5 @@ Firebase integration is currently functional, with basic features in place.
 
 To interact with Firebase:
 
-• Use the `firebaseConnection.ts` file located in \backend\src\firebase\ to call functions and retrieve data from Firebase.
+- Use the `firebaseConnection.ts` file located in \backend\src\firebase\ to call functions and retrieve data from Firebase.
 
