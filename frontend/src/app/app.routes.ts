@@ -13,6 +13,7 @@ import { AdminDashboardComponent } from './admin-dash/admin-dashboard.component'
 import { UploadHistoryComponent } from './upload-history/upload-history.component';
 import { UserListComponent } from './view/usersList/users-list.component';
 import { AdminProfileViewComponent } from './admin-acct-profile/admin-profile-view.component';
+import { AddCaseComponent } from './add-case/add-case.component';
 
 
 
@@ -31,7 +32,7 @@ export const routes: Routes = [
     {
         canActivate: [adminGuard],
         path: 'add-case',
-        component: EditCaseComponent
+        component: AddCaseComponent
     },
     {
         path: 'register',

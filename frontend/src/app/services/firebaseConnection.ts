@@ -193,6 +193,8 @@ export async function createDoc(caseData: Case): Promise<boolean> {
   const casesCol: CollectionReference = collection(db, 'cases');
   if (typeof caseData.createdDate === 'string') {
     caseData.createdDate = Timestamp.fromDate(new Date(caseData.createdDate));
+  } else {
+    caseData.createdDate = Timestamp.fromDate(new Date());
   }
   let newDoc: DocumentReference | null = null;
   newDoc = await addDoc(casesCol, caseData);
