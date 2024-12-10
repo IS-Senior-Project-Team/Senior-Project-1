@@ -33,20 +33,6 @@ export class EditCaseComponent implements OnInit {
 
   species: string[] = SPECIES;
 
-  /*
-    "Adult Dog, Adult Cat",
-    "Adult Dog, Puppy",
-    "Adult Dog, Kitten",
-    "Adult Cat, Puppy",
-    "Adult Cat, Kitten",
-    "Puppy, Kitten",
-    "Adult Dog, Adult Cat, Puppy",
-    "Adult Dog, Adult Cat, Kitten",
-    "Adult Dog, Puppy, Kitten",
-    "Adult Cat, Puppy, Kitten",
-    "Adult Dog, Adult Cat, Puppy, Kitten",
-  */
-
   // Initialize originalCase to later store the original case values
   private originalCase!: Case;
 
