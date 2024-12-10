@@ -6,6 +6,7 @@ import { StaffLoginComponent } from './view/staff-login/staff-login.component';
 import { ForgotPasswordComponent } from './view/forgot-password/forgot-password.component';
 import { UploadingComponent } from './uploading/uploading.component';
 import { ReportingComponent } from './reporting/reporting.component';
+import { AddCaseComponent } from './add-case/add-case.component';
 
 
 export const routes: Routes = [
@@ -16,6 +17,10 @@ export const routes: Routes = [
     {
         path: 'edit-case/:id',
         component: EditCaseComponent
+    },
+    {
+        path: 'add-case',
+        component: AddCaseComponent
     },
     {
         path: 'register',

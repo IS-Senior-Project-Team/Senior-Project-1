@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { Case } from '../models/case';
 import { CasesService } from '../services/cases.service';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 import { getCases, getContacts } from '../services/firebaseConnection';
 import { DocumentData } from 'firebase/firestore';
 import { FirebaseContact } from '../../../../backend/src/models/FirebaseTestObj'
@@ -28,7 +29,12 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
   showDeleted: boolean = false; // Toggle to show/hide deleted cases
   private dtInitialized = false; // Track the DataTable initialization state
 
-  constructor(private router: Router, private casesService: CasesService, private cdr: ChangeDetectorRef) {}
+  constructor (
+    private router: Router, 
+    private casesService: CasesService, 
+    private cdr: ChangeDetectorRef,
+    private toastr: ToastrService,
+  ) {}
 
   ngOnInit(): void {
     //Load case data
@@ -167,12 +173,6 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     });
   }
 
-  /*
-  toggleReadMore(item: Case) {
-    item.isExpanded = !item.isExpanded; // Toggle the expanded state for the specific item
-  }
-  */
-
   // Method to toggle the showDeleted 
   toggleShowDeleted() {
     this.showDeleted = !this.showDeleted;
@@ -198,8 +198,12 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       this.casesService.updateCase(caseItem).subscribe(() => {
         this.reInitDataTable(); // Reinitialize the DataTable after deleting a case
       });
+
+      // Display success message
+      this.toastr.success('Case deleted successfully', 'Success');
     } else {
-      console.log('Delete case canceled.')
+      // User canceled
+      this.toastr.info('Delete case canceled', 'Canceled');
     }
   }
 
@@ -210,21 +214,34 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     if (confirmRecover) {
       // set the case's deleted flag to true
       caseItem.isDeleted = false;
-      this.casesService.updateCase(caseItem).subscribe(() => {
-        if (!this.hasDeletedCases()) {
-          this.showDeleted = false;
-        }
-        this.reInitDataTable(); // Reinitialize the DataTable after recovering a case
-        window.location.reload();
-      });
+
+      // Display success message
+      this.toastr.success('Case recovered successfully', 'Success');
+
+      // Delay the case update and page reload
+      setTimeout(() => {
+        this.casesService.updateCase(caseItem).subscribe(() => {
+          if (!this.hasDeletedCases()) {
+            this.showDeleted = false;
+          }
+          this.reInitDataTable(); // Reinitialize the DataTable after recovering a case
+          window.location.reload();  // Reload the page 
+        });
+      }, 1000);  // 1-second delay before executing the update
     } else {
-      console.log('Recover case canceled')
+      // User canceled
+      this.toastr.info('Recover case canceled', 'Canceled');
     }
   }
 
   // Method to navigate to the edit case component/page
   editCase(caseId: string): void {
     this.router.navigate(['/edit-case', caseId]);
+  }
+
+  // Method to navigate to the add case page
+  addCase(): void {
+    this.router.navigate(['/add-case']);
   }
 
   // Filter cases based on the deleted flag

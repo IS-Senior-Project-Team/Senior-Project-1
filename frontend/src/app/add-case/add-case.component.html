@@ -1,11 +1,11 @@
-<div class="edit-case p-3">
+<div class="add-case p-3">
     <div class="card shadow-sm">
         <div class="card-body">
-            <h2 class="text-center p-3">Edit Pet Case #{{ case.id }}</h2>
+            <h2 class="text-center p-3">Add Pet Case</h2>
 
             <h3 class="text-left">Contact Details</h3>
 
-            <form #editCaseForm="ngForm">
+            <form #addCaseForm="ngForm">
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label>First Name: </label>
@@ -76,7 +76,7 @@
 
                 <div style="display: flex; justify-content: space-between; margin-top: 3%;">
                     <button class="btn btn-secondary" (click)="cancel()" style="width: 100px">Cancel</button>
-                    <button class="btn btn-primary" type="submit" style="width: 100px" (click)="save(editCaseForm)" [disabled]="editCaseForm.invalid || case.numOfPets < 0">Save</button>
+                    <button class="btn btn-primary" type="submit" style="width: 100px" (click)="save(addCaseForm)" [disabled]="addCaseForm.invalid || case.numOfPets < 0">Save</button>
                 </div>
             </form>
         </div>
