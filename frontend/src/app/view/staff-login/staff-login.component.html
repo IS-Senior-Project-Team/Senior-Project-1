@@ -1,15 +1,17 @@
 <div class="login-page">
   <h2 style="text-align: center;">Login</h2>
-<div class="form">
+  <div class="form">
     <form (submit)="loginUser()" class="login-form">
-        <input type="text" id="username" [(ngModel)]="username" name="username" placeholder="Enter username" />
+      <div class="form-group">
+        <input type="text" id="email" [(ngModel)]="email" name="email" placeholder="Enter email" />
         <input type="password" id="password" [(ngModel)]="password" name="password" placeholder="Enter password" />
+      </div>
         <button type="submit">Login</button>
     </form>
     <div *ngIf="errorMessage" class="error-message" style="color: rgb(230, 57, 57); font-size: smaller; margin-top: 7pt;">
       {{ errorMessage }}
     </div>
-    <p class="message">Not registered? <a (click)="toggleRegister()">Create an account</a></p>
+    <!-- <p class="message">Not registered? <a (click)="toggleRegister()">Create an account</a></p> -->
     <p class="message" (click)="toggleForgotPassword()"><a>Forgot password?</a></p>
 </div>
 </div>

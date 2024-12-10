@@ -1,11 +1,11 @@
 // Used for authentication of staff members
 export interface StaffInfo {
-    id : number;
-    staff_firstname: string;
-    staff_lastname: string;
-    staff_username: string;
-    staff_email: string;
-    staff_address: string;
-    staff_phone : number;
-    staff_password: string;
+    uid: string
+    firstname: string;
+    lastname: string;
+    email: string;
+    address: string;
+    phoneNumber : string;
+    password: string;
+    isAdmin : boolean
 }

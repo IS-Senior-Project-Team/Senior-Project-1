@@ -2,6 +2,7 @@
     <div class="profile">
       <div class="profile-avatar"></div>
       <div class="profile-info">
+        <!-- <div class="profile-name" *ngIf="staffInfo" >{{staffInfo.firstname}} {{staffInfo.lastname}} ({{staffInfo.isAdmin}})</div> -->
         <div class="profile-name">Andreas Ink (Admin)</div>
         <div class="profile-email"></div>
       </div>
@@ -28,9 +29,10 @@
       </button>
       <button
         class="menu-item"
-        [class.active]="isActive('/accounts')"
-        (click)="navigateTo('/accounts')">
+        [class.active]="isActive('/account')"
+        (click)="navigateTo('/account')">
         Accounts
       </button>
     </div>
 </div>
+<!-- <app-account-profile [isAccountSidebarOpen]="isAccountSidebarOpen" (close)="closeAccountSidebar()"></app-account-profile> -->
