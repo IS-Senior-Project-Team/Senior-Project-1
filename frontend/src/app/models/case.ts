@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 /**
  * Interface for the Case object
  * @param id The unique identifier for the case
@@ -20,4 +22,5 @@ export interface Case {
     numOfPets: number;
     species: string;
     isDeleted: boolean;
+    createdDate?: Timestamp;
 }

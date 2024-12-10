@@ -186,7 +186,9 @@ export async function updateCase(caseData: Case): Promise<void> {
 export async function createDoc(caseData: Case): Promise<boolean> {
   let highestID: string = await getCaseHighestID();
   const casesCol: CollectionReference = collection(db, 'cases');
-
+  if (typeof caseData.createdDate === 'string') {
+    caseData.createdDate = Timestamp.fromDate(new Date(caseData.createdDate));
+  }
   let newDoc: DocumentReference | null = null;
   newDoc = await addDoc(casesCol, caseData);
   if (newDoc == null) {
