@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 /**
  * Interface for the Case object
  * @param id The unique identifier for the case
@@ -18,5 +20,7 @@ export interface Case {
     species: string;
     isExpanded: boolean;
     isDeleted: boolean;
+    createdDate?: Timestamp;
+    
 }
   
