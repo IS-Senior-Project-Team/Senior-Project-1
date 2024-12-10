@@ -1,0 +1,36 @@
+<div class="user-list-page">
+    <h1>All Users</h1>
+    <button class="create-btn" type="button" [routerLink]="['/register']">Create Account</button>
+
+    <div *ngIf="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Loading users...</p>
+    </div>
+
+    <div *ngIf="!loading && users.length === 0" class="no-users">
+        <p>No users found.</p>
+    </div>
+
+    <div *ngIf="!loading && users.length > 0">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of users">
+                    <td>{{ user.firstname}}</td>
+                    <td>{{ user.lastname }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <button class="view-btn" (click)="viewProfile(user.uid)">View Profile</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

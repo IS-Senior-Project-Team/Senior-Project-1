@@ -23,10 +23,10 @@ export class AccountProfileComponent implements OnInit {
   staffName : string = ''
   isEditing: boolean = false; // Track if the form is in edit mode
   profileForm : FormGroup
+  loading = true;
 
   constructor(private router: Router, private authSvc: AuthService, private fb: NonNullableFormBuilder) {
     this.profileForm = this.fb.group({
-      uid: [''],
       email: [''],
       firstname: [''],
       lastname: [''],
@@ -48,6 +48,8 @@ export class AccountProfileComponent implements OnInit {
       }
     } catch (error) {
       console.error('Error loading user profile:', error);
+    } finally {
+      this.loading = false;
     }
   }
 
@@ -59,38 +61,19 @@ export class AccountProfileComponent implements OnInit {
       this.profileForm.patchValue(this.staffInfo!);
     }
   }
-  async saveProfile(): Promise<void> {
-    if (this.profileForm.valid) {
-      const updatedUser = { ...this.staffInfo, ...this.profileForm.value } as StaffInfo;
-  
-      if (!updatedUser.uid) {
-        alert('User UID is missing. Unable to update profile.');
-        return;
-      }
-  
-      try {
-        await updateUser(updatedUser).toPromise();
-        this.staffInfo = updatedUser; // Update local data
-        this.isEditing = false;
-        alert('Profile updated successfully!');
-      } catch (error) {
-        console.error('Error updating profile:', error);
-        alert('Failed to update profile. Please try again later.');
-      }
-    } else {
-      alert('Please fill out all required fields before saving.');
-    }
-  }
-  
-
   // async saveProfile(): Promise<void> {
   //   if (this.profileForm.valid) {
   //     const updatedUser = { ...this.staffInfo, ...this.profileForm.value } as StaffInfo;
-
+  
+  //     if (!updatedUser.uid) {
+  //       alert('User UID is missing. Unable to update profile.');
+  //       return;
+  //     }
+  
   //     try {
-  //       await updateUser(updatedUser).toPromise(); // Update Firestore with the new values
-  //       this.staffInfo = updatedUser; // Update the local data
-  //       this.isEditing = false; // Exit edit mode
+  //       await updateUser(updatedUser).toPromise();
+  //       this.staffInfo = updatedUser; // Update local data
+  //       this.isEditing = false;
   //       alert('Profile updated successfully!');
   //     } catch (error) {
   //       console.error('Error updating profile:', error);
@@ -100,6 +83,25 @@ export class AccountProfileComponent implements OnInit {
   //     alert('Please fill out all required fields before saving.');
   //   }
   // }
+  
+
+  async saveProfile(): Promise<void> {
+    if (this.profileForm.valid) {
+      const updatedUser = { ...this.staffInfo, ...this.profileForm.value } as StaffInfo;
+
+      try {
+        await updateUser(updatedUser).toPromise(); // Update Firestore with the new values
+        this.staffInfo = updatedUser; // Update the local data
+        this.isEditing = false; // Exit edit mode
+        alert('Profile updated successfully!');
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('Failed to update profile. Please try again later.');
+      }
+    } else {
+      alert('Please fill out all required fields before saving.');
+    }
+  }
 
   logout(): void {
     // TODO: Add an event listener that checks if a user is logged in or not to display the button appropriately
@@ -107,20 +109,3 @@ export class AccountProfileComponent implements OnInit {
     this.authSvc.logoutUser();
   }
 }
-
-  // this.currentUserProfile$ = currentUserProfile(); // Initialize with the current user profile observable
-  // ngOnInit(): void {
-  //   // Subscribe to the observable to populate the form fields
-  //   this.currentUserProfile$.subscribe((profile) => {
-  //     if (profile) {
-  //       this.staffInfo = profile;
-  //     }
-  //   });
-  // }
-
-  // ngOnInit(): void {
-  //   // Subscribe to the observable to populate the form fields
-  //   this.currentUserProfile$.subscribe((profile) => {
-  //     this.profileForm.patchValue({ ...profile })
-  //   });
-  // }

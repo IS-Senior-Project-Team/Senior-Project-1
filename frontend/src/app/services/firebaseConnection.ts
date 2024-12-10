@@ -9,6 +9,7 @@ import { AuthService } from "./auth.service";
 import { Router } from "@angular/router";
 import { StaffInfo } from "../models/staff-info";
 import { from, Observable, of, switchMap } from "rxjs";
+import { RegisterStaffComponent } from '../view/register-staff/register-staff.component';
 // Required for side-effects
 import "firebase/firestore";
 import { inject } from "@angular/core";
@@ -200,28 +201,32 @@ export async function createDoc(caseData: Case): Promise<boolean> {
   return true;
 }
 
+//   <== ACCOUNT MANAGEMENT FUNCTIONS BELOW ==>
+
 // This will create a staff member based on the email and temporary password set by admin.
 // An email will then be sent for staff member to make changes and complete account creation
 const auth = getAuth();
+
 // getAuth().setPersistence(browserSessionPersistence)          ------Include   THIS LATER TO SET THE STORAGE TO SESSION STORAGE
-export function createUser(email: string, password: string) {
+export function createUser(email: string, password: string, isAdmin : boolean) {
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // Signed up 
 
       const staffData = {
-        staff_email: email,
-        staff_firstname: "",
-        staff_lastname: "",
-        staff_address: "",                  //<<<<<<======= GOING TO CHANGE THIS TO AN STAFF ADDRESS ARRAY LATER
-        staff_phoneNumber: ""
+        email: email,
+        firstname: "",
+        lastname: "",
+        address: "",                  //<<<<<<======= GOING TO CHANGE THIS TO AN STAFF ADDRESS ARRAY LATER
+        phoneNumber: "",
+        isAdmin: isAdmin
       }
 
-      //Supposed to send email with creation
+      //NEED TO FIND A WAY TO INLUDE THIS MESSAGE IN THE RECIPIENTS EMAIL
 
       sendEmailVerification(userCredential.user)
         .then(() => {
-          alert("Email verification link sent. Please click \"Forgot Password\" link upon first login to reset your password and complete your account profile")
+          alert("Email verification link sent. They should click \"Forgot Password\" link upon first login to setup their password")
         });
 
 
@@ -238,7 +243,7 @@ export function createUser(email: string, password: string) {
     })
     .catch((error) => {
       const errorCode = error.code;
-      if (errorCode === '/auth/email-already-exists') {
+      if (errorCode == 'auth/email-already-in-use') {
         alert("Email address already exists!")
       }
       else {
@@ -252,44 +257,33 @@ auth.onAuthStateChanged((currentUser) => {
   console.log("User Status", currentUser)
 });
 
+export const redirect =() => {
+  const router = inject(Router)
+  return router.navigate(['case-management'])
+}
 export function loginUser(email: string, password: string) {
 
   //  ADD A FUNCTIONALITY LATER ON THAT CHECKS IF USER IS VERIFIED BEFORE LETTING THEM LOGIN
   //    set the login function to check if the user's email is verified or not, the property is inside the firebase user, user.isEmailVerified, or something like that.
   //   And then if it's not redirect to a "Pending Verification" page
-  // const router = inject(Router)
-  // const route: Router = {
-  //   path: "user/:userId",
-  //   component: User,
-  //   canActivate: [
-  //     () => {
-  //       const router = inject(Router);
-  //       const authService = inject(AuthenticationService);
-  
-  //       if (!authService.isLoggedIn()) {
-  //         const loginPath = router.parseUrl("/login");
-  //         return new RedirectCommand(loginPath, {
-  //           skipLocationChange: "true",
-  //         });
-  //       }
-  
-  //       return true;
-  //     },
-  //   ],
-  // };
-  // const authSvc = inject (AuthService)
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // Signed in 
       const user = userCredential.user;
       sessionStorage.setItem('loggedInUser', user.uid)
+      // sessionStorage.setItem('adminRole', user.isAdmin)
       alert("You are now logged in")
+      // redirect()
       // authSvc.navigateTo('case-management')
-      // router.navigate(['case-management'])
+      // authSvc.navigateTo('case-management')
     })
     .catch((error) => {
       const errorCode = error.code;
-      if (errorCode === "auth/invalid-credential") {
+      console.log(errorCode)
+      if (errorCode === "auth/wrong-password") {
+        alert("Invalid Email or Password")
+      }
+      else if (errorCode === "auth/invalid-email") {
         alert("Invalid Email or Password")
       }
       else if (errorCode === 'auth/user-not-found') {
@@ -300,8 +294,6 @@ export function loginUser(email: string, password: string) {
 }
 
 export async function forgotPassword(email: string) {
-  // TODO: Stop redirecting to login if email does not exist
-  //       Stop displaying 2 alerts if the email does not exist because it is invalid
   const emailExists = await checkEmailExists(email)
   if (!emailExists) {
     return;
@@ -316,49 +308,75 @@ export async function forgotPassword(email: string) {
       // ..
     });
 }
-// TODO: Check if the observable return type is needed
-// export function updateUser(user: StaffInfo): Observable<void> {
-//   const ref = doc(collection(db,'staffMembers'),user.uid)
-//   // const ref = doc(db, 'staffMembers', user.uid);
-//   return from(updateDoc(ref, { ...user }));
-// }
-export function updateUser(user: StaffInfo): Observable<void> {
-  console.log('Updating user with UID:', user.uid);
 
-  if (!user.uid || user.uid.trim() === '') {
+export function updateUser(user: StaffInfo): Observable<void> {
+  const currentUser = auth.currentUser
+  console.log('Updating user with UID:', currentUser?.uid);
+
+  if (!currentUser?.uid || currentUser?.uid.trim() === '') {
     throw new Error('Invalid UID. Cannot update user without a valid UID.');
   }
 
-  const ref = doc(db, 'staffMembers', user.uid); // Ensure valid UID
+  const ref = doc(db, 'staffMembers', currentUser.uid); // Ensure valid UID
   return from(updateDoc(ref, { ...user }));
 }
 
 
 export async function currentUserProfile(): Promise<StaffInfo | null> {
 
-    // Listen for auth state changes
     const user = auth.currentUser
       if (user && user.uid) {
         try {
-          const ref = doc(db, 'staffMembers', user.uid); // Get document reference
-          const docSnap = await getDoc(ref); // Fetch document from Firestore
+          const ref = doc(db, 'staffMembers', user.uid);
+          const docSnap = await getDoc(ref);
           
           if (docSnap.exists()) {
             const profile = docSnap.data() as StaffInfo;
-            return profile; // Emit the user profile
+            return profile;
           } else {
             console.error('No document found for the current user.');
-            return null; // Emit null if no document is found
+            return null;
           }
         } catch (error) {
           console.error('Error fetching user profile:', error);
-           // Emit error
         }
       } else {
         console.log('No user is currently logged in.');
-         return null; // Emit null if no user is logged in
+         return null;
       }
       return null
+}
+
+export async function getUserProfile(uid: string): Promise<Promise<StaffInfo> | null> {
+  if (uid != null) {
+    try {
+      const ref = doc(db, 'staffMembers', uid);
+      const docSnap = await getDoc(ref);
+      
+      if (docSnap.exists()) {
+        const profile = docSnap.data() as StaffInfo;
+        return profile;
+      } else {
+        console.error('No document found for the current user.');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  } else {
+    console.log('The user UID is invalid');
+     return null;
+  }
+  return null
+}
+
+export async function fetchAllUsers(): Promise<StaffInfo[]> {
+  const usersCollection = collection(db, "staffMembers");
+  const querySnapshot = await getDocs(usersCollection);
+  return querySnapshot.docs.map(doc => ({
+    uid: doc.id,
+    ...doc.data()
+  })) as StaffInfo[];
 }
 
 async function checkEmailExists(email: string): Promise<boolean> {
@@ -394,19 +412,7 @@ async function checkEmailExists(email: string): Promise<boolean> {
   }
 }
 
-// Helper function to validate email format
 function validateEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
-
-
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    const uid = user.uid;
-    // ...
-  } else {
-    // User is signed out
-    // ...
-  }
-});
