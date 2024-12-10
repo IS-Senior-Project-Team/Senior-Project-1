@@ -1,0 +1,51 @@
+id,firstName,lastName,phoneNumber,notes,status,numOfPets,species,createdDate
+1,Jane,Davis,7340514068,,Call elevated to management,4,Adult Cat,2024-12-05T03:16:21Z
+2,Morgan,Miller,9191729968,,Walk-in- Stray Intake,1,Adult Cat,2024-12-08T03:16:21Z
+3,Jane,Brown,1254979743,,Rehome Attempt,1,Puppy,2024-12-06T03:16:21Z
+4,Taylor,Doe,5088460316,,Owner Surrender Intake,2,Adult Dog,2024-12-06T03:16:21Z
+5,John,Miller,3947894081,,LM with Info,5,Puppy,2024-12-08T03:16:21Z
+6,John,Johnson,2286337761,,Keeping- Other,3,Kitten,2024-12-04T03:16:21Z
+7,John,Johnson,2530347463,,LM with Info,4,Adult Dog,2024-12-07T03:16:21Z
+8,Sam,Davis,9183646031,,Not PSN,3,Adult Cat,2024-12-07T03:16:21Z
+9,Pat,Garcia,6297857576,,Reunited,5,Puppy,2024-12-07T03:16:21Z
+10,Pat,Brown,9594169665,,Open,4,Kitten,2024-12-08T03:16:21Z
+11,Morgan,Davis,9421234016,,Rehome Attempt,1,Adult Cat,2024-12-04T03:16:21Z
+12,Sam,Johnson,6478423792,,Keeping- Other,2,Adult Cat,2024-10-28T03:16:21Z
+13,Sam,Williams,8671494242,The kitten has been reported missing near the park since last weekend.,Lost Pet,1,Kitten,2024-12-05T03:16:21Z
+14,Casey,Johnson,6650726177,,Reunited,1,Puppy,2024-09-30T03:16:21Z
+15,Sam,Brown,6756594908,,Call elevated to management,2,Adult Dog,2024-12-08T03:16:21Z
+16,Morgan,Williams,2611141053,,Keeping- Medical,4,Kitten,2024-10-04T03:16:21Z
+17,Sam,Brown,7652284305,,Found Pet,3,Adult Dog,2024-12-03T03:16:21Z
+18,Morgan,Smith,7755179889,,Not PSN,3,Kitten,2024-12-10T03:16:21Z
+19,Alex,Miller,2334463603,A puppy was found wandering in the neighborhood and brought in by a resident.,Found Pet,4,Puppy,2024-12-06T03:16:21Z
+20,Casey,Rodriguez,7928107565,,Surrender Denied,1,Kitten,2024-12-07T03:16:21Z
+21,Sam,Davis,4293655206,,Walk-in- Other,5,Puppy,2024-11-23T03:16:21Z
+22,Alex,Brown,6295623495,,Kitten Pack & S/N,4,Adult Dog,2024-12-04T03:16:21Z
+23,Morgan,Johnson,5641066325,,Not PSN,1,Puppy,2024-12-07T03:16:21Z
+24,Taylor,Williams,8593781472,The owner is looking for a new home for their adult dog due to housing restrictions.,Rehome Attempt,5,Adult Dog,2024-12-03T03:16:21Z
+25,Chris,Martinez,9093438853,,Keeping-Behavior,4,Puppy,2024-12-03T03:16:21Z
+26,Taylor,Rodriguez,2253110171,,Keeping- Medical,4,Kitten,2024-12-04T03:16:21Z
+27,Morgan,Williams,9730206051,,Keeping- Medical,1,Adult Cat,2024-10-01T03:16:21Z
+28,Taylor,Rodriguez,8146380637,,Already Rehomed,1,Puppy,2024-12-07T03:16:21Z
+29,John,Doe,2396729474,,Walk-in- Stray Attempt,3,Adult Cat,2024-12-07T03:16:21Z
+30,Sam,Davis,7450287590,,Surrender Denied,4,Adult Dog,2024-12-07T03:16:21Z
+31,Sam,Miller,1175487404,The kitten was successfully reunited with its owner after being identified through a microchip.,Reunited,1,Kitten,2024-12-06T03:16:21Z
+32,Alex,Davis,0732904191,,Walk-in Surrender Attempt,2,Adult Cat,2024-12-06T03:16:21Z
+33,Morgan,Martinez,0605022260,,Walk-In- OS Intake,4,Adult Cat,2024-09-26T03:16:21Z
+34,Casey,Doe,1207197835,,ACPS,4,Kitten,2024-12-08T03:16:21Z
+35,Jane,Johnson,0932495724,,Walk-in Surrender Attempt,3,Puppy,2024-12-05T03:16:21Z
+36,Morgan,Rodriguez,5669878529,,Owner Surrender Intake,5,Adult Dog,2024-10-23T03:16:21Z
+37,Morgan,Miller,8480333331,,Already Rehomed,1,Adult Cat,2024-09-17T03:16:21Z
+38,Sam,Rodriguez,5124938358,,Walk-in- Other,2,Adult Dog,2024-12-09T03:16:21Z
+39,Sam,Brown,7436208028,,Walk-In- OS Intake,4,Puppy,2024-12-03T03:16:21Z
+40,Pat,Williams,3880852000,,Surrender Denied,3,Puppy,2024-12-07T03:16:21Z
+41,Morgan,Garcia,0364525185,The scheduled surrender appointment for the adult dog was missed without prior notice.,No Show Appt,1,Adult Dog,2024-12-04T03:16:21Z
+42,John,Doe,2281301319,,LM with Info,4,Puppy,2024-12-04T03:16:21Z
+43,Jane,Garcia,9640783354,,Keeping- Medical,3,Kitten,2024-12-06T03:16:21Z
+44,Taylor,Miller,2689411107,,Reunited,4,Adult Dog,2024-12-07T03:16:21Z
+45,Casey,Johnson,2422520464,,Reunited,4,Adult Cat,2024-12-05T03:16:21Z
+46,Sam,Smith,5222893620,,Duplicate,4,Adult Cat,2024-12-10T03:16:21Z
+47,Jane,Rodriguez,8846044166,,PSN Boarding,4,Adult Dog,2024-10-14T03:16:21Z
+48,John,Garcia,7563862944,,Keeping-Behavior,5,Kitten,2024-12-07T03:16:21Z
+49,John,Brown,8313155366,,Walk-in- Other,5,Adult Dog,2024-11-18T03:16:21Z
+50,Alex,Garcia,5537271689,,Walk-in Surrender Attempt,4,Kitten,2024-12-04T03:16:21Z
