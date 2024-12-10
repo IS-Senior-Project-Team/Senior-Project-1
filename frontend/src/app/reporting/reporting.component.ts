@@ -29,7 +29,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   // Filter values
   // Each value needs to be unique, so "All" won't work here
-  timeFrame: string = "All time frames"
+  timeFrame: string = "Weekly"
   timeFrames: string[] = ['All time frames', 'Daily', 'Weekly', 'Monthly', "Yearly"];
 
   specie: string = "All species"
@@ -132,7 +132,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
     // Add table data
     let yPosition = 130;
-    this.cases.forEach((outcome, index) => {
+    this.cases.slice(0, 10).forEach((outcome, index) => {
       doc.text(`${index + 1}. ${outcome.firstName}: ${outcome.status}`, 10, yPosition);
       yPosition += 10;
     });
@@ -188,7 +188,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       chart: {
         type: 'column',
         backgroundColor: 'rgba(0,0,0,0)',
-        height: 300,
+        height: 400,
       },
       title: {
         text: 'Cases Statuses',
@@ -205,8 +205,11 @@ export class ReportingComponent implements OnInit, OnDestroy {
           text: null,
         },
         labels: {
+          rotation: -45,
           style: {
-            color: '#666666'
+            color: '#666666',
+            fontSize: '10px',
+            whiteSpace: 'normal'
           }
         }
       },

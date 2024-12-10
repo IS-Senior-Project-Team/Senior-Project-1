@@ -15,7 +15,7 @@ export class CasesService {
   async getAll(
     status: string | undefined = undefined,
     specie: string = "",
-    timeFrame: string = "All time frames"
+    timeFrame: string = "Weekly"
   ): Promise<Case[]> {
     return await getCases(status, specie, timeFrame);
   }

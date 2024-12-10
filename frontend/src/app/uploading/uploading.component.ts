@@ -7,6 +7,7 @@ import { Case } from '../models/case';
 import { CasesService } from '../services/cases.service';
 import { CaseFile } from '../models/caseFile';
 import { FormsModule } from '@angular/forms';
+import { serverTimestamp, Timestamp } from 'firebase/firestore';
 
 @Component({
   selector: 'app-uploading',
@@ -91,7 +92,8 @@ export class UploadingComponent {
         status: data[row][153],
         numOfPets: data[row][168],
         species: data[row][158],
-        isDeleted: false
+        isDeleted: false,
+        createdDate: Timestamp.now()
       }
       // console.log(c)
       thisFile.cases.push(c)
