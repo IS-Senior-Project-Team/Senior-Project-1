@@ -4,6 +4,8 @@
   width: 360px;
   padding: 7% 0 0;
   margin: auto;
+  justify-content: center;
+  align-items: center;
 }
 
 .form {
