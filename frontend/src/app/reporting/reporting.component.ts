@@ -132,7 +132,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
     // Add table data
     let yPosition = 130;
-    this.cases.forEach((outcome, index) => {
+    this.cases.slice(0, 10).forEach((outcome, index) => {
       doc.text(`${index + 1}. ${outcome.firstName}: ${outcome.status}`, 10, yPosition);
       yPosition += 10;
     });
