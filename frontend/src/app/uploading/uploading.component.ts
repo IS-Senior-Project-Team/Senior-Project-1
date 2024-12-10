@@ -92,7 +92,6 @@ export class UploadingComponent {
         status: data[row][153],
         numOfPets: data[row][168],
         species: data[row][158],
-        isExpanded: false,
         isDeleted: false,
         createdDate: Timestamp.now()
       }
@@ -131,7 +130,6 @@ export class UploadingComponent {
           status: line1["Status"],
           numOfPets: line1["# Pets (if PSN/RH)"],
           species: line1["Species"],
-          isExpanded: false,
           isDeleted: false,
           createdDate: Timestamp.now()
         }

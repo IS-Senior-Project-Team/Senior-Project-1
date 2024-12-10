@@ -6,10 +6,14 @@
       <h2 class="text-center p-3">Manage Pet Cases</h2>
 
       <div class="d-flex justify-content-start mb-3">
-        <button class="btn btn-secondary" 
+        <button class="btn btn-secondary me-3" 
                 (click)="toggleShowDeleted()" 
                 [disabled]="!hasDeletedCases()">
             {{ showDeleted ? 'Hide' : 'Show' }} Deleted Cases
+        </button>
+        <button class="btn btn-primary" *ngIf="showDeleted === false"
+                (click)="addCase()">
+          + Add Case
         </button>
       </div>
 

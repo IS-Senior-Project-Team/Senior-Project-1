@@ -5,6 +5,7 @@ import { CasesService } from '../services/cases.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { STATUSES, SPECIES } from '../constants';
 
 @Component({
@@ -25,7 +26,6 @@ export class EditCaseComponent implements OnInit {
     status: '',
     numOfPets: 0,
     species: '',
-    isExpanded: false,
     isDeleted: false
   };
 
@@ -33,24 +33,15 @@ export class EditCaseComponent implements OnInit {
 
   species: string[] = SPECIES;
 
-  /*
-    "Adult Dog, Adult Cat",
-    "Adult Dog, Puppy",
-    "Adult Dog, Kitten",
-    "Adult Cat, Puppy",
-    "Adult Cat, Kitten",
-    "Puppy, Kitten",
-    "Adult Dog, Adult Cat, Puppy",
-    "Adult Dog, Adult Cat, Kitten",
-    "Adult Dog, Puppy, Kitten",
-    "Adult Cat, Puppy, Kitten",
-    "Adult Dog, Adult Cat, Puppy, Kitten",
-  */
-
   // Initialize originalCase to later store the original case values
   private originalCase!: Case;
 
-  constructor(private router: Router, private route: ActivatedRoute, private casesService: CasesService) {}
+  constructor (
+    private router: Router, 
+    private route: ActivatedRoute, 
+    private casesService: CasesService,
+    private toastr: ToastrService,
+  ) {}
 
   ngOnInit(): void {
     // Retrieve the case ID from the route parameters
@@ -78,7 +69,11 @@ export class EditCaseComponent implements OnInit {
   }
 
   cancel() {
-    this.router.navigate(['/case-management']);
+    // User canceled
+    this.toastr.info('Case edit canceled', 'Canceled');
+    setTimeout(() => {
+      this.router.navigate(['/case-management']);
+    }, 100);
   }
 
   save(editCaseForm: NgForm) {
@@ -89,11 +84,14 @@ export class EditCaseComponent implements OnInit {
             this.casesService.updateCase(this.case).subscribe({
                 next: updatedCase => {
                     console.log('Case updated successfully:', updatedCase);
-                    alert(`Case #${this.case.id} has been successfully updated!`);
+                    // Display success message
+                    this.toastr.success('Case edited successfully', 'Success');
                     this.router.navigate(['/case-management']);
                 },
                 error: error => {
                     console.error('Error saving case', error);
+                    // Handle case where edit was not successful
+                    this.toastr.error('Failed to edit case', 'Error');
                 }
             });
         } else {
@@ -101,6 +99,9 @@ export class EditCaseComponent implements OnInit {
         }
     } else {
         console.log('Update canceled by the user. Reverting to previous values.');
+
+        // User canceled
+        this.toastr.info('Case edit canceled', 'Canceled');
 
         // Restore original values
         this.case = { ...this.originalCase };

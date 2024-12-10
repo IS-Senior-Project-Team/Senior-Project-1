@@ -8,6 +8,9 @@ import { Timestamp } from "firebase/firestore";
  * @param phoneNumber The phone number of the pet owner
  * @param notes Any notes about the case
  * @param status The status of the case (open, closed, etc.)
+ * @param numOfPets The number of pets for the case
+ * @param species The species of the pet(s) in the case
+ * @param isDeleted Used to keep track if the case is deleted or not
  */ 
 export interface Case {
     id: string;
@@ -18,9 +21,6 @@ export interface Case {
     status: string;
     numOfPets: number;
     species: string;
-    isExpanded: boolean;
     isDeleted: boolean;
     createdDate?: Timestamp;
-    
 }
-  
