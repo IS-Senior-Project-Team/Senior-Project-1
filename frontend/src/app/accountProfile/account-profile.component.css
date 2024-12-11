@@ -1,7 +1,8 @@
 .account-profile-page {
     width: 100%;
     height: 100vh;
-    background-color: #e6f4e6;
+    /* background-color: #e6f4e6; */
+    background-color: #EAF3EA;
     display: flex;
     flex-direction: column;
     align-items: center;
