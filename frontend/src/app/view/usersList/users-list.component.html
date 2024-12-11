@@ -4,8 +4,6 @@
         <button class="create-btn" type="button" [routerLink]="['/register']">Create Account</button>
         <button class="dash-btn" type="button" [routerLink]="['/admin-dashboard']" style="mar">Back to Dashboard</button>
     </div>
-
-
     <div *ngIf="loading" class="loading">
         <div class="spinner"></div>
         <p>Loading users...</p>
