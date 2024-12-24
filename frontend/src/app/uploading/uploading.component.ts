@@ -19,7 +19,7 @@ import { serverTimestamp, Timestamp } from 'firebase/firestore';
 export class UploadingComponent {
 
   filesToUpload: File[] = [];
-  isEditingData = false;
+  isEditingData = false; //;;;;;;;;;;
   checkData = false;
   isLoading = false;
   files: CaseFile[] = [];
