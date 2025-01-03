@@ -83,7 +83,7 @@ export async function getCases(
         q = query(q, where('createdDate', '<=', Timestamp.fromDate(endDate)));
       }
     }
-
+    q = query(q, where('isDeleted', '==', false));
     const snapshot = await getDocs(q);
     return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Case));
   }
