@@ -25,6 +25,19 @@
       </select>
       <caption class="select-caption">Species</caption>
     </div>
+    <div class="select-wrapper">
+     <div class="hstack">
+
+   <button class="arrow-button" (click)="incrementOffset()">
+    ⬅
+   </button>
+   <button class="arrow-button" (click)="decrementOffset()">
+    ➡️
+   </button>
+     
+    </div>
+    <caption class="select-caption">Offset: {{ offset }}</caption>
+    </div>
   </div>
 </div>
 
