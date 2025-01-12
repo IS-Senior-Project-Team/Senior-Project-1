@@ -109,6 +109,17 @@
     border-style: none;
     width: 100px;
     height: 40px;
+    margin-top: 20px;
+}
+.upload-file-btn:hover {
+    color: rgba(255, 255, 255, 0.908);
+    background-color: #52d45fd7;
+    border-radius: 16px;
+    border-color: white;
+    border-style: none;
+    width: 100px;
+    height: 40px;
+    margin-top: 20px;
 }
 .upload-file-btn:disabled {
     color: rgba(255, 255, 255, 0.908);
@@ -178,14 +189,16 @@ td > input[type='text'],select {
     margin-left: 15px; /* Don't forget this line exists lol */
 }
 .editButton {
-    background-color: blue;
+    background-color: #1a6ef7;
     color: white;
     width: 100px;
+    border-radius: 8px;
 }
 .deleteButton {
-    background-color: red;
+    background-color: #E13C3C;
     color: white;
     width: 75px;
+    border-radius: 8px;
 }
 .cancelButton {
     background-color: grey;
@@ -194,23 +207,57 @@ td > input[type='text'],select {
     margin-left: 0;
 }
 .applyButton {
-    background-color: #418DF8;
-    color: white;
-    width: 130px;
-    /* padding: 5px 5px 5px 5px; */
-    margin-left: 0;
+    /* background-color: #418DF8; */
+    /* background-color: #4CAF50; */
+    /* color: rgba(255, 255, 255, 0.908); */
+    background-color: #4dc959d7;
+    color: black;
+    font-weight: bold;
+    /* width: 130px; */
+    padding: 5px 10px;
+    box-shadow: 0px 5px 20px gray;
+    font-family: Arial, sans-serif;
+    border-radius: 8px;
+    border: none;
+    /* border-radius: 16px; */
+    border-color: white;
+    border-style: none;
 }
 
+.applyButton:hover {
+    background-color: #71c779d7;
+    color: black;
+    font-weight: bold;
+    padding: 5px 10px;
+    box-shadow: 0px 5px 20px gray;
+    font-family: Arial, sans-serif;
+    border-radius: 8px;
+    border: none;
+    border-color: white;
+    border-style: none;
+}
+
+/* .upload-file-btn {
+    color: rgba(255, 255, 255, 0.908);
+    background-color: #4dc959d7;
+    border-radius: 16px;
+    border-color: white;
+    border-style: none;
+    width: 100px;
+    height: 40px;
+} */
+
 #data-viewer {
-    width: 70vw;
+    width: 75vw;
     height: 90vh;
     position: absolute;
     top: 5%;
-    left: 25%;
+    left: 20%;
     z-index: 1;
-    background-color: whitesmoke;
+    /* background-color: #b4e4b4; */
+    background-color: #C3EAC7;
     border-radius: 20px;
-    padding: 35px;
+    padding: 35px 50px 10px 50px;
     box-shadow: 0px 10px 20px gray;
 }
 
@@ -219,4 +266,5 @@ td > input[type='text'],select {
     overflow-y: auto;
     margin-bottom: 10px;
     background-color: white;
+    /* background-color: #CDFCCD; */
 }
