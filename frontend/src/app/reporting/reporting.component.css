@@ -43,6 +43,25 @@
     transition: background-color 0.3s;
 }
 
+
+
+.arrow-button {
+    background-color: #4dc959;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: small;
+    margin: 2%;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.arrow-button:hover {
+    background-color: #45b34d;
+}
+
 .export-button:hover {
     background-color: #45b34d;
 }

@@ -41,7 +41,8 @@ const db = getFirestore(app);
 export async function getCases(
   status?: string,
   specie?: string,
-  timeFrame?: string
+  timeFrame?: string,
+  offset: number = 0
   ): Promise<Case[]> {
     const casesCollection = collection(db, 'cases');
     let q = query(casesCollection);
@@ -64,17 +65,17 @@ export async function getCases(
 
       switch (timeFrame) {
         case 'Daily':
-          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - offset);
           break;
         case 'Weekly':
           startDate = new Date(now);
-          startDate.setDate(now.getDate() - 7);
+          startDate.setDate(now.getDate() - (7 * offset));
           break;
         case 'Monthly':
-          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          startDate = new Date(now.getFullYear(), now.getMonth() - offset, 1);
           break;
         case 'Yearly':
-          startDate = new Date(now.getFullYear(), 0, 1);
+          startDate = new Date(now.getFullYear() - offset, 0, 1);
           break;
       }
 
@@ -83,7 +84,7 @@ export async function getCases(
         q = query(q, where('createdDate', '<=', Timestamp.fromDate(endDate)));
       }
     }
-
+   // q = query(q, where('isDeleted', '==', false));
     const snapshot = await getDocs(q);
     return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Case));
   }
