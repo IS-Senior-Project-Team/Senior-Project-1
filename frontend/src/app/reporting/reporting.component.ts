@@ -38,6 +38,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
   status: string = "All statuses"
   statuses: string[];
   
+  offset: number = 0;
+
   @ViewChild('casesTable', { static: false }) table!: ElementRef;
 
   public mainChartInstance: Highcharts.Chart | null = null;
@@ -73,7 +75,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     newTimeFrame = this.timeFrame !== "All time frames" ? this.timeFrame : undefined;
   
     // Query the service with all filters
-    this.caseService.getAll(newStatus, newSpecie, newTimeFrame).then((data) => {
+    this.caseService.getAll(newStatus, newSpecie, newTimeFrame, this.offset).then((data) => {
       this.cases = data;
       this.createBarChart();
       this.createPieChart();
@@ -306,8 +308,10 @@ export class ReportingComponent implements OnInit, OnDestroy {
       console.log('Filter changed:', newValue);
       // Update the filter value from the html element and refresh the data
       // Includes is like contains in Swift
+     
       if(this.timeFrames.includes(newValue ?? "")) {
         this.timeFrame = newValue ?? "";
+        this.offset = 0;
         this.refreshData();
         return;
       }
@@ -328,5 +332,13 @@ export class ReportingComponent implements OnInit, OnDestroy {
         console.error('Event target is null');
         return;
       }
+    }
+    decrementOffset(): void {
+      this.offset--;
+      this.refreshData();
+    }
+    incrementOffset(): void {
+      this.offset++;
+      this.refreshData();
     }
 }

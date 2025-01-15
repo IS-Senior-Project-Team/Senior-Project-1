@@ -21,27 +21,18 @@ export class ForgotPasswordComponent {
   constructor(private authSvc: AuthService, private router: Router) {}
 
   forgotPassword() {
-    if (!this.email || !this.newPassword || !this.confirmPassword) {
-      this.errorMessage = 'Please fill out all fields';
+    if (!this.email) {
+      this.errorMessage = 'Please enter your email';
       return;
     }
-
-    if (this.newPassword !== this.confirmPassword) {
-      this.errorMessage = 'Passwords do not match';
-      return;
-    }
-    this.authSvc.resetPassword(this.email, this.newPassword).subscribe({
-      next: () => {
-        this.message = 'Password has been reset successfully';
-        this.errorMessage = '';
+    // TODO: Display error message if email is not entered. (Will transition from alert messages to snack bars )
+    this.authSvc.userForgotPassword(this.email)
+        this.message = 'Password has been reset successfully'; //Confirm if I still need this
         this.router.navigate(['/login']);
-      },
-      error: (err) => {
-        console.error('Error during password reset process:', err);
-        this.errorMessage = 'Error resetting password. Please check the email entered.';
-      }
-    });
   }
 
+  toggleLogin () {
+    this.router.navigate(['login'])
+  }
 
 }

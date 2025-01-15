@@ -1,0 +1,40 @@
+
+<div class="account-profile-page">
+    <div class="header">
+        <h1>{{staffInfo?.firstname}}'s Account Profile</h1>
+    </div>
+
+    <div class="content">
+        <!-- Ensure userProfile exists before rendering the form -->
+        <form *ngIf="staffInfo" [formGroup]="profileForm" class="profile-form">
+            <div class="row">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" formControlName="firstname"/>
+
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" formControlName="lastname" />
+            </div>
+            <div class="row">
+                <label for="email">Email:</label>
+                <input type="email" id="email" formControlName="email"/>
+
+                <label for="phone">Phone Number:</label>
+                <input type="text" id="phone" formControlName="phoneNumber"/>
+            </div>
+            <div class="row">
+                <label for="address">Address:</label>
+                <textarea id="address" formControlName="address"></textarea>
+            </div>
+
+            <div class="actions" style="display: flex; justify-content: space-between;">
+                <button type="button" [routerLink]="['/admin-dashboard/users']">Go Back</button>
+                <button type="button">Deactivate</button>
+              </div>
+        </form>
+    </div>
+
+    <!-- Fallback if no profile is found -->
+    <p *ngIf="!staffInfo"><em>Loading profile information...</em></p>
+
+
+</div> 
