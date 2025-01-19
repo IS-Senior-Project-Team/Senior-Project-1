@@ -55,29 +55,36 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
   }
 
   private handleActionClick = (event: Event) => {
-    const target = event.currentTarget as HTMLElement;
-    const action = target.getAttribute('data-action');
-    
-    if (!action || !this.dtInstance) return;
+    event.preventDefault();
+    const target = event.target as HTMLElement;
+    const actionButton = target.closest('[data-action]');
+
+    if (!actionButton || !this.dtInstance) return;
+
+    const action = actionButton.getAttribute('data-action');
+    const caseId = actionButton.getAttribute('data-id');
+
+    if (!action) return;
+
+    const row = actionButton.closest('tr');
+    if (!row) return;
+
+    const rowData = this.dtInstance.row(row).data();
 
     switch (action) {
       case 'edit':
-        const caseId = target.getAttribute('data-id');
         if (caseId) {
           this.editCase(caseId);
-        } 
-        break;
-
-      case 'delete':
-      case 'recover':
-        const row = target.closest('tr');
-        if (row) {
-          const rowData = this.dtInstance.row(row).data();
-          action === 'delete' ? this.deleteCase(rowData) : this.recoverCase(rowData);
         }
         break;
+      case 'delete':
+        this.deleteCase(rowData);
+        break;
+      case 'recover':
+        this.recoverCase(rowData);
+        break;
     }
-  };
+  }
   
   ngAfterViewInit() {
     this.cdr.detectChanges();
@@ -90,14 +97,9 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
   }
 
   private bindTableEvents(): void {
-    document.addEventListener('click', (event: Event) => {
-      const target = event.target as HTMLElement;
-      const actionButton = target.closest('[data-action]');
-      
-      if (actionButton) {
-        this.handleActionClick(new Event('click', { bubbles: true }));
-      }
-    });
+    if (this.dataTable && this.dataTable.nativeElement) {
+      this.dataTable.nativeElement.addEventListener('click', this.handleActionClick);
+    }
   }
 
   private renderActions(caseItem: Case): string {
@@ -117,6 +119,28 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     }
   }
 
+  // Method to render column data in the DataTable
+    // Displays N/A for each column data that is missing
+    // Prevents "no column data" error
+  private renderColumn(data: any, type: string, maxLength?: number): string {
+    if (type === 'display') {
+      // Handle null/undefined/empty values
+      if (data == null || data === '') {
+        return 'N/A';
+      }
+      
+      // Handle text truncation if maxLength is specified
+      if (maxLength && typeof data === 'string' && data.length > maxLength) {
+        return `<span title="${data}">${data.substring(0, maxLength)}...</span>`;
+      }
+      
+      return data.toString();
+    }
+    // For sorting/filtering, return empty string if null/undefined
+    return data == null ? '' : data.toString();
+  }
+
+  // Method to initialize the DataTable
   private initDataTable(): void {
     if (!this.dataTable) {
       console.error('DataTable element not found.');
@@ -128,29 +152,42 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       this.dtInstance.destroy();
     }
 
+    const columns = [
+      {
+        name: 'firstName',
+      },
+      {
+        name: 'lastName',
+      },
+      {
+        name: 'phoneNumber',
+      },
+      {
+        name: 'notes',
+        maxLength: 25,
+      },
+      {
+        name: 'status',
+      },
+      {
+        name: 'numOfPets',
+      },
+      {
+        name: 'species',
+      }
+    ];
+
     // Create new DataTable instance
     this.dtInstance = new DataTable(this.dataTable.nativeElement, {
       data: this.displayedCases,
       columns: [
-        { data: 'firstName' },
-        { data: 'lastName' },
-        { data: 'phoneNumber' },
-        {
-          data: 'notes',
-          render: (data: string, type: string) => {
-            // For display type, truncate the text if too long
-            if (type === 'display' && data) {
-              return data.length > 75
-                ? `<span title="${data}">${data.substring(0, 75)}...</span>`
-                : data;
-            }
-            // For sorting, filtering, and other types, return full data
-            return data;
-          }
-        },
-        { data: 'status' },
-        { data: 'numOfPets' },
-        { data: 'species' },
+        ...columns.map(col => ({
+          data: col.name,
+          defaultContent: 'N/A',
+          orderable: ['firstName', 'lastName', 'phoneNumber', 'status', 'numOfPets', 'species'].includes(col.name), // Columns that are orderable
+          searchable: ['firstName', 'lastName', 'phoneNumber', 'status', 'species'].includes(col.name), // Columns that are searchable
+          render: (data: any, type: string) => this.renderColumn(data, type, col.maxLength)
+        })),
         {
           data: null,
           orderable: false,
@@ -171,7 +208,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
         topStart: 'pageLength',
         topEnd: {
           search: {
-            placeholder: 'Search'
+            placeholder: 'Search',
           }
         }
       }
@@ -228,7 +265,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       this.toastr.success('Case deleted successfully', 'Success');
     } else {
       // User canceled
-      this.toastr.info('Delete case canceled', 'Canceled');
+      this.toastr.info('Delete case was canceled', 'Canceled');
     }
   }
 
@@ -255,7 +292,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       }, 1000);  // 1-second delay before executing the update
     } else {
       // User canceled
-      this.toastr.info('Recover case canceled', 'Canceled');
+      this.toastr.info('Recover case was canceled', 'Canceled');
     }
   }
 

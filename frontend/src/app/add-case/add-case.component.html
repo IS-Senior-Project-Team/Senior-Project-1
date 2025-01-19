@@ -28,11 +28,12 @@
                             type="text" 
                             required 
                             #phoneNumber="ngModel" 
-                            placeholder="Phone Number" 
+                            placeholder="e.g. 123-456-7890"
+                            pattern="^(?:\d{3}-){2}\d{4}$"
                         />
                         <div *ngIf="phoneNumber.invalid && (phoneNumber.dirty || phoneNumber.touched)" class="text-danger">
                             <div *ngIf="phoneNumber.errors?.['required']">Phone number is required.</div>
-                            <div *ngIf="phoneNumber.errors?.['pattern']">Invalid phone number format.</div>
+                            <div *ngIf="phoneNumber.errors?.['pattern']">Invalid phone number format.<br>(e.g., 123-456-7890)</div>
                         </div>
                     </div>
                 </div>
@@ -44,9 +45,10 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label>Status: </label>
-                        <select class="form-select" [(ngModel)]="case.status" name="status">
+                        <select class="form-select" [(ngModel)]="case.status" name="status" required #status="ngModel">
                             <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
                         </select>
+                        <div *ngIf="status.invalid && status.touched" class="text-danger">Status is required.</div>
                     </div>
                     <div class="col-md-4">
                         <label># of Pets: </label>
@@ -61,9 +63,10 @@
                     
                     <div class="col-md-4">
                         <label>Species: </label>
-                        <select class="form-select" [(ngModel)]="case.species" name="species">
+                        <select class="form-select" [(ngModel)]="case.species" name="species" required #caseSpecies="ngModel">
                             <option *ngFor="let specie of species" [value]="specie">{{ specie }}</option>
                         </select>
+                        <div *ngIf="caseSpecies.invalid && caseSpecies.touched" class="text-danger">Species is required.</div>
                     </div>
                 </div>
 
