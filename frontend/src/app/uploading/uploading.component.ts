@@ -130,8 +130,7 @@ export class UploadingComponent {
           status: line1["Status"],
           numOfPets: line1["# Pets (if PSN/RH)"],
           species: line1["Species"],
-          isDeleted: false,
-          createdDate: Timestamp.now()
+          isDeleted: false
         }
         thisFile.cases.push(c) // Push all of the cases to the CaseFile object
       }

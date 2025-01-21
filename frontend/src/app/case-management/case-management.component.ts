@@ -1,18 +1,13 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
-import $ from 'jquery';
 import 'datatables.net';
 import 'datatables.net-buttons';
 import 'datatables.net-buttons-dt';
+import DataTable from 'datatables.net-dt';
 import { Router } from '@angular/router';
 import { Case } from '../models/case';
 import { CasesService } from '../services/cases.service';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
-import { getCases, getContacts } from '../services/firebaseConnection';
-import { DocumentData } from 'firebase/firestore';
-import { FirebaseContact } from '../../../../backend/src/models/FirebaseTestObj'
-import { Config } from 'datatables.net'
-import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-case-management',
@@ -25,9 +20,11 @@ import { Subject } from 'rxjs';
 export class CaseManagementComponent implements OnInit, AfterViewInit, AfterViewChecked {
   @ViewChild('dataTable', { static: false }) dataTable!: ElementRef;
 
+  private dtInstance: any | null = null;
+  private dtInitialized = false; // Track the DataTable initialization state
+
   cases: Case[] = [];
   showDeleted: boolean = false; // Toggle to show/hide deleted cases
-  private dtInitialized = false; // Track the DataTable initialization state
 
   constructor (
     private router: Router, 
@@ -42,10 +39,51 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     this.bindTableEvents();
   }
 
-  ngOnDestroy() {
-    $('body').off('click', '[data-action="edit"]');
-    $('body').off('click', '[data-action="delete"]');
-    $('body').off('click', '[data-action="recover"]');
+  ngOnDestroy(): void {
+
+    const actionButtons = document.querySelectorAll('[data-action]');
+
+    actionButtons.forEach(button => {
+      button.removeEventListener('click', this.handleActionClick);
+    });
+    
+    // Destroy DataTable instance if it exists
+    if (this.dtInstance) {
+      this.dtInstance.destroy();
+      this.dtInstance = null;
+    }
+  }
+
+  private handleActionClick = (event: Event) => {
+    event.preventDefault();
+    const target = event.target as HTMLElement;
+    const actionButton = target.closest('[data-action]');
+
+    if (!actionButton || !this.dtInstance) return;
+
+    const action = actionButton.getAttribute('data-action');
+    const caseId = actionButton.getAttribute('data-id');
+
+    if (!action) return;
+
+    const row = actionButton.closest('tr');
+    if (!row) return;
+
+    const rowData = this.dtInstance.row(row).data();
+
+    switch (action) {
+      case 'edit':
+        if (caseId) {
+          this.editCase(caseId);
+        }
+        break;
+      case 'delete':
+        this.deleteCase(rowData);
+        break;
+      case 'recover':
+        this.recoverCase(rowData);
+        break;
+    }
   }
   
   ngAfterViewInit() {
@@ -59,28 +97,9 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
   }
 
   private bindTableEvents(): void {
-    $('body').on('click', '[data-action="edit"]', (event) => {
-      const caseId = $(event.currentTarget).data('id');
-      this.editCase(caseId);
-    });
-
-    $('body').on('click', '[data-action="delete"]', (event) => {
-      const row = $(event.currentTarget).closest('tr');
-      const rowData = $(this.dataTable.nativeElement)
-        .DataTable()
-        .row(row)
-        .data();
-      this.deleteCase(rowData);
-    });
-
-    $('body').on('click', '[data-action="recover"]', (event) => {
-      const row = $(event.currentTarget).closest('tr');
-      const rowData = $(this.dataTable.nativeElement)
-        .DataTable()
-        .row(row)
-        .data();
-      this.recoverCase(rowData);
-    });
+    if (this.dataTable && this.dataTable.nativeElement) {
+      this.dataTable.nativeElement.addEventListener('click', this.handleActionClick);
+    }
   }
 
   private renderActions(caseItem: Case): string {
@@ -100,69 +119,112 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     }
   }
 
+  // Method to render column data in the DataTable
+    // Displays N/A for each column data that is missing
+    // Prevents "no column data" error
+  private renderColumn(data: any, type: string, maxLength?: number): string {
+    if (type === 'display') {
+      // Handle null/undefined/empty values
+      if (data == null || data === '') {
+        return 'N/A';
+      }
+      
+      // Handle text truncation if maxLength is specified
+      if (maxLength && typeof data === 'string' && data.length > maxLength) {
+        return `<span title="${data}">${data.substring(0, maxLength)}...</span>`;
+      }
+      
+      return data.toString();
+    }
+    // For sorting/filtering, return empty string if null/undefined
+    return data == null ? '' : data.toString();
+  }
+
+  // Method to initialize the DataTable
   private initDataTable(): void {
-    if (this.dataTable) {
-      $(this.dataTable.nativeElement).DataTable().destroy(); // Destroy existing instance
-      $(this.dataTable.nativeElement).DataTable({
-        data: this.displayedCases,
-        columns: [
-          { data: 'firstName' },
-          { data: 'lastName' },
-          { data: 'phoneNumber' },
-          { 
-            data: 'notes',
-            render: function(data, type, row) {
-              // For display type, truncate the text if too long
-              if (type === 'display') {
-                return data && data.length > 75 
-                  ? `<span title="${data}">${data.substring(0, 75)}...</span>` 
-                  : data;
-              }
-              // For sorting, filtering, and other types, return full data
-              return data;
-            }
-          },
-          { data: 'status' },
-          { data: 'numOfPets' },
-          { data: 'species' },
-          {
-            data: null,
-            orderable: false,
-            searchable: false,
-            render: (data: any, type: any, row: any) => this.renderActions(row)
-          }
-        ],
-        pageLength: 5,
-        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-        language: {
-          lengthMenu: "Display _MENU_ records per page",
-          zeroRecords: "Nothing Found",
-          info: "Showing page _PAGE_ of _PAGES_",
-          infoEmpty: "No records available",
-          infoFiltered: "(filtered from _MAX_ total records)"
-        },
-        layout: {
-          topStart: 'pageLength',
-          topEnd: {
-            search: {
-              placeholder: 'Search'
-            }
+    if (!this.dataTable) {
+      console.error('DataTable element not found.');
+      return;
+    }
+
+    // Destroy existing instance if it exists
+    if (this.dtInstance) {
+      this.dtInstance.destroy();
+    }
+
+    const columns = [
+      {
+        name: 'firstName',
+      },
+      {
+        name: 'lastName',
+      },
+      {
+        name: 'phoneNumber',
+      },
+      {
+        name: 'notes',
+        maxLength: 25,
+      },
+      {
+        name: 'status',
+      },
+      {
+        name: 'numOfPets',
+      },
+      {
+        name: 'species',
+      }
+    ];
+
+    // Create new DataTable instance
+    this.dtInstance = new DataTable(this.dataTable.nativeElement, {
+      data: this.displayedCases,
+      columns: [
+        ...columns.map(col => ({
+          data: col.name,
+          defaultContent: 'N/A',
+          orderable: ['firstName', 'lastName', 'phoneNumber', 'status', 'numOfPets', 'species'].includes(col.name), // Columns that are orderable
+          searchable: ['firstName', 'lastName', 'phoneNumber', 'status', 'species'].includes(col.name), // Columns that are searchable
+          render: (data: any, type: string) => this.renderColumn(data, type, col.maxLength)
+        })),
+        {
+          data: null,
+          orderable: false,
+          searchable: false,
+          render: (data: any, type: string, row: any) => this.renderActions(row)
+        }
+      ],
+      pageLength: 5,
+      lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+      language: {
+        lengthMenu: "Display _MENU_ records per page",
+        zeroRecords: "Nothing Found",
+        info: "Showing page _PAGE_ of _PAGES_",
+        infoEmpty: "No records available",
+        infoFiltered: "(filtered from _MAX_ total records)"
+      },
+      layout: {
+        topStart: 'pageLength',
+        topEnd: {
+          search: {
+            placeholder: 'Search',
           }
         }
-      });
-      this.dtInitialized = true;
-    } else {
-      console.error('DataTable element not found.');
-    }
+      }
+    });
+
+    this.dtInitialized = true;
+    this.bindTableEvents();
   }
 
   private reInitDataTable(): void {
-    if (this.dataTable) {
-      const dataTableInstance = $(this.dataTable.nativeElement).DataTable();
-      dataTableInstance.clear();
-      dataTableInstance.rows.add(this.displayedCases);
-      dataTableInstance.draw();
-    }
+    if (!this.dtInstance) return;
+
+    this.dtInstance
+      .clear()
+      .rows.add(this.displayedCases)
+      .draw();
   }
   
   //Fetch and load all case data
@@ -203,7 +265,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       this.toastr.success('Case deleted successfully', 'Success');
     } else {
       // User canceled
-      this.toastr.info('Delete case canceled', 'Canceled');
+      this.toastr.info('Delete case was canceled', 'Canceled');
     }
   }
 
@@ -230,7 +292,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       }, 1000);  // 1-second delay before executing the update
     } else {
       // User canceled
-      this.toastr.info('Recover case canceled', 'Canceled');
+      this.toastr.info('Recover case was canceled', 'Canceled');
     }
   }
 

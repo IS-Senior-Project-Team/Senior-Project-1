@@ -18,7 +18,7 @@
       </div>
 
       <div class="table-responsive">
-        <table #dataTable class="display table table-striped table-hover mb-0" style="width:100%">
+        <table #dataTable class="display table table-striped table-hover mb-0" style="width: 100%">
           <thead>
             <tr class="text-center">
               <th scope="col">First Name</th>
@@ -45,19 +45,21 @@
                   <div class="d-flex justify-content-center gap-2">
                     <button *ngIf="!item.isDeleted" 
                             class="btn btn-link p-1" 
-                            (click)="editCase(item.id)">
+                            (click)="editCase(item.id)"
+                            data-action="edit">
                       <img src="edit-icon.png" alt="Edit" style="width: 25px; height: 25px;">
                     </button>
-
                     <button *ngIf="!item.isDeleted" 
                             class="btn btn-link p-1" 
-                            (click)="deleteCase(item)">
+                            (click)="deleteCase(item)"
+                            data-action="delete">
                       <img src="red-trashcan-icon.png" alt="Delete" style="width: 25px; height: 25px;">
                     </button>
 
                     <button *ngIf="item.isDeleted" 
                             class="btn btn-link p-1" 
-                            (click)="recoverCase(item)">
+                            (click)="recoverCase(item)"
+                            data-action="recover">
                       <img src="undo.png" alt="Recover" style="width: 25px; height: 25px;">
                     </button>
                   </div>

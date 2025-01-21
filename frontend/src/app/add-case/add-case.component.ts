@@ -42,19 +42,19 @@ export class AddCaseComponent {
 
   cancel() {
     // User canceled
-    this.toastr.info('Case addition canceled', 'Canceled');
+    this.toastr.info('Add case was canceled', 'Canceled');
     setTimeout(() => {
       this.router.navigate(['/case-management']);
     }, 100);
   }
 
   async save(addCaseForm: NgForm) {
-    const confirmUpdate = window.confirm(`Are you sure you want to add this new case?`);
+    const confirmUpdate = window.confirm(`Are you sure you want to add a new pet case for ${this.case.firstName} ${this.case.lastName}?`);
 
     if (confirmUpdate) {
         if (addCaseForm.valid) {
           try {
-            this.case.id = new Date().getTime().toString();
+            this.case.id = new Date().getTime().toString(); // Change later
             const success = await this.casesService.createCase(this.case);
             
             if (success) {
@@ -76,7 +76,7 @@ export class AddCaseComponent {
         }
     } else {
       // User canceled
-      this.toastr.info('Case addition canceled', 'Canceled');
+      this.toastr.info('Add case was canceled', 'Canceled');
     }
   }
 }
