@@ -2,7 +2,7 @@
 <div class="export-selectors-container">
   <!-- Export to PDF Button -->
   <div class="export-container">
-    <button class="export-button" (click)="generatePDF()">Export</button>
+    <button class="export-button" (click)="generatePDF()"><img src="download.svg" style="padding-right: 10px;"/>Export</button>
   </div>
 
   <!-- Selectors for Status, TimeFrames, and Species -->
@@ -11,32 +11,32 @@
       <select class="select-menu" (change)="onStatusChange($event)">
         <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
       </select>
-      <caption class="select-caption">Statuses</caption>
+      <caption class="select-caption"> <img src="filter.svg" style="padding-right: 10px;"/>Statuses</caption>
     </div>
     <div class="select-wrapper">
       <select class="select-menu" (change)="onStatusChange($event)">
         <option *ngFor="let timeFrame of timeFrames" [value]="timeFrame">{{ timeFrame }}</option>
       </select>
-      <caption class="select-caption">TimeFrames</caption>
+      <caption class="select-caption"><img src="calendar.svg" style="padding-right: 10px;"/> TimeFrames</caption>
     </div>
     <div class="select-wrapper">
       <select class="select-menu" (change)="onStatusChange($event)">
         <option *ngFor="let specie of species" [value]="specie">{{ specie }}</option>
       </select>
-      <caption class="select-caption">Species</caption>
+      <caption class="select-caption"><img src="group.svg" style="padding-right: 10px;"/> Species</caption>
     </div>
     <div class="select-wrapper">
      <div class="hstack">
 
    <button class="arrow-button" (click)="incrementOffset()">
-    ⬅
+    <img src="chevron-left.svg" style="accent-color: white;"/>
    </button>
    <button class="arrow-button" (click)="decrementOffset()">
-    ➡️
+    <img src="chevron-right.svg"/>
    </button>
      
     </div>
-    <caption class="select-caption">Offset: {{ offset }}</caption>
+    <caption class="select-caption">Offset: {{ offset * -1 }}</caption>
     </div>
   </div>
 </div>
