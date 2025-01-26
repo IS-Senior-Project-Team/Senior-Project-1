@@ -26,9 +26,7 @@ export class StaffLoginComponent {
       return;
     }
     this.authSvc.loginUser(this.email, this.password)
-    //this.router.navigate(['case-management'])
-    
-    //Clearing entry after login
+
     this.email = "";
     this.password = "";
   }
