@@ -213,7 +213,7 @@ export async function createDoc(caseData: Case): Promise<boolean> {
 const auth = getAuth();
 
 // getAuth().setPersistence(browserLocalPersistence)        //  ------Include   THIS LATER TO SET THE STORAGE TO SESSION STORAGE
-export function createUser(email: string, password: string, isAdmin: boolean) {
+export function createUser(email: string, password: string, isAdmin: boolean, router: Router) {
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // Signed up 
@@ -244,6 +244,7 @@ export function createUser(email: string, password: string, isAdmin: boolean) {
         })
 
       alert('Account has been created successfully!')
+      router.navigate(['/admin-dashboard/users'])
       // ...
     })
     .catch((error) => {
@@ -264,16 +265,6 @@ auth.onAuthStateChanged((currentUser) => {
     console.log("User Status", user_id)
   }
 });
-
-export const redirect = () => {
-  const router = inject(Router)
-  const loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser") || "{}");
-  if (loggedInUser?.isAdmin) {
-    return router.navigate(["/admin-dashboard"])
-  } else {
-    return router.navigate(['case-management'])
-  }
-}
 
 export function loginUser(email: string, password: string, router: Router) {
 
@@ -329,7 +320,7 @@ export async function forgotPassword(email: string) {
   }
   sendPasswordResetEmail(auth, email)
     .then(() => {
-      alert("A password reset link has been sent to your email, ")
+      alert("A password reset link has been sent to your email!")
     })
     .catch((error) => {
       const errorCode = error.code;

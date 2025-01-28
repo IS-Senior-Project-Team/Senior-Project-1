@@ -16,7 +16,7 @@ export class AuthService {
 
   //This should only take in the email and then temp password is generated somewhere in between
   CreateUser(email: RegisterStaffEmail, isAdminRole : boolean): void { //This is calling the create user function from firebase service 
-    return createUser(email.staffEmail, this.generateTempPassword(), isAdminRole);
+    return createUser(email.staffEmail, this.generateTempPassword(), isAdminRole, this.router);
   }
 
   loginUser(email: string, password: string) {
