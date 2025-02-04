@@ -1,4 +1,4 @@
-import { Injectable, OnInit } from '@angular/core';
+import { EventEmitter, Injectable, OnInit } from '@angular/core';
 import { StaffInfo } from '../models/staff-info';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -11,7 +11,7 @@ import { RegisterStaffEmail } from '../models/register-staff-email';
   providedIn: 'root'
 })
 export class AuthService {
-
+  userLoggedIn: EventEmitter<StaffInfo> = new EventEmitter<StaffInfo>();
   constructor(private httpClient: HttpClient, private router: Router) { }
 
   //This should only take in the email and then temp password is generated somewhere in between
@@ -19,9 +19,16 @@ export class AuthService {
     return createUser(email.staffEmail, this.generateTempPassword(), isAdminRole, this.router);
   }
 
+  // loginUser(email: string, password: string) {
+  //   console.log(email, "and", password)
+  //   return loginUser(email, password, this.router)
+  // }
   loginUser(email: string, password: string) {
-    console.log(email, "and", password)
-    return loginUser(email, password, this.router)
+    loginUser(email, password, this.router).then((userData) => {
+      if (userData) {
+        this.userLoggedIn.emit(userData); // Emit the user data when logged in
+      }
+    });
   }
 
   userForgotPassword(email: string) {
@@ -45,6 +52,7 @@ export class AuthService {
 
   logoutUser(): void {
     sessionStorage.removeItem('loggedInUser');
+    
     this.router.navigate(['/login']);
   }
 

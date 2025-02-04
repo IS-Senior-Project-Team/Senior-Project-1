@@ -61,29 +61,6 @@ export class AccountProfileComponent implements OnInit {
       this.profileForm.patchValue(this.staffInfo!);
     }
   }
-  // async saveProfile(): Promise<void> {
-  //   if (this.profileForm.valid) {
-  //     const updatedUser = { ...this.staffInfo, ...this.profileForm.value } as StaffInfo;
-  
-  //     if (!updatedUser.uid) {
-  //       alert('User UID is missing. Unable to update profile.');
-  //       return;
-  //     }
-  
-  //     try {
-  //       await updateUser(updatedUser).toPromise();
-  //       this.staffInfo = updatedUser; // Update local data
-  //       this.isEditing = false;
-  //       alert('Profile updated successfully!');
-  //     } catch (error) {
-  //       console.error('Error updating profile:', error);
-  //       alert('Failed to update profile. Please try again later.');
-  //     }
-  //   } else {
-  //     alert('Please fill out all required fields before saving.');
-  //   }
-  // }
-  
 
   async saveProfile(): Promise<void> {
     if (this.profileForm.valid) {
@@ -103,9 +80,15 @@ export class AccountProfileComponent implements OnInit {
     }
   }
 
+  changePassword() {
+
+  }
+
+  //Not being used since logout button is added on sidebar
   logout(): void {
-    // TODO: Add an event listener that checks if a user is logged in or not to display the button appropriately
     this.loggedInUser = null; // Set to null on logout
+    this.staffInfo = null;
     this.authSvc.logoutUser();
+    this.router.navigate(['/login']); // Redirect to login page
   }
 }

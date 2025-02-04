@@ -53,7 +53,6 @@ export const redirectIfLoggedIn: CanActivateFn = async (route, state) => {
       alert("You are already logged in!")
       return router.createUrlTree(['/admin-dashboard']); // Redirect to admin dash
     } else if (authSvc.isLoggedIn()) {
-      alert("You are already logged in!")
       return router.createUrlTree(['/case-management']); // Redirect to cases page
     }
   } catch (err) {
