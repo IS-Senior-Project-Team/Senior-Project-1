@@ -28,8 +28,11 @@
 
             <div class="actions" style="display: flex; justify-content: space-between;">
                 <button type="button" [routerLink]="['/admin-dashboard/users']">Go Back</button>
-                <button type="button">Deactivate</button>
-              </div>
+                <div class="actions" style="display: flex;">
+                <button type="button" (click)="deactivateUser(this.route.snapshot.paramMap.get('uid'))" style="margin-right: 10pt;">Deactivate</button>
+                <button type="button" *ngIf="staffInfo.isActive == false">Activate</button>
+                </div>
+            </div>
         </form>
     </div>
 

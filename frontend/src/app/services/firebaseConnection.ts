@@ -224,7 +224,8 @@ export function createUser(email: string, password: string, isAdmin: boolean, ro
         lastname: "",
         address: "",                  //<<<<<<======= GOING TO CHANGE THIS TO AN STAFF ADDRESS ARRAY LATER
         phoneNumber: "",
-        isAdmin: isAdmin
+        isAdmin: isAdmin,
+        isActive: true
       }
 
       //NEED TO FIND A WAY TO INLUDE THIS MESSAGE IN THE RECIPIENTS EMAIL
@@ -326,11 +327,11 @@ export function loginUser(email: string, password: string, router: Router): Prom
       if (userDoc.exists()) {
         const userData = userDoc.data() as StaffInfo;
         
-        // if (!userData.isActive) {
-        //   await signOut(auth);
-        //   alert("Your account has been deactivated. Please contact an administrator.");
-        //   return;
-        // }
+        if (!userData.isActive) {
+          await signOut(auth);
+          alert("Your account has been deactivated. Please contact an administrator.");
+          return null;
+        }
 
         const userInfo = {
           uid: user.uid,
@@ -405,6 +406,24 @@ export function updateUser(user: StaffInfo): Observable<void> {
   return from(updateDoc(ref, { ...user }));
 }
 
+ export async function deactivateUser(uid : string | null, router : Router ) {
+  try {
+    // const user = await getUserProfile(uid)
+    // const userId = user?.uid;
+    const userDocRef = doc(db, "staffMembers", uid!);
+    
+    updateDoc(userDocRef, { isActive: false })
+    .then(() => {
+      alert("User has been deactivated.");
+      router.navigate(['/admin-dashboard/users'])
+    })
+    .catch((error) => {
+      console.error("Error deactivating user:", error);
+    });
+  } catch (error) {
+    console.error("Error getting current user")
+  }
+}
 
 export async function currentUserProfile(): Promise<StaffInfo | null> {
 

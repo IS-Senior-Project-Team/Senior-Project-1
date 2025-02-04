@@ -5,6 +5,8 @@ import { StaffInfo } from '../models/staff-info';
 import { NgIf } from '@angular/common';
 import { getUserProfile } from '../services/firebaseConnection';
 import { RouterLink } from '@angular/router';
+import { deactivateUser } from '../services/firebaseConnection';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-profile-view',
@@ -14,33 +16,36 @@ import { RouterLink } from '@angular/router';
   styleUrl: './admin-profile-view.component.css'
 })
 export class AdminProfileViewComponent {
-  profileForm : FormGroup
+  profileForm: FormGroup
   staffInfo: StaffInfo | null = null
 
-constructor(private route: ActivatedRoute, private fb: NonNullableFormBuilder) {
-  this.profileForm = this.fb.group({
-    email: [''],
-    firstname: [''],
-    lastname: [''],
-    phoneNumber: [''],
-    address: [''],
-  });
-}
+  constructor(public route: ActivatedRoute, private fb: NonNullableFormBuilder, private router : Router) {
+    this.profileForm = this.fb.group({
+      email: [''],
+      firstname: [''],
+      lastname: [''],
+      phoneNumber: [''],
+      address: [''],
+    });
+  }
 
-async ngOnInit(): Promise<void> {
-  const uid = this.route.snapshot.paramMap.get('uid');
-  if (uid) {
-    try {
-      const profile = await getUserProfile(uid); // Update to fetch by UID
-      if (profile) {
-        this.staffInfo = profile;
-        this.profileForm.patchValue(profile);
+  async ngOnInit(): Promise<void> {
+    const uid = this.route.snapshot.paramMap.get('uid');
+    if (uid) {
+      try {
+        const profile = await getUserProfile(uid); // Update to fetch by UID
+        if (profile) {
+          this.staffInfo = profile;
+          this.profileForm.patchValue(profile);
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
       }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
     }
   }
-}
 
+  deactivateUser(uid : string | null) {
+    console.log(uid)
+    deactivateUser(uid, this.router);
+  }
 }
-
