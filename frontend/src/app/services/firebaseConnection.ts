@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc, query, where, Timestamp, CollectionReference, DocumentReference, addDoc } from 'firebase/firestore';
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail, Auth, browserSessionPersistence, browserLocalPersistence } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail, Auth, browserSessionPersistence, browserLocalPersistence, signOut } from "firebase/auth";
 import { authState } from '@angular/fire/auth'
 import { Case } from '../models/case';
 import { AuthService } from "./auth.service";
@@ -12,7 +12,7 @@ import { from, Observable, of, switchMap } from "rxjs";
 import { RegisterStaffComponent } from '../view/register-staff/register-staff.component';
 // Required for side-effects
 import "firebase/firestore";
-import { inject } from "@angular/core";
+import { EventEmitter, inject } from "@angular/core";
 
 // Follow this pattern to import other Firebase services
 // import { } from 'firebase/<service>';
@@ -266,35 +266,98 @@ auth.onAuthStateChanged((currentUser) => {
   }
 });
 
-export function loginUser(email: string, password: string, router: Router) {
+// export function loginUser(email: string, password: string, router: Router) {
 
-  //  ADD A FUNCTIONALITY LATER ON THAT CHECKS IF USER IS VERIFIED BEFORE LETTING THEM LOGIN
-  //    set the login function to check if the user's email is verified or not, the property is inside the firebase user, user.isEmailVerified, or something like that.
-  //   And then if it's not redirect to a "Pending Verification" page
-  signInWithEmailAndPassword(auth, email, password)
+//   const UserLoggedIn: EventEmitter<string> = new EventEmitter<string>();
+//   //  ADD A FUNCTIONALITY LATER ON THAT CHECKS IF USER IS VERIFIED BEFORE LETTING THEM LOGIN
+//   //    set the login function to check if the user's email is verified or not, the property is inside the firebase user, user.isEmailVerified, or something like that.
+//   //   And then if it's not redirect to a "Pending Verification" page
+//   signInWithEmailAndPassword(auth, email, password)
+//     .then(async (userCredential) => {
+//       // Signed in 
+//       const user = userCredential.user;
+//       // Fetch user role from Firestore
+//       const userDocRef = doc(db, "staffMembers", user.uid);
+//       const userDoc = await getDoc(userDocRef);
+
+//       if (userDoc.exists()) {
+//         const userData = userDoc.data();
+//         sessionStorage.setItem("loggedInUser", JSON.stringify({
+//           uid: user.uid,
+//           isAdmin: userData["isAdmin"] || false,
+//         }))
+//         UserLoggedIn.emit(email);
+
+//         if (userData["isAdmin"]) {
+//           router.navigate(["/admin-dashboard"]); // Redirect admin
+//         } else {
+//           router.navigate(["/case-management"]); // Redirect staff
+//         }
+//       }
+
+//       alert("You are now logged in")
+//       return true;
+//     })
+//     .catch((error) => {
+//       const errorCode = error.code;
+//       const errorMessage = error.message;
+//       console.log(errorCode, errorMessage)
+//       if (errorCode === "auth/wrong-password") {
+//         alert("Invalid Email or Password")
+//       }
+//       else if (errorCode === "auth/invalid-email") {
+//         alert("Invalid Email or Password")
+//       }
+//       else if (errorCode === 'auth/user-not-found') {
+//         alert("Account does not exist")
+//       }
+//       // const errorMessage = error.message;
+//     });
+// }
+
+export function loginUser(email: string, password: string, router: Router): Promise<StaffInfo | null> {
+  return signInWithEmailAndPassword(auth, email, password)
     .then(async (userCredential) => {
-      // Signed in 
       const user = userCredential.user;
-      // Fetch user role from Firestore
+
       const userDocRef = doc(db, "staffMembers", user.uid);
       const userDoc = await getDoc(userDocRef);
 
       if (userDoc.exists()) {
-        const userData = userDoc.data();
-        sessionStorage.setItem("loggedInUser", JSON.stringify({
-          uid: user.uid,
-          isAdmin: userData["isAdmin"] || false,
-        }));
+        const userData = userDoc.data() as StaffInfo;
+        
+        // if (!userData.isActive) {
+        //   await signOut(auth);
+        //   alert("Your account has been deactivated. Please contact an administrator.");
+        //   return;
+        // }
 
+        const userInfo = {
+          uid: user.uid,
+          firstname: userData.firstname || "",
+          lastname: userData.lastname || "",
+          email: userData.email || "",
+          isAdmin: userData.isAdmin || false,
+          address: userData.address,
+          password: userData.password,
+          phoneNumber: userData.phoneNumber,
+          isActive: userData.isActive
+        };
+
+        sessionStorage.setItem("loggedInUser", JSON.stringify(userInfo));
+
+        // Redirect based on user role
         if (userData["isAdmin"]) {
-          router.navigate(["/admin-dashboard"]); // Redirect admin
+          router.navigate(["/admin-dashboard"]);
         } else {
-          router.navigate(["/case-management"]); // Redirect staff
+          router.navigate(["/case-management"]);
         }
+
+        alert("You are now logged in");
+        return userInfo; // Return user data
       }
 
-      alert("You are now logged in")
-      return true;
+      return null;
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -310,6 +373,7 @@ export function loginUser(email: string, password: string, router: Router) {
         alert("Account does not exist")
       }
       // const errorMessage = error.message;
+      return null;
     });
 }
 
