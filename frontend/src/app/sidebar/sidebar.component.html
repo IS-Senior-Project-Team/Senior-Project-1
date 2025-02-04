@@ -10,9 +10,9 @@
         {{staffInfo.firstname}} {{staffInfo.lastname}} 
         ({{staffInfo.isAdmin ? "Admin" : "Staff"}})
       </div>
-      <div class="profile-email">{{staffInfo.email}}</div>
+      <div class="profile-email" style="color: black;">{{staffInfo.email}}</div>
     </div>
-    
+  </div>
     <div class="menu">
       <button
         class="menu-item"
@@ -36,6 +36,7 @@
         Uploads
       </button>
      <button *ngIf="staffInfo && staffInfo.isAdmin != false" class="menu-item" [class.active]="isActive('/admin-dashboard/users')" (click)="navigateTo('/admin-dashboard/users')">
+      <img src="users.svg" style="accent-color: white; width: 15px;"/>
       Users
     </button>
       <button
@@ -46,8 +47,6 @@
         Accounts
       </button>
     </div>
-  <button *ngIf="staffInfo" class="logout-button" (click)="logout()">
-    Logout
-  </button>
+  
 </div>
 
