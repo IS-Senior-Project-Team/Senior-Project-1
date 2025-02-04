@@ -10,29 +10,43 @@
         {{staffInfo.firstname}} {{staffInfo.lastname}} 
         ({{staffInfo.isAdmin ? "Admin" : "Staff"}})
       </div>
-      <div class="profile-email">{{staffInfo.email}}</div>
+      <div class="profile-email" style="color: black;">{{staffInfo.email}}</div>
     </div>
   </div>
-
-  <div class="menu">
-    <button class="menu-item" [class.active]="isActive('/report')" (click)="navigateTo('/report')">
-      Reports
-    </button>
-    <button class="menu-item" [class.active]="isActive('/case-management')" (click)="navigateTo('/case-management')">
-      Cases
-    </button>
-    <button class="menu-item" [class.active]="isActive('/upload')" (click)="navigateTo('/upload')">
-      Uploads
-    </button>
-    <button *ngIf="staffInfo && staffInfo.isAdmin != false" class="menu-item" [class.active]="isActive('/admin-dashboard/users')" (click)="navigateTo('/admin-dashboard/users')">
+    <div class="menu">
+      <button
+        class="menu-item"
+        [class.active]="isActive('/report')"
+        (click)="navigateTo('/report')">
+        <img src="reports.svg" style="accent-color: white; width: 15px;"/>
+        Reports
+      </button>
+      <button
+        class="menu-item"
+        [class.active]="isActive('/case-management')"
+        (click)="navigateTo('/case-management')">
+        <img src="cases.svg" style="accent-color: white; width: 15px;"/>
+        Cases
+      </button>
+      <button
+        class="menu-item"
+        [class.active]="isActive('/upload')"
+        (click)="navigateTo('/upload')">
+        <img src="uploads.svg" style="accent-color: white; width: 15px;"/>
+        Uploads
+      </button>
+     <button *ngIf="staffInfo && staffInfo.isAdmin != false" class="menu-item" [class.active]="isActive('/admin-dashboard/users')" (click)="navigateTo('/admin-dashboard/users')">
+      <img src="users.svg" style="accent-color: white; width: 15px;"/>
       Users
     </button>
-    <button class="menu-item" [class.active]="isActive('/account')" (click)="navigateTo('/account')">
-      Account
-    </button>
-  </div>
-
-  <button *ngIf="staffInfo" class="logout-button" (click)="logout()">
-    Logout
-  </button>
+      <button
+        class="menu-item"
+        [class.active]="isActive('/account')"
+        (click)="navigateTo('/account')">
+        <img src="accounts.svg" style="accent-color: white; width: 15px;"/>
+        Accounts
+      </button>
+    </div>
+  
 </div>
+
