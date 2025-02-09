@@ -12,7 +12,8 @@
   left: 0;
   z-index: 2000;
   overflow: hidden;
-  background-color: #EAF3EA;
+  /* background-color: #365341; */
+  background-color: #d3e4d3;
 }
 
 /* Profile section */
@@ -38,12 +39,12 @@
 .profile-name {
   font-size: 16px;
   font-weight: bold;
-  color: #333;
+  color: rgb(43, 42, 42);
 }
 
 .profile-email {
   font-size: 14px;
-  color: #777;
+  color: rgb(255, 255, 255);
 }
 
 /* Menu styles */
@@ -75,4 +76,17 @@
 
 .menu-item:hover {
   background-color: #e0f3e0;
+}
+
+.logout-button {
+  background-color: #ff9718;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem; /* Larger button for easier interaction */
+  border-radius: 8px; /* Rounded button edges */
+  cursor: pointer;
+  font-weight: bold;
+  /* font-size: 1rem; Larger text */
+  margin-top: 15rem;
+  margin-left: 3rem;
 }

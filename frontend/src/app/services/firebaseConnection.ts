@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc, query, where, Timestamp, CollectionReference, DocumentReference, addDoc } from 'firebase/firestore';
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail,fetchSignInMethodsForEmail, Auth, browserSessionPersistence } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail, Auth, browserSessionPersistence, browserLocalPersistence, signOut } from "firebase/auth";
 import { authState } from '@angular/fire/auth'
 import { Case } from '../models/case';
 import { AuthService } from "./auth.service";
@@ -12,7 +12,7 @@ import { from, Observable, of, switchMap } from "rxjs";
 import { RegisterStaffComponent } from '../view/register-staff/register-staff.component';
 // Required for side-effects
 import "firebase/firestore";
-import { inject } from "@angular/core";
+import { EventEmitter, inject } from "@angular/core";
 
 // Follow this pattern to import other Firebase services
 // import { } from 'firebase/<service>';
@@ -43,51 +43,51 @@ export async function getCases(
   specie?: string,
   timeFrame?: string,
   offset: number = 0
-  ): Promise<Case[]> {
-    const casesCollection = collection(db, 'cases');
-    let q = query(casesCollection);
+): Promise<Case[]> {
+  const casesCollection = collection(db, 'cases');
+  let q = query(casesCollection);
 
-    // Apply status filter
-    if (status) {
-      q = query(q, where('status', '==', status));
-    }
-
-    // Apply species filter
-    if (specie) {
-      q = query(q, where('species', '==', specie));
-    }
-
-    // Apply timeFrame filter
-    if (timeFrame) {
-      const now = new Date();
-      let startDate: Date | null = null;
-      let endDate: Date = now;
-
-      switch (timeFrame) {
-        case 'Daily':
-          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - offset);
-          break;
-        case 'Weekly':
-          startDate = new Date(now);
-          startDate.setDate(now.getDate() - (7 * offset));
-          break;
-        case 'Monthly':
-          startDate = new Date(now.getFullYear(), now.getMonth() - offset, 1);
-          break;
-        case 'Yearly':
-          startDate = new Date(now.getFullYear() - offset, 0, 1);
-          break;
-      }
-
-      if (startDate) {
-        q = query(q, where('createdDate', '>=', Timestamp.fromDate(startDate)));
-        q = query(q, where('createdDate', '<=', Timestamp.fromDate(endDate)));
-      }
-    }
-   // q = query(q, where('isDeleted', '==', false));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Case));
+  // Apply status filter
+  if (status) {
+    q = query(q, where('status', '==', status));
   }
+
+  // Apply species filter
+  if (specie) {
+    q = query(q, where('species', '==', specie));
+  }
+
+  // Apply timeFrame filter
+  if (timeFrame) {
+    const now = new Date();
+    let startDate: Date | null = null;
+    let endDate: Date = now;
+
+    switch (timeFrame) {
+      case 'Daily':
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - offset);
+        break;
+      case 'Weekly':
+        startDate = new Date(now);
+        startDate.setDate(now.getDate() - (7 * offset));
+        break;
+      case 'Monthly':
+        startDate = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+        break;
+      case 'Yearly':
+        startDate = new Date(now.getFullYear() - offset, 0, 1);
+        break;
+    }
+
+    if (startDate) {
+      q = query(q, where('createdDate', '>=', Timestamp.fromDate(startDate)));
+      q = query(q, where('createdDate', '<=', Timestamp.fromDate(endDate)));
+    }
+  }
+  // q = query(q, where('isDeleted', '==', false));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Case));
+}
 /*
 // Gets a case from Firebase by id 
 export async function getCaseById(caseId: string): Promise<Case | null> {
@@ -111,18 +111,18 @@ export async function getCaseById(caseId: string): Promise<Case | null> {
 // Gets a case from Firebase by id 
 export async function getCaseById(caseId: string): Promise<Case | null> {
   console.log(`Fetching case with stored case ID: ${caseId}`);
-  
+
   const casesCol = collection(db, 'cases');
   const q = query(casesCol, where("id", "==", caseId));
   const querySnapshot = await getDocs(q)
 
   if (querySnapshot) {
-    let caseData  = {};
+    let caseData = {};
 
     querySnapshot.forEach(doc => {
       caseData = { id: doc.id, ...doc.data() }
     });
-  
+
     return caseData as Case;
   } else {
     console.log("No such document!");
@@ -136,7 +136,7 @@ export async function getCaseHighestID() {
   const casesColSnapshot = await getDocs(casesCol);
   let highestID: string = "";
   for (let doc of casesColSnapshot.docs) {
-    console.log(doc.id + " " + typeof(doc.id));
+    console.log(doc.id + " " + typeof (doc.id));
     if (doc.data()['id'] > highestID) {
       highestID = doc.data()['id'];
     }
@@ -212,8 +212,8 @@ export async function createDoc(caseData: Case): Promise<boolean> {
 // An email will then be sent for staff member to make changes and complete account creation
 const auth = getAuth();
 
-// getAuth().setPersistence(browserSessionPersistence)          ------Include   THIS LATER TO SET THE STORAGE TO SESSION STORAGE
-export function createUser(email: string, password: string, isAdmin : boolean) {
+// getAuth().setPersistence(browserLocalPersistence)        //  ------Include   THIS LATER TO SET THE STORAGE TO SESSION STORAGE
+export function createUser(email: string, password: string, isAdmin: boolean, router: Router) {
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // Signed up 
@@ -224,7 +224,8 @@ export function createUser(email: string, password: string, isAdmin : boolean) {
         lastname: "",
         address: "",                  //<<<<<<======= GOING TO CHANGE THIS TO AN STAFF ADDRESS ARRAY LATER
         phoneNumber: "",
-        isAdmin: isAdmin
+        isAdmin: isAdmin,
+        isActive: true
       }
 
       //NEED TO FIND A WAY TO INLUDE THIS MESSAGE IN THE RECIPIENTS EMAIL
@@ -244,6 +245,7 @@ export function createUser(email: string, password: string, isAdmin : boolean) {
         })
 
       alert('Account has been created successfully!')
+      router.navigate(['/admin-dashboard/users'])
       // ...
     })
     .catch((error) => {
@@ -259,32 +261,109 @@ export function createUser(email: string, password: string, isAdmin : boolean) {
 }
 
 auth.onAuthStateChanged((currentUser) => {
-  console.log("User Status", currentUser)
+  if (currentUser) {
+    const user_id = currentUser.uid;
+    console.log("User Status", user_id)
+  }
 });
 
-export const redirect =() => {
-  const router = inject(Router)
-  return router.navigate(['case-management'])
-}
-export function loginUser(email: string, password: string) {
+// export function loginUser(email: string, password: string, router: Router) {
 
-  //  ADD A FUNCTIONALITY LATER ON THAT CHECKS IF USER IS VERIFIED BEFORE LETTING THEM LOGIN
-  //    set the login function to check if the user's email is verified or not, the property is inside the firebase user, user.isEmailVerified, or something like that.
-  //   And then if it's not redirect to a "Pending Verification" page
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed in 
+//   const UserLoggedIn: EventEmitter<string> = new EventEmitter<string>();
+//   //  ADD A FUNCTIONALITY LATER ON THAT CHECKS IF USER IS VERIFIED BEFORE LETTING THEM LOGIN
+//   //    set the login function to check if the user's email is verified or not, the property is inside the firebase user, user.isEmailVerified, or something like that.
+//   //   And then if it's not redirect to a "Pending Verification" page
+//   signInWithEmailAndPassword(auth, email, password)
+//     .then(async (userCredential) => {
+//       // Signed in 
+//       const user = userCredential.user;
+//       // Fetch user role from Firestore
+//       const userDocRef = doc(db, "staffMembers", user.uid);
+//       const userDoc = await getDoc(userDocRef);
+
+//       if (userDoc.exists()) {
+//         const userData = userDoc.data();
+//         sessionStorage.setItem("loggedInUser", JSON.stringify({
+//           uid: user.uid,
+//           isAdmin: userData["isAdmin"] || false,
+//         }))
+//         UserLoggedIn.emit(email);
+
+//         if (userData["isAdmin"]) {
+//           router.navigate(["/admin-dashboard"]); // Redirect admin
+//         } else {
+//           router.navigate(["/case-management"]); // Redirect staff
+//         }
+//       }
+
+//       alert("You are now logged in")
+//       return true;
+//     })
+//     .catch((error) => {
+//       const errorCode = error.code;
+//       const errorMessage = error.message;
+//       console.log(errorCode, errorMessage)
+//       if (errorCode === "auth/wrong-password") {
+//         alert("Invalid Email or Password")
+//       }
+//       else if (errorCode === "auth/invalid-email") {
+//         alert("Invalid Email or Password")
+//       }
+//       else if (errorCode === 'auth/user-not-found') {
+//         alert("Account does not exist")
+//       }
+//       // const errorMessage = error.message;
+//     });
+// }
+
+export function loginUser(email: string, password: string, router: Router): Promise<StaffInfo | null> {
+  return signInWithEmailAndPassword(auth, email, password)
+    .then(async (userCredential) => {
       const user = userCredential.user;
-      sessionStorage.setItem('loggedInUser', user.uid)
-      // sessionStorage.setItem('adminRole', user.isAdmin)
-      alert("You are now logged in")
-      // redirect()
-      // authSvc.navigateTo('case-management')
-      // authSvc.navigateTo('case-management')
+
+      const userDocRef = doc(db, "staffMembers", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data() as StaffInfo;
+        
+        if (!userData.isActive) {
+          await signOut(auth);
+          alert("Your account has been deactivated. Please contact an administrator.");
+          return null;
+        }
+
+        const userInfo = {
+          uid: user.uid,
+          firstname: userData.firstname || "",
+          lastname: userData.lastname || "",
+          email: userData.email || "",
+          isAdmin: userData.isAdmin || false,
+          address: userData.address,
+          password: userData.password,
+          phoneNumber: userData.phoneNumber,
+          isActive: userData.isActive
+        };
+
+        sessionStorage.setItem("loggedInUser", JSON.stringify(userInfo));
+
+        // Redirect based on user role
+        if (userData["isAdmin"]) {
+          router.navigate(["/admin-dashboard"]);
+        } else {
+          router.navigate(["/case-management"]);
+        }
+
+        alert("You are now logged in");
+        return userInfo; // Return user data
+      }
+
+      return null;
     })
     .catch((error) => {
       const errorCode = error.code;
-      console.log(errorCode)
+      const errorMessage = error.message;
+      console.log(errorCode, errorMessage)
       if (errorCode === "auth/wrong-password") {
         alert("Invalid Email or Password")
       }
@@ -294,7 +373,8 @@ export function loginUser(email: string, password: string) {
       else if (errorCode === 'auth/user-not-found') {
         alert("Account does not exist")
       }
-      const errorMessage = error.message;
+      // const errorMessage = error.message;
+      return null;
     });
 }
 
@@ -305,7 +385,7 @@ export async function forgotPassword(email: string) {
   }
   sendPasswordResetEmail(auth, email)
     .then(() => {
-      alert("A password reset link has been sent to your email, ")
+      alert("A password reset link has been sent to your email!")
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -326,30 +406,48 @@ export function updateUser(user: StaffInfo): Observable<void> {
   return from(updateDoc(ref, { ...user }));
 }
 
+ export async function deactivateUser(uid : string | null, router : Router ) {
+  try {
+    // const user = await getUserProfile(uid)
+    // const userId = user?.uid;
+    const userDocRef = doc(db, "staffMembers", uid!);
+    
+    updateDoc(userDocRef, { isActive: false })
+    .then(() => {
+      alert("User has been deactivated.");
+      router.navigate(['/admin-dashboard/users'])
+    })
+    .catch((error) => {
+      console.error("Error deactivating user:", error);
+    });
+  } catch (error) {
+    console.error("Error getting current user")
+  }
+}
 
 export async function currentUserProfile(): Promise<StaffInfo | null> {
 
-    const user = auth.currentUser
-      if (user && user.uid) {
-        try {
-          const ref = doc(db, 'staffMembers', user.uid);
-          const docSnap = await getDoc(ref);
-          
-          if (docSnap.exists()) {
-            const profile = docSnap.data() as StaffInfo;
-            return profile;
-          } else {
-            console.error('No document found for the current user.');
-            return null;
-          }
-        } catch (error) {
-          console.error('Error fetching user profile:', error);
-        }
+  const user = auth.currentUser
+  if (user && user.uid) {
+    try {
+      const ref = doc(db, 'staffMembers', user.uid);
+      const docSnap = await getDoc(ref);
+
+      if (docSnap.exists()) {
+        const profile = docSnap.data() as StaffInfo;
+        return profile;
       } else {
-        console.log('No user is currently logged in.');
-         return null;
+        console.error('No document found for the current user.');
+        return null;
       }
-      return null
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  } else {
+    console.log('From firebase connection: No user is currently logged in.');
+    return null;
+  }
+  return null
 }
 
 export async function getUserProfile(uid: string): Promise<Promise<StaffInfo> | null> {
@@ -357,7 +455,7 @@ export async function getUserProfile(uid: string): Promise<Promise<StaffInfo> | 
     try {
       const ref = doc(db, 'staffMembers', uid);
       const docSnap = await getDoc(ref);
-      
+
       if (docSnap.exists()) {
         const profile = docSnap.data() as StaffInfo;
         return profile;
@@ -370,7 +468,7 @@ export async function getUserProfile(uid: string): Promise<Promise<StaffInfo> | 
     }
   } else {
     console.log('The user UID is invalid');
-     return null;
+    return null;
   }
   return null
 }
@@ -394,13 +492,13 @@ async function checkEmailExists(email: string): Promise<boolean> {
 
     // NOTE: This is a risky method becuase it is prone to email enumeration attacks
     // TODO: Turn the email enumeration protection back on in firebase
-    const signInMethods = await fetchSignInMethodsForEmail(auth,email);
+    const signInMethods = await fetchSignInMethodsForEmail(auth, email);
 
     if (signInMethods && signInMethods.length > 0) {
       // Email exists
       return true;
     } else {
-      console.log("from checkemail exists",signInMethods)
+      console.log("from checkemail exists", signInMethods)
       alert("Email does not exist. Please try again.");
       return false;
     }

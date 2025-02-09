@@ -1,38 +1,42 @@
 <div class="sidebar">
-    <div class="profile">
-      <div class="profile-avatar"></div>
-      <div class="profile-info">
-        <!-- <div class="profile-name" *ngIf="staffInfo" >{{staffInfo.firstname}} {{staffInfo.lastname}} ({{staffInfo.isAdmin}})</div> -->
-        <div class="profile-name">Andreas Ink (Admin)</div>
-        <div class="profile-email"></div>
+  <div class="jhs-logo">
+    <img src="jhs_logo.png" alt="Jax Humane Society Logo" width="100" height="50" style="justify-content: center;">
+    <p></p>
+  </div>
+  <div class="profile" *ngIf="staffInfo">
+    <div class="profile-avatar"></div>
+    <div class="profile-info">
+      <div class="profile-name">
+        {{staffInfo.firstname}} {{staffInfo.lastname}}
+        ({{staffInfo.isAdmin ? "Admin" : "Staff"}})
       </div>
+      <div class="profile-email" style="color: black;">{{staffInfo.email}}</div>
     </div>
-    
-    <div class="menu">
-      <button
-        class="menu-item"
-        [class.active]="isActive('/report')"
-        (click)="navigateTo('/report')">
-        Reports
-      </button>
-      <button
-        class="menu-item"
-        [class.active]="isActive('/case-management')"
-        (click)="navigateTo('/case-management')">
-        Cases
-      </button>
-      <button
-        class="menu-item"
-        [class.active]="isActive('/upload')"
-        (click)="navigateTo('/upload')">
-        Uploads
-      </button>
-      <button
-        class="menu-item"
-        [class.active]="isActive('/account')"
-        (click)="navigateTo('/account')">
-        Accounts
-      </button>
-    </div>
+  </div>
+  <div class="menu">
+    <button class="menu-item" [class.active]="isActive('/report')" (click)="navigateTo('/report')">
+      <img src="reports.svg" style="accent-color: white; width: 15px;" />
+      Reports
+    </button>
+    <button class="menu-item" [class.active]="isActive('/case-management')" (click)="navigateTo('/case-management')">
+      <img src="cases.svg" style="accent-color: white; width: 15px;" />
+      Cases
+    </button>
+    <button class="menu-item" [class.active]="isActive('/upload')" (click)="navigateTo('/upload')">
+      <img src="uploads.svg" style="accent-color: white; width: 15px;" />
+      Uploads
+    </button>
+    <button *ngIf="staffInfo && staffInfo.isAdmin != false" class="menu-item"
+      [class.active]="isActive('/admin-dashboard/users')" (click)="navigateTo('/admin-dashboard/users')">
+      <img src="users.svg" style="accent-color: white; width: 15px;" />
+      Users
+    </button>
+    <button class="menu-item" [class.active]="isActive('/account')" (click)="navigateTo('/account')">
+      <img src="accounts.svg" style="accent-color: white; width: 15px;" />
+      Accounts
+    </button>
+  </div>
+  <button *ngIf="staffInfo" class="logout-button" (click)="logout()">
+    Logout
+  </button>
 </div>
-<!-- <app-account-profile [isAccountSidebarOpen]="isAccountSidebarOpen" (close)="closeAccountSidebar()"></app-account-profile> -->

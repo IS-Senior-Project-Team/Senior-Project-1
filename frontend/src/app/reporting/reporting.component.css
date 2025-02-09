@@ -46,7 +46,7 @@
 
 
 .arrow-button {
-    background-color: #4dc959;
+    background-color: #8aa58e10;
     color: white;
     padding: 8px 15px;
     border: none;
@@ -59,7 +59,7 @@
 }
 
 .arrow-button:hover {
-    background-color: #45b34d;
+    background-color: #8aa58e25;
 }
 
 .export-button:hover {

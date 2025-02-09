@@ -15,85 +15,82 @@ import { UserListComponent } from './view/usersList/users-list.component';
 import { AdminProfileViewComponent } from './admin-acct-profile/admin-profile-view.component';
 import { AddCaseComponent } from './add-case/add-case.component';
 
-
-
 export const routes: Routes = [
-
     {
-        path: '',
-        component: StaffLoginComponent,
-        canActivate: [redirectIfLoggedIn] // Redirect based on role
-    },
-    {
-        path: 'login',
-        component: StaffLoginComponent,
-        canActivate: [redirectIfLoggedIn]
+      path: '',
+      component: StaffLoginComponent,
+      canActivate: [redirectIfLoggedIn], // Redirect based on role
     },
     {
-        canActivate: [adminGuard],
-        path: 'add-case',
-        component: AddCaseComponent
+      path: 'login',
+      component: StaffLoginComponent,
+      canActivate: [redirectIfLoggedIn],
     },
     {
-        path: 'register',
-        component: RegisterStaffComponent
+      canActivate: [noAuthGuard],
+      path: 'case-management',
+      component: CaseManagementComponent,
     },
     {
-        canActivate: [noAuthGuard],
-        path: 'case-management',
-        component: CaseManagementComponent
+      canActivate: [adminGuard],
+      path: 'admin-dashboard',
+      component: AdminDashboardComponent,
     },
     {
-        canActivate: [noAuthGuard],
-        path: 'edit-case/:id',
-        component: EditCaseComponent
+      canActivate: [adminGuard],
+      path: 'report',
+      component: ReportingComponent,
     },
     {
-        path: 'forgot-password',
-        component: ForgotPasswordComponent,
+      canActivate: [adminGuard],
+      path: 'add-case',
+      component: AddCaseComponent,
     },
     {
-        canActivate: [noAuthGuard],
-        path: 'upload',
-        component: UploadingComponent
+      path: 'register',
+      component: RegisterStaffComponent,
     },
     {
-        canActivate: [adminGuard],
-        path: 'report',
-        component: ReportingComponent,
+      canActivate: [noAuthGuard],
+      path: 'edit-case/:id',
+      component: EditCaseComponent,
     },
     {
-        path: 'emailConfirm',
-        component: EmailConfirmComponent
+      path: 'forgot-password',
+      component: ForgotPasswordComponent,
     },
     {
-        canActivate: [noAuthGuard],
-        path: 'account',
-        component: AccountProfileComponent
+      canActivate: [noAuthGuard],
+      path: 'upload',
+      component: UploadingComponent,
     },
     {
-        // canActivate: [adminGuard],
-        path: 'profile/:uid',
-        component: AdminProfileViewComponent
+      path: 'emailConfirm',
+      component: EmailConfirmComponent,
     },
     {
-        // canActivate: [adminGuard],
-        path: 'admin-dashboard',
-        component: AdminDashboardComponent
-    },
-    {   // TODO: This should be changed to admin/users since its only accessible by admin?
-        // canActivate: [adminGuard],
-        path: 'admin-dashboard/users',
-        component: UserListComponent
+      canActivate: [noAuthGuard],
+      path: 'account',
+      component: AccountProfileComponent,
     },
     {
-        // canActivate: [adminGuard],
-        path: 'admin-dashboard/upload-history',
-        component: UploadHistoryComponent
+      path: 'profile/:uid',
+      component: AdminProfileViewComponent,
     },
-    {   // TODO: This should be changed to report since its only accessible by admin
-        // canActivate: [adminGuard],
-        path: 'admin-dashboard/report',
-        component: ReportingComponent
-    }
-];
+    {
+      path: 'admin-dashboard/users',
+      component: UserListComponent,
+      canActivate: [adminGuard],
+    },
+    {
+      path: 'admin-dashboard/upload-history',
+      component: UploadHistoryComponent,
+      canActivate: [adminGuard],
+    },
+    {
+      path: 'admin-dashboard/report',
+      component: ReportingComponent,
+      canActivate: [adminGuard],
+    },
+  ];
+  

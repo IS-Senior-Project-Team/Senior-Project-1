@@ -8,4 +8,5 @@ export interface StaffInfo {
     phoneNumber : string;
     password: string;
     isAdmin : boolean
+    isActive: boolean;
 }
