@@ -8,6 +8,7 @@ import { CaseFile } from '../models/caseFile';
 import { FormsModule } from '@angular/forms';
 import { serverTimestamp, Timestamp } from 'firebase/firestore';
 import { ToastrService } from 'ngx-toastr';
+import { STATUSES, SPECIES } from '../constants';
 
 @Component({
   selector: 'app-uploading',
@@ -29,15 +30,8 @@ export class UploadingComponent {
   XLSXType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   CSVType = 'text/csv';
   phoneShape = /[0-9]{10}$/;
-  species = ["Adult Cat", "Adult Dog", "Cat", "Dog", "Kitten", "Puppy", "Infant Cat", "Infant Dog"];
-  statuses = ["Already Rehomed", "Asked for more info", "Bad # or No VM", 
-    "Duplicate", "Found Pet", "Keeping-Behavior", "Keeping- Medical", 
-    "Keeping- Other", "Kitten Pack & S/N", "LM with Info", "Lost Pet", 
-    "No Show Appt", "Not PSN", "Open", "Owner Surrender Intake", "PSN Boarding", 
-    "Rehome Attempt", "Rehome Confirmed", "Reunited", "Surrender Appt", 
-    "Surrender Denied", "Walk-in Surrender Attempt", "Walk-in- Stray Attempt", 
-    "Walk-In- OS Intake", "Walk-in- Stray Intake", "Walk-in- Other", 
-    "Call elevated to management", "ACPS"];
+  species = SPECIES;
+  statuses = STATUSES;
 
 
   constructor(private toast: ToastrService, private papa: Papa, private caseService: CasesService) {}
