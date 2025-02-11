@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { UploadsService } from '../services/uploads.service';
 import { Papa, ParseResult } from "ngx-papaparse";
 import * as XLSX from "xlsx";
 import { Case } from '../models/case';
@@ -8,6 +7,7 @@ import { CasesService } from '../services/cases.service';
 import { CaseFile } from '../models/caseFile';
 import { FormsModule } from '@angular/forms';
 import { serverTimestamp, Timestamp } from 'firebase/firestore';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-uploading',
@@ -40,7 +40,7 @@ export class UploadingComponent {
     "Call elevated to management", "ACPS"];
 
 
-  constructor(private uploadService: UploadsService, private papa: Papa, private caseService: CasesService) {}
+  constructor(private toast: ToastrService, private papa: Papa, private caseService: CasesService) {}
 
   enableEditData() {
     this.isEditingData = true
@@ -58,17 +58,14 @@ export class UploadingComponent {
     this.enableEditData()
   }
   
-  cancel(){
+  cancel() {
     let confirmAlert = confirm("Are you sure you want to cancel?")
     if (confirmAlert) { this.disableEditData() }
   }
 
-  apply() {
-    // The 2 lines below are not needed, as NgModel updates the data in the CaseFile on change
-    // let confirmAlert = confirm("Are you sure you want to apply the changes?")
-    // if (!confirmAlert) { return } // Cancel the changes and keep the modal open
-    
-    console.log(this.currentFile)
+  apply() {    
+    // console.log(this.currentFile)
+    this.toast.info("Changes saved.")
     this.disableEditData()
   }
   
@@ -216,7 +213,7 @@ export class UploadingComponent {
    this.files = []
 
    // Alert the user that the upload was succesful
-   alert("The upload was successful! Find the cases you uploaded in the \"Cases\" tab.")
+   this.toast.info("File uploaded! Find it in the \"Cases\" tab.")
 
    // Signify that all Cases were uploaded successfully
     return true
