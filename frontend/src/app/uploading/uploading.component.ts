@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { serverTimestamp, Timestamp } from 'firebase/firestore';
 import { ToastrService } from 'ngx-toastr';
 import { STATUSES, SPECIES } from '../constants';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-uploading',
@@ -75,7 +76,7 @@ export class UploadingComponent {
       phoneExec != null ? phoneNum = phoneExec[0] : phoneNum = ""
 
       let c: Case = {
-        id: "",
+        id: uuidv4(),
         firstName: data[row][2],
         lastName: data[row][3],
         phoneNumber: phoneNum,
@@ -113,7 +114,7 @@ export class UploadingComponent {
   
         //Create the Case that is pushed to the CaseFile object
         let c: Case = {
-          id: "",
+          id: uuidv4(),
           firstName: "",
           lastName: "",
           phoneNumber: String(line2["Phone Number"]),
@@ -132,9 +133,6 @@ export class UploadingComponent {
   }
 
   handleFileInput(event: Event) {
-    // console.log('CaseFiles:')
-    // console.log(this.files)
-
     // Clear the files lists so that the wrong case files are not still listed
     this.files = []
 
@@ -145,9 +143,6 @@ export class UploadingComponent {
     if (fileList) {
       const files = Array.from(fileList);
       this.filesToUpload = files
-      // for(let file of Array.from(input?.files)) {
-      //   this.filesToUpload.push(file);
-      // }
     }
 
     this.filesToUpload.forEach((file, i) => {
@@ -169,47 +164,33 @@ export class UploadingComponent {
   }
 
   async upload(): Promise<boolean> {
-    // debugger
-    console.log("Upload print")
-    console.log(this.files)
-    // let uploadCase: Case;
-    let successfulUpload;
-
-    // TEMP SETUP, gets the first Case of the first CaseFile and uploads it, checking 
+    // Loop through each CaseFile that is being stored in "files" and upload all of the cases and upload them using firebaseConnection
     if (this.files[0].cases[0] == undefined) { 
+      // TEMP SETUP, gets the first Case of the first CaseFile and checks it
       return false
     } else {
-      // uploadCase = this.files[0].cases[0]
-      // uploadCase.id = new Date().getTime().toString() // Get a unique number for the id (seems to have an impact on the system's ability to record the deleted cases)
       // if (!allCasesValid()) { halt upload and show required fields }
       let errorLevel: boolean;
       this.files.forEach(caseFile => { 
         caseFile.cases.forEach(async uploadCase => {
-          uploadCase.id = new Date().getTime().toString()
+          // Removed this line to not overwrite the (now unique) id of the case
+          // uploadCase.id = new Date().getTime().toString()
+          // console.log(uploadCase.id)
           errorLevel = await this.caseService.createCase(uploadCase)
           if (errorLevel == false) { return uploadCase }
           return true
         })
       })
-      // successfulUpload = await this.caseService.createCase(uploadCase);
     }
-    
-    console.log("Successful Upload?: " + successfulUpload)
-    // Loop through each CaseFile that is being stored in "files" and upload all of the cases and upload them using firebaseConnection
-    
-    // Initial thought process of uploading and confirmation of upload status
-    /*
-    
-    */
-       
-   // Clear the upload queue
-   this.filesToUpload = []
-   this.files = []
 
-   // Alert the user that the upload was succesful
-   this.toast.info("File uploaded! Find it in the \"Cases\" tab.")
+    // Clear the upload queue
+    this.filesToUpload = []
+    this.files = []
 
-   // Signify that all Cases were uploaded successfully
+    // Alert the user that the upload was succesful
+    this.toast.info("File(s) uploaded! Find it in the \"Cases\" tab.")
+
+    // Signify that all Cases were uploaded successfully
     return true
   }
 
@@ -226,7 +207,6 @@ export class UploadingComponent {
         this.files?.splice((index ?? 0), 1);
       }
     }
-    
   }
 }
 
