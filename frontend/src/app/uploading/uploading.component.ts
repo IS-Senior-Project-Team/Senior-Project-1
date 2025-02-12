@@ -150,6 +150,7 @@ export class UploadingComponent {
       // }
     }
 
+    let removedIncorrectFile = false
     this.filesToUpload.forEach((file, i) => {
       if (file.type == this.XLSXType) {
         this.parseXLSX(file)
@@ -157,8 +158,13 @@ export class UploadingComponent {
         this.parseCSV(file) 
       } else {
         this.removeFile(i, false)
+        removedIncorrectFile = true
       }
     });
+
+    if (removedIncorrectFile) {
+      this.toast.info("Discarded files(s) that were not .csv or .xlsx files.")
+    }
   }
   
   allCasesValid(): boolean {
