@@ -38,7 +38,7 @@
     "datatables.net-dt": "^2.1.8",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "firebase": "^10.14.1",
+    "firebase": "^11.3.1",
     "highcharts": "^11.4.8",
     "highcharts-angular": "^4.0.1",
     "install": "^0.13.0",
