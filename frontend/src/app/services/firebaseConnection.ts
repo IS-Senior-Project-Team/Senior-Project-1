@@ -136,12 +136,12 @@ export async function getCaseHighestID() {
   const casesColSnapshot = await getDocs(casesCol);
   let highestID: string = "";
   for (let doc of casesColSnapshot.docs) {
-    console.log(doc.id + " " + typeof (doc.id));
+    // console.log(doc.id + " " + typeof (doc.id));
     if (doc.data()['id'] > highestID) {
       highestID = doc.data()['id'];
     }
   }
-  console.log(highestID);
+  // console.log(highestID);
   return highestID;
   // casesColSnapshot.docs.sort((a,b) => {
   //   if (b.id['id'] < a.id) {
