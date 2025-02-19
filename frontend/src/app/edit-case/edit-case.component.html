@@ -15,8 +15,7 @@
                     </div>
                     <div class="col-md-6">
                         <label>Last Name: </label>
-                        <input class="form-control" [(ngModel)]="case.lastName" name="lastName" required #lastName="ngModel" placeholder="Last Name"/>
-                        <div *ngIf="lastName.invalid" class="text-danger">Last Name is required.</div>
+                        <input class="form-control" [(ngModel)]="case.lastName" name="lastName" #lastName="ngModel" placeholder="Last Name"/>
                     </div>
                 </div>
 
@@ -29,12 +28,12 @@
                             type="text" 
                             required 
                             #phoneNumber="ngModel" 
-                            placeholder="e.g. 123-456-7890"
-                            pattern="^(?:\d{3}-){2}\d{4}$"
+                            placeholder="e.g. 1234567890"
+                            pattern="^\d{10}$"
                         />
                         <div *ngIf="phoneNumber.invalid" class="text-danger">
-                            <div *ngIf="phoneNumber.errors?.['required']">Phone number is required.</div>
-                            <div *ngIf="phoneNumber.errors?.['pattern']">Invalid phone number format.<br>(e.g., 123-456-7890)</div>
+                            <div *ngIf="phoneNumber.errors?.['required']">Phone Number is required.</div>
+                            <div *ngIf="phoneNumber.errors?.['pattern']">Invalid phone number format.<br>(e.g., 1234567890)</div>
                         </div>
                     </div>
                 </div>
@@ -55,7 +54,7 @@
                         <label># of Pets: </label>
                         <input class="form-control" [(ngModel)]="case.numOfPets" name="numOfPets" type="number" required #numOfPets="ngModel" placeholder="Number of Pets"/>
                         <div *ngIf="numOfPets.invalid" class="text-danger">
-                            Please enter a valid number for the number of pets.
+                            Please enter a valid number of pets.
                         </div>
                         <div *ngIf="case.numOfPets < 0" class="text-danger">
                             Number of pets cannot be negative.

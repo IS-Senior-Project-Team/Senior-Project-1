@@ -77,34 +77,23 @@ export class EditCaseComponent implements OnInit {
   }
 
   save(editCaseForm: NgForm) {
-    const confirmUpdate = window.confirm(`Are you sure you want to update and apply changes to Case #${this.case.id}?`);
 
-    if (confirmUpdate) {
-        if (editCaseForm.valid) {
-            this.casesService.updateCase(this.case).subscribe({
-                next: updatedCase => {
-                    console.log('Case updated successfully:', updatedCase);
-                    // Display success message
-                    this.toastr.success('Case edited successfully', 'Success');
-                    this.router.navigate(['/case-management']);
-                },
-                error: error => {
-                    console.error('Error saving case', error);
-                    // Handle case where edit was not successful
-                    this.toastr.error('Failed to edit case', 'Error');
-                }
-            });
-        } else {
-            console.log('Form is invalid');
-        }
+    if (editCaseForm.valid) {
+        this.casesService.updateCase(this.case).subscribe({
+            next: updatedCase => {
+                console.log('Case updated successfully:', updatedCase);
+                // Display success message
+                this.toastr.success('Case updated successfully', 'Success');
+                this.router.navigate(['/case-management']);
+            },
+            error: error => {
+                console.error('Error saving case', error);
+                // Handle case where edit was not successful
+                this.toastr.error('Failed to update case', 'Error');
+            }
+        });
     } else {
-        console.log('Update canceled by the user. Reverting to previous values.');
-
-        // User canceled
-        this.toastr.info('Case edit canceled', 'Canceled');
-
-        // Restore original values
-        this.case = { ...this.originalCase };
+        console.log('Form is invalid');
     }
   }
 
