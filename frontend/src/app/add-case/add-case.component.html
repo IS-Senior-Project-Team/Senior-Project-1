@@ -14,8 +14,7 @@
                     </div>
                     <div class="col-md-6">
                         <label>Last Name: </label>
-                        <input class="form-control" [(ngModel)]="case.lastName" name="lastName" required #lastName="ngModel" placeholder="Last Name"/>
-                        <div *ngIf="lastName.invalid && lastName.touched" class="text-danger">Last Name is required.</div>
+                        <input class="form-control" [(ngModel)]="case.lastName" name="lastName" #lastName="ngModel" placeholder="Last Name"/>
                     </div>
                 </div>
 
@@ -28,12 +27,12 @@
                             type="text" 
                             required 
                             #phoneNumber="ngModel" 
-                            placeholder="e.g. 123-456-7890"
-                            pattern="^(?:\d{3}-){2}\d{4}$"
+                            placeholder="e.g. 1234567890"
+                            pattern="^\d{10}$"
                         />
                         <div *ngIf="phoneNumber.invalid && (phoneNumber.dirty || phoneNumber.touched)" class="text-danger">
-                            <div *ngIf="phoneNumber.errors?.['required']">Phone number is required.</div>
-                            <div *ngIf="phoneNumber.errors?.['pattern']">Invalid phone number format.<br>(e.g., 123-456-7890)</div>
+                            <div *ngIf="phoneNumber.errors?.['required']">Phone Number is required.</div>
+                            <div *ngIf="phoneNumber.errors?.['pattern']">Invalid phone number format.<br>(e.g., 1234567890)</div>
                         </div>
                     </div>
                 </div>
@@ -46,7 +45,8 @@
                     <div class="col-md-4">
                         <label>Status: </label>
                         <select class="form-select" [(ngModel)]="case.status" name="status" required #status="ngModel">
-                            <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+                            <option value="" disabled>Select Status</option>
+                            <option *ngFor="let status of statuses" [value]="status" selected>{{ status }}</option>
                         </select>
                         <div *ngIf="status.invalid && status.touched" class="text-danger">Status is required.</div>
                     </div>
@@ -54,7 +54,7 @@
                         <label># of Pets: </label>
                         <input class="form-control" [(ngModel)]="case.numOfPets" name="numOfPets" type="number" required #numOfPets="ngModel" placeholder="Number of Pets"/>
                         <div *ngIf="numOfPets.invalid && (numOfPets.dirty || numOfPets.touched)" class="text-danger">
-                            Please enter a valid number for the number of pets.
+                            Please enter a valid number of pets.
                         </div>
                         <div *ngIf="case.numOfPets < 0 && (numOfPets.dirty || numOfPets.touched)" class="text-danger">
                             Number of pets cannot be negative.
@@ -64,6 +64,7 @@
                     <div class="col-md-4">
                         <label>Species: </label>
                         <select class="form-select" [(ngModel)]="case.species" name="species" required #caseSpecies="ngModel">
+                            <option value="" disabled selected>Select Species</option>
                             <option *ngFor="let specie of species" [value]="specie">{{ specie }}</option>
                         </select>
                         <div *ngIf="caseSpecies.invalid && caseSpecies.touched" class="text-danger">Species is required.</div>
