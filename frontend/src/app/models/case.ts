@@ -11,6 +11,9 @@ import { Timestamp } from "firebase/firestore";
  * @param numOfPets The number of pets for the case
  * @param species The species of the pet(s) in the case
  * @param isDeleted Used to keep track if the case is deleted or not
+ * @param createdDate The Timestamp the case was uploaded to the system
+ * @param callDate The Timestamp (as close as can be represented) the call was original recorded in the voicemail log xlsx file
+ * @param updateDate The Timestamp representing the last time the Case was updated in the system
  */ 
 export interface Case {
     id: string;
@@ -23,4 +26,6 @@ export interface Case {
     species: string;
     isDeleted: boolean;
     createdDate?: Timestamp;
+    callDate?: Timestamp | string;
+    updateDate?: Timestamp | string;
 }

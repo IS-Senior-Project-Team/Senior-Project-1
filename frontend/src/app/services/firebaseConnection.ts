@@ -189,8 +189,10 @@ export async function updateCase(caseData: Case): Promise<void> {
 
   console.log(`Case with Firestore document ID ${caseRef.id} updated successfully`);
 }
+
 export async function createDoc(caseData: Case): Promise<boolean> {
-  let highestID: string = await getCaseHighestID();
+  // Removed the below line to lower document reads, as it is not needed with unique case IDs
+  // let highestID: string = await getCaseHighestID();
   const casesCol: CollectionReference = collection(db, 'cases');
   if (typeof caseData.createdDate === 'string') {
     caseData.createdDate = Timestamp.fromDate(new Date(caseData.createdDate));
