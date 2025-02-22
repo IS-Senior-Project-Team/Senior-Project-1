@@ -86,8 +86,7 @@ export class UploadingComponent {
         status: data[row][213],
         numOfPets: data[row][233],
         species: data[row][218],
-        isDeleted: false,
-        createdDate: Timestamp.now()
+        isDeleted: false
       }
       // console.log(c)
       thisFile.cases.push(c)
