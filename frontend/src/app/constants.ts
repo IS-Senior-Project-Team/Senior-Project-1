@@ -27,12 +27,19 @@ export const STATUSES: string[] = [
     "Walk-in- Stray Intake",
     "Walk-in- Other",
     "Call elevated to management",
-    "ACPS"
+    "ACPS",
+    "Counseling in Progress",
+    "Intake",
+    "HSH",
+    "Referred to External Service",
+    "Appointment Made"
   ];
 
   export const SPECIES: string[] = [
     "Adult Dog",
     "Adult Cat",
     "Puppy",
-    "Kitten"
+    "Kitten",
+    "Large Dog",
+    "Small Dog"
   ]
