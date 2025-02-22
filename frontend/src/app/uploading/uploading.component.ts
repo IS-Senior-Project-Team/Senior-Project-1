@@ -84,8 +84,7 @@ export class UploadingComponent {
         status: data[row][153],
         numOfPets: data[row][168],
         species: data[row][158],
-        isDeleted: false,
-        createdDate: Timestamp.now()
+        isDeleted: false
       }
       // console.log(c)
       thisFile.cases.push(c)
@@ -122,7 +121,8 @@ export class UploadingComponent {
           status: line1["Status"],
           numOfPets: line1["# Pets (if PSN/RH)"],
           species: line1["Species"],
-          isDeleted: false
+          isDeleted: false,
+          callDate: Timestamp.fromDate(new Date(line1["Date of Message"]))
         }
         thisFile.cases.push(c) // Push all of the cases to the CaseFile object
       }
@@ -135,7 +135,6 @@ export class UploadingComponent {
   handleFileInput(event: Event) {
     // Clear the files lists so that the wrong case files are not still listed
     this.files = []
-
 
     const input = event.currentTarget as HTMLInputElement;
     const fileList: FileList | null = input.files;
@@ -179,8 +178,6 @@ export class UploadingComponent {
       let errorLevel: boolean;
       this.files.forEach(caseFile => { 
         caseFile.cases.forEach(async uploadCase => {
-          // Removed this line to not overwrite the (now unique) id of the case
-          // uploadCase.id = new Date().getTime().toString()
           // console.log(uploadCase.id)
           errorLevel = await this.caseService.createCase(uploadCase)
           if (errorLevel == false) { return uploadCase }
