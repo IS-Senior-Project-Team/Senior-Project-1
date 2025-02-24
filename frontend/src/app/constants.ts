@@ -34,5 +34,6 @@ export const STATUSES: string[] = [
     "Adult Dog",
     "Adult Cat",
     "Puppy",
-    "Kitten"
+    "Kitten",
+    "Unknown"
   ]
