@@ -5,10 +5,11 @@ import { StaffInfo } from '../models/staff-info';
 import { currentUserProfile } from '../services/firebaseConnection';
 import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { RouterLink } from '@angular/router';
 
 @Component({
   standalone: true,
-  imports: [NgIf, NgOptimizedImage],
+  imports: [NgIf, NgOptimizedImage, RouterLink],
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
