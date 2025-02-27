@@ -356,7 +356,6 @@ export function loginUser(email: string, password: string, router: Router): Prom
           router.navigate(["/case-management"]);
         }
 
-        alert("You are now logged in");
         return userInfo; // Return user data
       }
 
@@ -398,7 +397,6 @@ export async function forgotPassword(email: string) {
 
 export function updateUser(user: StaffInfo): Observable<void> {
   const currentUser = auth.currentUser
-  console.log('Updating user with UID:', currentUser?.uid);
 
   if (!currentUser?.uid || currentUser?.uid.trim() === '') {
     throw new Error('Invalid UID. Cannot update user without a valid UID.');
@@ -443,7 +441,7 @@ export async function currentUserProfile(): Promise<StaffInfo | null> {
         return null;
       }
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.error('Error fetching user profile:');
     }
   } else {
     console.log('From firebase connection: No user is currently logged in.');

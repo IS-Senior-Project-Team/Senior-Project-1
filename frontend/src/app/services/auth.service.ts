@@ -32,7 +32,6 @@ export class AuthService {
   }
 
   userForgotPassword(email: string) {
-    console.log("Password sucessfully reset")
     return forgotPassword(email)
   }
 
