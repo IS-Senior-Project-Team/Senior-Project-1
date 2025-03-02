@@ -3,17 +3,17 @@
     <p *ngIf="passwordMismatch" style="color: red;">Passwords do not match.</p>
     <mat-form-field>
         <mat-label>Current Password</mat-label>
-        <input matInput required [(ngModel)]="pswd" (ngModelChange)="pswdInputFilled = !!pswd" />
+        <input matInput type="password" required [(ngModel)]="pswd" (ngModelChange)="pswdInputFilled = !!pswd" />
     </mat-form-field>
     <br>
     <mat-form-field>
         <mat-label>New Password</mat-label>
-        <input matInput required [(ngModel)]="newPswd" />
+        <input matInput type="password" required [(ngModel)]="newPswd" />
     </mat-form-field>
     <br>
     <mat-form-field>
         <mat-label>Confirm New Password</mat-label>
-        <input matInput required [(ngModel)]="confirmNewPswd" />
+        <input matInput type="password" required [(ngModel)]="confirmNewPswd" />
     </mat-form-field>
     <br>
 </mat-dialog-content>
