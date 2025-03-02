@@ -271,29 +271,23 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
 
   // Method to recover a deleted case
   recoverCase(caseItem: Case) {
-    const confirmRecover = window.confirm(`Are you sure you want to RECOVER Case #${caseItem.id}?`);
 
-    if (confirmRecover) {
-      // set the case's deleted flag to true
-      caseItem.isDeleted = false;
+    // set the case's deleted flag to false
+    caseItem.isDeleted = false;
 
-      // Display success message
-      this.toastr.success('Case recovered successfully', 'Success');
+    // Display success message
+    this.toastr.success('Case recovered successfully', 'Success');
 
-      // Delay the case update and page reload
-      setTimeout(() => {
-        this.casesService.updateCase(caseItem).subscribe(() => {
-          if (!this.hasDeletedCases()) {
-            this.showDeleted = false;
-          }
-          this.reInitDataTable(); // Reinitialize the DataTable after recovering a case
-          window.location.reload();  // Reload the page 
-        });
-      }, 1000);  // 1-second delay before executing the update
-    } else {
-      // User canceled
-      this.toastr.info('Recover case was canceled', 'Canceled');
-    }
+    // Delay the case update and page reload
+    setTimeout(() => {
+      this.casesService.updateCase(caseItem).subscribe(() => {
+        if (!this.hasDeletedCases()) {
+          this.showDeleted = false;
+        }
+        this.reInitDataTable(); // Reinitialize the DataTable after recovering a case
+        window.location.reload();  // Reload the page 
+      });
+    }, 1000);  // 1-second delay before executing the update
   }
 
   // Method to navigate to the edit case component/page
