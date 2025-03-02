@@ -1,0 +1,24 @@
+<h2 mat-dialog-title>Change Password</h2>
+<mat-dialog-content>
+    <p *ngIf="passwordMismatch" style="color: red;">Passwords do not match.</p>
+    <mat-form-field>
+        <mat-label>Current Password</mat-label>
+        <input matInput required [(ngModel)]="pswd" (ngModelChange)="pswdInputFilled = !!pswd" />
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+        <mat-label>New Password</mat-label>
+        <input matInput required [(ngModel)]="newPswd" />
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+        <mat-label>Confirm New Password</mat-label>
+        <input matInput required [(ngModel)]="confirmNewPswd" />
+    </mat-form-field>
+    <br>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-raised-button (click)="changePassword(pswd,newPswd, confirmNewPswd)" [disabled]="!pswdInputFilled">Save
+        changes</button>
+    <button mat-raised-button mat-dialog-close>Close</button>
+</mat-dialog-actions>
