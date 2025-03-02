@@ -1,7 +1,8 @@
 <div class="account-profile-page">
     <div class="header">
-        <h1>{{staffInfo?.firstname}}'s Account Profile</h1>
-        <button class="changePswd-btn" (click)="changePassword()">Change Password</button>
+        <h1 *ngIf="!staffInfo || staffInfo.firstname == null">Account Profile</h1>
+        <h1 *ngIf="staffInfo">{{staffInfo.firstname}}'s Account Profile</h1>
+        <button *ngIf="staffInfo" class="changePswd-btn" (click)="changePassword()">Change Password</button>
     </div>
 
     <div class="content">
