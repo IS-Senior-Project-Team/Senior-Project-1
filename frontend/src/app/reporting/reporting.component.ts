@@ -29,8 +29,11 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   // Filter values
   // Each value needs to be unique, so "All" won't work here
-  timeFrame: string = "Weekly"
-  timeFrames: string[] = ['All time frames', 'Daily', 'Weekly', 'Monthly', "Yearly"];
+  timeFrame: string = "Monthly"
+  // The ui picker defaults to the first item in this list,
+  // while the above default sets the actual logic/data populated
+  // so, make sure the first item matches the item above to prevent confusion
+  timeFrames: string[] = ['Monthly', 'Weekly', 'Daily', "Yearly", 'All time frames'];
 
   specie: string = "All species"
   species: string[];
