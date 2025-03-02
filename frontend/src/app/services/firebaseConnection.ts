@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc, query, where, Timestamp, CollectionReference, DocumentReference, addDoc } from 'firebase/firestore';
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail, Auth, browserSessionPersistence, browserLocalPersistence, signOut } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail, updatePassword, signOut, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { authState } from '@angular/fire/auth'
 import { Case } from '../models/case';
 import { AuthService } from "./auth.service";
@@ -247,17 +247,17 @@ export function createUser(email: string, password: string, isAdmin: boolean, ro
           console.log("Error writing document", error)
         })
 
-      toastr.success('Account has been created successfully!', 'Successful', {positionClass: "toast-bottom-left"});
+      toastr.success('Account has been created successfully!', 'Successful', { positionClass: "toast-bottom-left" });
       router.navigate(['/admin-dashboard/users'])
       // ...
     })
     .catch((error) => {
       const errorCode = error.code;
       if (errorCode == 'auth/email-already-in-use') {
-        toastr.warning('Email address already exists!', 'Warning', {positionClass: "toast-bottom-left"});
-    }
+        toastr.warning('Email address already exists!', 'Warning', { positionClass: "toast-bottom-left" });
+      }
       else {
-        toastr.error('Unable to create staff member', 'Error', {positionClass: "toast-bottom-left"});
+        toastr.error('Unable to create staff member', 'Error', { positionClass: "toast-bottom-left" });
       }
       const errorMessage = error.message;
     });
@@ -367,13 +367,13 @@ export function loginUser(email: string, password: string, router: Router, toast
       const errorMessage = error.message;
       console.log(errorCode, errorMessage)
       if (errorCode === "auth/wrong-password") {
-        toastr.warning('Invalid Email or Password', 'Warning', {positionClass: "toast-bottom-left"}); 
+        toastr.warning('Invalid Email or Password', 'Warning', { positionClass: "toast-bottom-left" });
       }
       else if (errorCode === "auth/invalid-email") {
-        toastr.warning('Invalid Email or Password', 'Warning', {positionClass: "toast-bottom-left"});
+        toastr.warning('Invalid Email or Password', 'Warning', { positionClass: "toast-bottom-left" });
       }
       else if (errorCode === 'auth/user-not-found') {
-        toastr.error('Account does not exist', 'Error', {positionClass: "toast-bottom-left"});
+        toastr.error('Account does not exist', 'Error', { positionClass: "toast-bottom-left" });
       }
       // const errorMessage = error.message;
       return null;
@@ -387,13 +387,53 @@ export async function forgotPassword(email: string, toastr: ToastrService) {
   }
   sendPasswordResetEmail(auth, email)
     .then(() => {
-      toastr.info('A password reset link has been sent to your email!', 'Password Reset', {positionClass: "toast-bottom-left"});
+      toastr.info('A password reset link has been sent to your email!', 'Password Reset', { positionClass: "toast-bottom-left" });
     })
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
       // ..
     });
+}
+
+export async function changePassword(currentPswd: string, newPswd: string, toastr: ToastrService) {
+  const user = auth.currentUser;
+
+  if (!user) {
+    toastr.error('No user is logged in', 'Error', { positionClass: 'toast-bottom-left' })
+    return;
+  }
+
+  const credential = EmailAuthProvider.credential(user.email!, currentPswd);
+
+  try {
+    // Reauthenticate the user
+    await reauthenticateWithCredential(user, credential);
+
+    await updatePassword(user, newPswd).then(() => {
+      // Update successful.
+      toastr.success('Password updated successfully', 'Updated', { positionClass: 'toast-bottom-left' })
+    }).catch((error) => {
+      // An error ocurred
+      console.error("Error updating password:", error);
+      if (error.code === "auth/weak-password") {
+      toastr.warning('The new password is too weak.', 'Password Too Weak', { positionClass: "toast-bottom-left" })
+    }
+      // ...
+    });
+
+  } catch (error: any) {
+    console.error("Error reauthenticating", error);
+    if (error.code === "auth/wrong-password") {
+      toastr.error('The current password is incorrect.', 'Incorrect Password', { positionClass: "toast-bottom-left" })
+    }
+    else if (error.code === "auth/requires-recent-login") {
+      toastr.error('You need to log in again before updating your password.', 'Login Required', { positionClass: "toast-bottom-left" })
+    }
+    else {
+      toastr.error('An error occurred. Please try again.', 'Error', { positionClass: "toast-bottom-left" })
+    }
+  }
 }
 
 export function updateUser(user: StaffInfo): Observable<void> {
@@ -417,7 +457,7 @@ export async function deactivateUser(uid: string | null, router: Router, toastr:
 
       updateDoc(userDocRef, { isActive: false })
         .then(() => {
-          toastr.success('User has been deactivated', 'Deactivated', {positionClass: "toast-bottom-left"});
+          toastr.success('User has been deactivated', 'Deactivated', { positionClass: "toast-bottom-left" });
           router.navigate(['/admin-dashboard/users'])
         })
         .catch((error) => {
@@ -425,7 +465,7 @@ export async function deactivateUser(uid: string | null, router: Router, toastr:
         });
     }
     else {
-      toastr.info('Deactivation was canceled', 'Canceled', {positionClass: "toast-bottom-left"});
+      toastr.info('Deactivation was canceled', 'Canceled', { positionClass: "toast-bottom-left" });
     }
   } catch (error) {
     console.error("Error getting current user")
@@ -440,7 +480,7 @@ export async function activateUser(uid: string | null, router: Router, toastr: T
 
     updateDoc(userDocRef, { isActive: true })
       .then(() => {
-        toastr.success('User has been activated', 'Activated', {positionClass: "toast-bottom-left"});
+        toastr.success('User has been reactivated', 'Activated', { positionClass: "toast-bottom-left" });
         router.navigate(['/admin-dashboard/users'])
       })
       .catch((error) => {
@@ -513,7 +553,7 @@ async function checkEmailExists(email: string, toastr: ToastrService): Promise<b
   try {
     // Check if the email format is valid
     if (!email || !validateEmail(email)) {
-      toastr.warning('Invalid email format. Please enter a valid email.', 'Error', {positionClass: "toast-bottom-left"});
+      toastr.warning('Invalid email format. Please enter a valid email.', 'Error', { positionClass: "toast-bottom-left" });
       return false;
     }
 
@@ -525,17 +565,17 @@ async function checkEmailExists(email: string, toastr: ToastrService): Promise<b
       // Email exists
       return true;
     } else {
-      toastr.error('This email does not exist. Please try again.', 'Error', {positionClass: "toast-bottom-left"});
+      toastr.error('This email does not exist. Please try again.', 'Error', { positionClass: "toast-bottom-left" });
       return false;
     }
   } catch (error: any) {
     if (error.code === "auth/invalid-email") {
-      toastr.error('The email address is invalid. Please try again.', 'Error', {positionClass: "toast-bottom-left"});
+      toastr.error('The email address is invalid. Please try again.', 'Error', { positionClass: "toast-bottom-left" });
     } else if (error.code === "auth/user-not-found") {
-      toastr.error('No user found with this email address. Please try again.', 'Error', {positionClass: "toast-bottom-left"});
+      toastr.error('No user found with this email address. Please try again.', 'Error', { positionClass: "toast-bottom-left" });
     } else {
       console.error("Error checking email:", error);
-      toastr.error('An unexpected error occurred. Please try again later', 'Error', {positionClass: "toast-bottom-left"});
+      toastr.error('An unexpected error occurred. Please try again later', 'Error', { positionClass: "toast-bottom-left" });
     }
     return false;
   }
