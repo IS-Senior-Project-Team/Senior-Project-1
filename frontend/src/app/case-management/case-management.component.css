@@ -1,5 +1,18 @@
+.card:hover {
+    transform: scale(1);
+}
+
+.green-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.green-btn:hover {
+    background-color: #45a049;
+}
+
 .case-management {
-    
+
     .table {
         margin-bottom: 0;
         

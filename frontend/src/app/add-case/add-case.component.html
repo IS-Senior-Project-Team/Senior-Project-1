@@ -9,7 +9,7 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label>First Name: </label>
-                        <input class="form-control" [(ngModel)]="case.firstName" name="firstName" required #firstName="ngModel" placeholder="First Name"/>
+                        <input class="form-control" [(ngModel)]="case.firstName" name="firstName" required #firstName="ngModel" placeholder="First Name" autofocus/>
                         <div *ngIf="firstName.invalid && firstName.touched" class="text-danger">First Name is required.</div>
                     </div>
                     <div class="col-md-6">
@@ -21,6 +21,9 @@
                 <div class="row mb-5">
                     <div class="col-md-6">
                         <label>Phone Number: </label>
+                        <!--
+                            pattern="^(?:\d{3}-){2}\d{4}$"
+                        -->
                         <input class="form-control" 
                             [(ngModel)]="case.phoneNumber" 
                             name="phoneNumber" 
@@ -28,7 +31,7 @@
                             required 
                             #phoneNumber="ngModel" 
                             placeholder="e.g. 1234567890"
-                            pattern="^\d{10}$"
+                            pattern="^\d{10}$" 
                         />
                         <div *ngIf="phoneNumber.invalid && (phoneNumber.dirty || phoneNumber.touched)" class="text-danger">
                             <div *ngIf="phoneNumber.errors?.['required']">Phone Number is required.</div>
@@ -45,8 +48,8 @@
                     <div class="col-md-4">
                         <label>Status: </label>
                         <select class="form-select" [(ngModel)]="case.status" name="status" required #status="ngModel">
-                            <option value="" disabled>Select Status</option>
-                            <option *ngFor="let status of statuses" [value]="status" selected>{{ status }}</option>
+                            <option value="" disabled selected>Select Status</option>
+                            <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
                         </select>
                         <div *ngIf="status.invalid && status.touched" class="text-danger">Status is required.</div>
                     </div>
@@ -56,8 +59,8 @@
                         <div *ngIf="numOfPets.invalid && (numOfPets.dirty || numOfPets.touched)" class="text-danger">
                             Please enter a valid number of pets.
                         </div>
-                        <div *ngIf="case.numOfPets < 0 && (numOfPets.dirty || numOfPets.touched)" class="text-danger">
-                            Number of pets cannot be negative.
+                        <div *ngIf="case.numOfPets < 1 && (numOfPets.dirty || numOfPets.touched)" class="text-danger">
+                            Number of pets cannot be zero or negative.
                         </div>
                     </div>
                     
@@ -80,7 +83,7 @@
 
                 <div style="display: flex; justify-content: space-between; margin-top: 3%;">
                     <button class="btn btn-secondary" (click)="cancel()" style="width: 100px">Cancel</button>
-                    <button class="btn btn-primary" type="submit" style="width: 100px" (click)="save(addCaseForm)" [disabled]="addCaseForm.invalid || case.numOfPets < 0">Save</button>
+                    <button class="btn green-btn" type="submit" style="width: 100px" (click)="save(addCaseForm)" [disabled]="addCaseForm.invalid || case.numOfPets < 1">Save</button>
                 </div>
             </form>
         </div>
