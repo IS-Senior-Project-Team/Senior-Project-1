@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { UploadsService } from '../services/uploads.service';
 import { Papa, ParseResult } from "ngx-papaparse";
 import * as XLSX from "xlsx";
 import { Case } from '../models/case';
@@ -8,6 +7,9 @@ import { CasesService } from '../services/cases.service';
 import { CaseFile } from '../models/caseFile';
 import { FormsModule } from '@angular/forms';
 import { serverTimestamp, Timestamp } from 'firebase/firestore';
+import { ToastrService } from 'ngx-toastr';
+import { STATUSES, SPECIES } from '../constants';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'app-uploading',
@@ -29,18 +31,11 @@ export class UploadingComponent {
   XLSXType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   CSVType = 'text/csv';
   phoneShape = /[0-9]{10}$/;
-  species = ["Adult Cat", "Adult Dog", "Cat", "Dog", "Kitten", "Puppy", "Infant Cat", "Infant Dog"];
-  statuses = ["Already Rehomed", "Asked for more info", "Bad # or No VM", 
-    "Duplicate", "Found Pet", "Keeping-Behavior", "Keeping- Medical", 
-    "Keeping- Other", "Kitten Pack & S/N", "LM with Info", "Lost Pet", 
-    "No Show Appt", "Not PSN", "Open", "Owner Surrender Intake", "PSN Boarding", 
-    "Rehome Attempt", "Rehome Confirmed", "Reunited", "Surrender Appt", 
-    "Surrender Denied", "Walk-in Surrender Attempt", "Walk-in- Stray Attempt", 
-    "Walk-In- OS Intake", "Walk-in- Stray Intake", "Walk-in- Other", 
-    "Call elevated to management", "ACPS"];
+  species = SPECIES;
+  statuses = STATUSES;
 
 
-  constructor(private uploadService: UploadsService, private papa: Papa, private caseService: CasesService) {}
+  constructor(private toast: ToastrService, private papa: Papa, private caseService: CasesService) {}
 
   enableEditData() {
     this.isEditingData = true
@@ -58,17 +53,14 @@ export class UploadingComponent {
     this.enableEditData()
   }
   
-  cancel(){
+  cancel() {
     let confirmAlert = confirm("Are you sure you want to cancel?")
     if (confirmAlert) { this.disableEditData() }
   }
 
-  apply() {
-    // The 2 lines below are not needed, as NgModel updates the data in the CaseFile on change
-    // let confirmAlert = confirm("Are you sure you want to apply the changes?")
-    // if (!confirmAlert) { return } // Cancel the changes and keep the modal open
-    
-    console.log(this.currentFile)
+  apply() {    
+    // console.log(this.currentFile)
+    this.toast.info("Changes saved.")
     this.disableEditData()
   }
   
@@ -84,7 +76,7 @@ export class UploadingComponent {
       phoneExec != null ? phoneNum = phoneExec[0] : phoneNum = ""
 
       let c: Case = {
-        id: "",
+        id: uuidv4(),
         firstName: data[row][2],
         lastName: data[row][3],
         phoneNumber: phoneNum,
@@ -92,8 +84,7 @@ export class UploadingComponent {
         status: data[row][153],
         numOfPets: data[row][168],
         species: data[row][158],
-        isDeleted: false,
-        createdDate: Timestamp.now()
+        isDeleted: false
       }
       // console.log(c)
       thisFile.cases.push(c)
@@ -122,7 +113,7 @@ export class UploadingComponent {
   
         //Create the Case that is pushed to the CaseFile object
         let c: Case = {
-          id: "",
+          id: uuidv4(),
           firstName: "",
           lastName: "",
           phoneNumber: String(line2["Phone Number"]),
@@ -130,7 +121,8 @@ export class UploadingComponent {
           status: line1["Status"],
           numOfPets: line1["# Pets (if PSN/RH)"],
           species: line1["Species"],
-          isDeleted: false
+          isDeleted: false,
+          callDate: Timestamp.fromDate(new Date(line1["Date of Message"]))
         }
         thisFile.cases.push(c) // Push all of the cases to the CaseFile object
       }
@@ -141,12 +133,8 @@ export class UploadingComponent {
   }
 
   handleFileInput(event: Event) {
-    // console.log('CaseFiles:')
-    // console.log(this.files)
-
     // Clear the files lists so that the wrong case files are not still listed
     this.files = []
-
 
     const input = event.currentTarget as HTMLInputElement;
     const fileList: FileList | null = input.files;
@@ -154,11 +142,9 @@ export class UploadingComponent {
     if (fileList) {
       const files = Array.from(fileList);
       this.filesToUpload = files
-      // for(let file of Array.from(input?.files)) {
-      //   this.filesToUpload.push(file);
-      // }
     }
 
+    let removedIncorrectFile = false
     this.filesToUpload.forEach((file, i) => {
       if (file.type == this.XLSXType) {
         this.parseXLSX(file)
@@ -166,8 +152,13 @@ export class UploadingComponent {
         this.parseCSV(file) 
       } else {
         this.removeFile(i, false)
+        removedIncorrectFile = true
       }
     });
+
+    if (removedIncorrectFile) {
+      this.toast.info("Discarded files(s) that were not .csv or .xlsx files.")
+    }
   }
   
   allCasesValid(): boolean {
@@ -178,47 +169,31 @@ export class UploadingComponent {
   }
 
   async upload(): Promise<boolean> {
-    // debugger
-    console.log("Upload print")
-    console.log(this.files)
-    // let uploadCase: Case;
-    let successfulUpload;
-
-    // TEMP SETUP, gets the first Case of the first CaseFile and uploads it, checking 
+    // Loop through each CaseFile that is being stored in "files" and upload all of the cases and upload them using firebaseConnection
     if (this.files[0].cases[0] == undefined) { 
+      // TEMP SETUP, gets the first Case of the first CaseFile and checks it
       return false
     } else {
-      // uploadCase = this.files[0].cases[0]
-      // uploadCase.id = new Date().getTime().toString() // Get a unique number for the id (seems to have an impact on the system's ability to record the deleted cases)
       // if (!allCasesValid()) { halt upload and show required fields }
       let errorLevel: boolean;
       this.files.forEach(caseFile => { 
         caseFile.cases.forEach(async uploadCase => {
-          uploadCase.id = new Date().getTime().toString()
+          // console.log(uploadCase.id)
           errorLevel = await this.caseService.createCase(uploadCase)
           if (errorLevel == false) { return uploadCase }
           return true
         })
       })
-      // successfulUpload = await this.caseService.createCase(uploadCase);
     }
-    
-    console.log("Successful Upload?: " + successfulUpload)
-    // Loop through each CaseFile that is being stored in "files" and upload all of the cases and upload them using firebaseConnection
-    
-    // Initial thought process of uploading and confirmation of upload status
-    /*
-    
-    */
-       
-   // Clear the upload queue
-   this.filesToUpload = []
-   this.files = []
 
-   // Alert the user that the upload was succesful
-   alert("The upload was successful! Find the cases you uploaded in the \"Cases\" tab.")
+    // Clear the upload queue
+    this.filesToUpload = []
+    this.files = []
 
-   // Signify that all Cases were uploaded successfully
+    // Alert the user that the upload was succesful
+    this.toast.info("File(s) uploaded! Find it in the \"Cases\" tab.")
+
+    // Signify that all Cases were uploaded successfully
     return true
   }
 
@@ -235,7 +210,6 @@ export class UploadingComponent {
         this.files?.splice((index ?? 0), 1);
       }
     }
-    
   }
 }
 

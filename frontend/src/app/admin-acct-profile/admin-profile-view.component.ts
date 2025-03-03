@@ -6,7 +6,9 @@ import { NgIf } from '@angular/common';
 import { getUserProfile } from '../services/firebaseConnection';
 import { RouterLink } from '@angular/router';
 import { deactivateUser } from '../services/firebaseConnection';
+import { activateUser } from '../services/firebaseConnection';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-admin-profile-view',
@@ -19,7 +21,7 @@ export class AdminProfileViewComponent {
   profileForm: FormGroup
   staffInfo: StaffInfo | null = null
 
-  constructor(public route: ActivatedRoute, private fb: NonNullableFormBuilder, private router : Router) {
+  constructor(public route: ActivatedRoute, private fb: NonNullableFormBuilder, private router : Router, private toastr : ToastrService) {
     this.profileForm = this.fb.group({
       email: [''],
       firstname: [''],
@@ -46,6 +48,11 @@ export class AdminProfileViewComponent {
 
   deactivateUser(uid : string | null) {
     console.log(uid)
-    deactivateUser(uid, this.router);
+    deactivateUser(uid, this.router, this.toastr);
+  }
+
+  activateUser(uid : string | null) {
+    console.log(uid)
+    activateUser(uid, this.router, this.toastr);
   }
 }

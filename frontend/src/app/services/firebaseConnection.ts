@@ -13,6 +13,7 @@ import { RegisterStaffComponent } from '../view/register-staff/register-staff.co
 // Required for side-effects
 import "firebase/firestore";
 import { EventEmitter, inject } from "@angular/core";
+import { ToastrService } from "ngx-toastr";
 
 // Follow this pattern to import other Firebase services
 // import { } from 'firebase/<service>';
@@ -136,12 +137,12 @@ export async function getCaseHighestID() {
   const casesColSnapshot = await getDocs(casesCol);
   let highestID: string = "";
   for (let doc of casesColSnapshot.docs) {
-    console.log(doc.id + " " + typeof (doc.id));
+    // console.log(doc.id + " " + typeof (doc.id));
     if (doc.data()['id'] > highestID) {
       highestID = doc.data()['id'];
     }
   }
-  console.log(highestID);
+  // console.log(highestID);
   return highestID;
   // casesColSnapshot.docs.sort((a,b) => {
   //   if (b.id['id'] < a.id) {
@@ -189,8 +190,10 @@ export async function updateCase(caseData: Case): Promise<void> {
 
   console.log(`Case with Firestore document ID ${caseRef.id} updated successfully`);
 }
+
 export async function createDoc(caseData: Case): Promise<boolean> {
-  let highestID: string = await getCaseHighestID();
+  // Removed the below line to lower document reads, as it is not needed with unique case IDs
+  // let highestID: string = await getCaseHighestID();
   const casesCol: CollectionReference = collection(db, 'cases');
   if (typeof caseData.createdDate === 'string') {
     caseData.createdDate = Timestamp.fromDate(new Date(caseData.createdDate));
@@ -213,7 +216,7 @@ export async function createDoc(caseData: Case): Promise<boolean> {
 const auth = getAuth();
 
 // getAuth().setPersistence(browserLocalPersistence)        //  ------Include   THIS LATER TO SET THE STORAGE TO SESSION STORAGE
-export function createUser(email: string, password: string, isAdmin: boolean, router: Router) {
+export function createUser(email: string, password: string, isAdmin: boolean, router: Router, toastr: ToastrService) {
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // Signed up 
@@ -244,17 +247,17 @@ export function createUser(email: string, password: string, isAdmin: boolean, ro
           console.log("Error writing document", error)
         })
 
-      alert('Account has been created successfully!')
+      toastr.success('Account has been created successfully!', 'Successful', {positionClass: "toast-bottom-left"});
       router.navigate(['/admin-dashboard/users'])
       // ...
     })
     .catch((error) => {
       const errorCode = error.code;
       if (errorCode == 'auth/email-already-in-use') {
-        alert("Email address already exists!")
-      }
+        toastr.warning('Email address already exists!', 'Warning', {positionClass: "toast-bottom-left"});
+    }
       else {
-        alert("Sorry, unable to create staff member")
+        toastr.error('Unable to create staff member', 'Error', {positionClass: "toast-bottom-left"});
       }
       const errorMessage = error.message;
     });
@@ -316,7 +319,7 @@ auth.onAuthStateChanged((currentUser) => {
 //     });
 // }
 
-export function loginUser(email: string, password: string, router: Router): Promise<StaffInfo | null> {
+export function loginUser(email: string, password: string, router: Router, toastr: ToastrService): Promise<StaffInfo | null> {
   return signInWithEmailAndPassword(auth, email, password)
     .then(async (userCredential) => {
       const user = userCredential.user;
@@ -326,7 +329,7 @@ export function loginUser(email: string, password: string, router: Router): Prom
 
       if (userDoc.exists()) {
         const userData = userDoc.data() as StaffInfo;
-        
+
         if (!userData.isActive) {
           await signOut(auth);
           alert("Your account has been deactivated. Please contact an administrator.");
@@ -354,7 +357,6 @@ export function loginUser(email: string, password: string, router: Router): Prom
           router.navigate(["/case-management"]);
         }
 
-        alert("You are now logged in");
         return userInfo; // Return user data
       }
 
@@ -365,27 +367,27 @@ export function loginUser(email: string, password: string, router: Router): Prom
       const errorMessage = error.message;
       console.log(errorCode, errorMessage)
       if (errorCode === "auth/wrong-password") {
-        alert("Invalid Email or Password")
+        toastr.warning('Invalid Email or Password', 'Warning', {positionClass: "toast-bottom-left"}); 
       }
       else if (errorCode === "auth/invalid-email") {
-        alert("Invalid Email or Password")
+        toastr.warning('Invalid Email or Password', 'Warning', {positionClass: "toast-bottom-left"});
       }
       else if (errorCode === 'auth/user-not-found') {
-        alert("Account does not exist")
+        toastr.error('Account does not exist', 'Error', {positionClass: "toast-bottom-left"});
       }
       // const errorMessage = error.message;
       return null;
     });
 }
 
-export async function forgotPassword(email: string) {
-  const emailExists = await checkEmailExists(email)
+export async function forgotPassword(email: string, toastr: ToastrService) {
+  const emailExists = await checkEmailExists(email, toastr)
   if (!emailExists) {
     return;
   }
   sendPasswordResetEmail(auth, email)
     .then(() => {
-      alert("A password reset link has been sent to your email!")
+      toastr.info('A password reset link has been sent to your email!', 'Password Reset', {positionClass: "toast-bottom-left"});
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -396,7 +398,6 @@ export async function forgotPassword(email: string) {
 
 export function updateUser(user: StaffInfo): Observable<void> {
   const currentUser = auth.currentUser
-  console.log('Updating user with UID:', currentUser?.uid);
 
   if (!currentUser?.uid || currentUser?.uid.trim() === '') {
     throw new Error('Invalid UID. Cannot update user without a valid UID.');
@@ -406,24 +407,50 @@ export function updateUser(user: StaffInfo): Observable<void> {
   return from(updateDoc(ref, { ...user }));
 }
 
- export async function deactivateUser(uid : string | null, router : Router ) {
+export async function deactivateUser(uid: string | null, router: Router, toastr: ToastrService) {
   try {
     // const user = await getUserProfile(uid)
     // const userId = user?.uid;
-    const userDocRef = doc(db, "staffMembers", uid!);
-    
-    updateDoc(userDocRef, { isActive: false })
-    .then(() => {
-      alert("User has been deactivated.");
-      router.navigate(['/admin-dashboard/users'])
-    })
-    .catch((error) => {
-      console.error("Error deactivating user:", error);
-    });
+    let confirmDeactivate = confirm('Are you sure you want to deactivate this user?')
+    if (confirmDeactivate) {
+      const userDocRef = doc(db, "staffMembers", uid!);
+
+      updateDoc(userDocRef, { isActive: false })
+        .then(() => {
+          toastr.success('User has been deactivated', 'Deactivated', {positionClass: "toast-bottom-left"});
+          router.navigate(['/admin-dashboard/users'])
+        })
+        .catch((error) => {
+          console.error("Error deactivating user:", error);
+        });
+    }
+    else {
+      toastr.info('Deactivation was canceled', 'Canceled', {positionClass: "toast-bottom-left"});
+    }
   } catch (error) {
     console.error("Error getting current user")
   }
 }
+
+export async function activateUser(uid: string | null, router: Router, toastr: ToastrService) {
+  try {
+    // const user = await getUserProfile(uid)
+    // const userId = user?.uid;
+    const userDocRef = doc(db, "staffMembers", uid!);
+
+    updateDoc(userDocRef, { isActive: true })
+      .then(() => {
+        toastr.success('User has been activated', 'Activated', {positionClass: "toast-bottom-left"});
+        router.navigate(['/admin-dashboard/users'])
+      })
+      .catch((error) => {
+        console.error("Error activating user:", error);
+      });
+  } catch (error) {
+    console.error("Error getting current user")
+  }
+}
+
 
 export async function currentUserProfile(): Promise<StaffInfo | null> {
 
@@ -441,7 +468,7 @@ export async function currentUserProfile(): Promise<StaffInfo | null> {
         return null;
       }
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.error('Error fetching user profile:');
     }
   } else {
     console.log('From firebase connection: No user is currently logged in.');
@@ -482,11 +509,11 @@ export async function fetchAllUsers(): Promise<StaffInfo[]> {
   })) as StaffInfo[];
 }
 
-async function checkEmailExists(email: string): Promise<boolean> {
+async function checkEmailExists(email: string, toastr: ToastrService): Promise<boolean> {
   try {
     // Check if the email format is valid
     if (!email || !validateEmail(email)) {
-      alert("Invalid email format. Please enter a valid email.");
+      toastr.warning('Invalid email format. Please enter a valid email.', 'Error', {positionClass: "toast-bottom-left"});
       return false;
     }
 
@@ -498,18 +525,17 @@ async function checkEmailExists(email: string): Promise<boolean> {
       // Email exists
       return true;
     } else {
-      console.log("from checkemail exists", signInMethods)
-      alert("Email does not exist. Please try again.");
+      toastr.error('This email does not exist. Please try again.', 'Error', {positionClass: "toast-bottom-left"});
       return false;
     }
   } catch (error: any) {
     if (error.code === "auth/invalid-email") {
-      alert("The email address is invalid. Please try again.");
+      toastr.error('The email address is invalid. Please try again.', 'Error', {positionClass: "toast-bottom-left"});
     } else if (error.code === "auth/user-not-found") {
-      alert("No user found with this email address. Please try again.");
+      toastr.error('No user found with this email address. Please try again.', 'Error', {positionClass: "toast-bottom-left"});
     } else {
       console.error("Error checking email:", error);
-      alert("An unexpected error occurred. Please try again later.");
+      toastr.error('An unexpected error occurred. Please try again later', 'Error', {positionClass: "toast-bottom-left"});
     }
     return false;
   }

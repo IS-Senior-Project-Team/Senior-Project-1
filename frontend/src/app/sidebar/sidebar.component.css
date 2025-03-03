@@ -90,3 +90,9 @@
   margin-top: 15rem;
   margin-left: 3rem;
 }
+
+a {
+  color: #000000;
+  background-color: transparent;
+  text-decoration: none;
+}
