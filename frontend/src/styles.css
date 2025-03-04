@@ -19,3 +19,5 @@ html, body {
 .card:hover {
     transform: scale(1.005); 
 }
+
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

@@ -7,6 +7,8 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { STATUSES, SPECIES } from '../constants';
+import { v4 as uuidv4 } from 'uuid';
+import { Timestamp } from 'firebase/firestore';
 
 @Component({
   selector: 'app-add-case',
@@ -24,10 +26,11 @@ export class AddCaseComponent {
     lastName: '',
     phoneNumber: '',
     notes: '',
-    status: '',
-    numOfPets: 0,
+    status: 'Open',
+    numOfPets: 1,
     species: '',
-    isDeleted: false
+    isDeleted: false,
+    createdDate: undefined,
   };
 
   statuses: string[] = STATUSES;
@@ -49,34 +52,29 @@ export class AddCaseComponent {
   }
 
   async save(addCaseForm: NgForm) {
-    const confirmUpdate = window.confirm(`Are you sure you want to add a new pet case for ${this.case.firstName} ${this.case.lastName}?`);
-
-    if (confirmUpdate) {
-        if (addCaseForm.valid) {
-          try {
-            this.case.id = new Date().getTime().toString(); // Change later
-            const success = await this.casesService.createCase(this.case);
-            
-            if (success) {
-              // Display success message
-              this.toastr.success('Case added successfully', 'Success');
-              
-              // Reset form and navigate back to case management page
-              addCaseForm.reset();
-              this.router.navigate(['/case-management']);
-            } else {
-              // Handle case where creation was not successful
-              this.toastr.error('Failed to add case', 'Error');
-            }
-          } catch (error) {
-            // Catch any unexpected errors
-            console.error('Error adding case:', error);
-            this.toastr.error('An unexpected error occurred', 'Error');
-          }
+    
+    if (addCaseForm.valid) {
+      try {
+        this.case.id = uuidv4(); // Generate unique id using the UUID library
+        this.case.createdDate = Timestamp.fromDate(new Date()); // Generate the case's created date when a case is added
+        const success = await this.casesService.createCase(this.case);
+        
+        if (success) {
+          // Display success message
+          this.toastr.success('Case added successfully', 'Success');
+          
+          // Reset form and navigate back to case management page
+          addCaseForm.reset();
+          this.router.navigate(['/case-management']);
+        } else {
+          // Handle case where creation was not successful
+          this.toastr.error('Failed to add case', 'Error');
         }
-    } else {
-      // User canceled
-      this.toastr.info('Add case was canceled', 'Canceled');
+      } catch (error) {
+        // Catch any unexpected errors
+        console.error('Error adding case:', error);
+        this.toastr.error('An unexpected error occurred', 'Error');
+      }
     }
   }
 }

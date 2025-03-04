@@ -1,13 +1,21 @@
 .user-list-page {
-  max-width: 1200px;
-  margin-left: 100px;
+  max-width: 100%;
+  margin: auto;
   padding: 20px;
   font-family: 'Arial', sans-serif;
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-top: 4%;
-  width: 200vh;
+  width: 107vh
+}
+
+/* Flex container for buttons */
+.user-list-page div[style*="justify-content:space-between;"] {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 h1 {
@@ -17,6 +25,88 @@ h1 {
   margin-bottom: 20px;
 }
 
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Responsive table container */
+@media (max-width: 768px) {
+  .user-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+.user-table thead {
+  background-color: #5cc05f;
+  color: white;
+}
+
+.user-table th,
+.user-table td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.user-table tbody tr {
+  border-bottom: 1px solid #ddd;
+}
+
+.user-table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Responsive button layout */
+@media (max-width: 768px) {
+  .user-list-page div[style*="justify-content:space-between;"] {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .create-btn,
+  .dash-btn {
+    width: 100%;
+    text-align: center;
+    margin: 5px 0;
+  }
+}
+
+/* Adjust button sizes */
+.create-btn,
+.dash-btn,
+.view-btn {
+  padding: 10px 15px;
+  font-size: 14px;
+}
+
+.create-btn,.view-btn,.dash-btn {
+  padding: 8px 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  float: right;
+  margin-bottom: 7px;
+}
+
+.view-btn:hover {
+  background-color: #45a049;
+}
+.dash-btn:hover {
+  background-color: #45a049;
+}
+.create-btn:hover {
+  background-color: #45a049;
+}
 .loading {
   text-align: center;
   font-size: 1.2rem;
@@ -46,91 +136,36 @@ h1 {
   padding: 20px;
 }
 
-.user-table {
-  width: 100%;
-  height: 50vh;
-  border-collapse: collapse;
-  margin: 20px 0;
-  background-color: #fff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  overflow: hidden;
-}
+/* Stack table rows on smaller screens */
+@media (max-width: 600px) {
+  .user-table thead {
+    display: none;
+  }
 
-.user-table thead {
-  background-color: #5cc05f;
-  color: white;
-}
+  .user-table tbody,
+  .user-table tr,
+  .user-table td {
+    display: block;
+    width: 100%;
+  }
 
-.user-table th,
-.user-table td {
-  padding: 12px 15px;
-  text-align: left;
-}
+  .user-table tr {
+    margin-bottom: 10px;
+    border-bottom: 2px solid #5cc05f;
+  }
 
-.user-table tbody tr {
-  border-bottom: 1px solid #ddd;
-}
+  .user-table td {
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
 
-.user-table tbody tr:hover {
-  background-color: #f1f1f1;
-}
-
-.create-btn {
-  padding: 8px 12px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  float: right;
-  margin-bottom: 7px;
-}
-
-.create-btn:hover {
-  background-color: #45a049;
-}
-
-.create-btn:active {
-  background-color: #3d8c43;
-}
-
-.dash-btn {
-  padding: 8px 12px;
-  background-color: #1988d7;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  float: left;
-  margin-bottom: 7px;
-}
-
-.dash-btn:hover {
-  background-color: #1578be;
-}
-
-.dash-btn:active {
-  background-color: #3d8c43;
-}
-
-.view-btn {
-  padding: 8px 12px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  align-items: flex-end;
-}
-
-.view-btn:hover {
-  background-color: #45a049;
-}
-
-.view-btn:active {
-  background-color: #3d8c43;
+  .user-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    width: 45%;
+    font-weight: bold;
+    text-align: left;
+  }
 }

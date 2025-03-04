@@ -6,17 +6,18 @@ import { catchError, from, map, mergeMap, Observable, throwError } from 'rxjs';
 import { createUser, forgotPassword } from './firebaseConnection'
 import { loginUser } from './firebaseConnection';
 import { RegisterStaffEmail } from '../models/register-staff-email';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   userLoggedIn: EventEmitter<StaffInfo> = new EventEmitter<StaffInfo>();
-  constructor(private httpClient: HttpClient, private router: Router) { }
+  constructor(private httpClient: HttpClient, private router: Router, private toastr: ToastrService) { }
 
   //This should only take in the email and then temp password is generated somewhere in between
   CreateUser(email: RegisterStaffEmail, isAdminRole : boolean): void { //This is calling the create user function from firebase service 
-    return createUser(email.staffEmail, this.generateTempPassword(), isAdminRole, this.router);
+    return createUser(email.staffEmail, this.generateTempPassword(), isAdminRole, this.router, this.toastr);
   }
 
   // loginUser(email: string, password: string) {
@@ -24,7 +25,7 @@ export class AuthService {
   //   return loginUser(email, password, this.router)
   // }
   loginUser(email: string, password: string) {
-    loginUser(email, password, this.router).then((userData) => {
+    loginUser(email, password, this.router, this.toastr).then((userData) => {
       if (userData) {
         this.userLoggedIn.emit(userData); // Emit the user data when logged in
       }
@@ -32,8 +33,7 @@ export class AuthService {
   }
 
   userForgotPassword(email: string) {
-    console.log("Password sucessfully reset")
-    return forgotPassword(email)
+    return forgotPassword(email, this.toastr)
   }
 
   //This is intended to generate temp password along with admin creating a new account using just the user email

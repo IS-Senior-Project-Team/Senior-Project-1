@@ -11,9 +11,10 @@
                 [disabled]="!hasDeletedCases()">
             {{ showDeleted ? 'Hide' : 'Show' }} Deleted Cases
         </button>
-        <button class="btn btn-primary" *ngIf="showDeleted === false"
+        <button class="btn green-btn" 
+                *ngIf="showDeleted === false"
                 (click)="addCase()">
-          + Add Case
+          Add New Case
         </button>
       </div>
 
@@ -24,6 +25,7 @@
               <th scope="col">First Name</th>
               <th scope="col">Last Name</th>
               <th scope="col">Phone Number</th>
+              <th scope="col">Created Date</th>
               <th scope="col">Notes</th>
               <th scope="col">Status</th>
               <th scope="col"># of Pets</th>
@@ -43,20 +45,20 @@
                 <td>{{ item.species }}</td>
                 <td>
                   <div class="d-flex justify-content-center gap-2">
-                    <button *ngIf="!item.isDeleted" 
+                    <button *ngIf="!item.isDeleted"
                             class="btn btn-link p-1" 
                             (click)="editCase(item.id)"
                             data-action="edit">
                       <img src="edit-icon.png" alt="Edit" style="width: 25px; height: 25px;">
                     </button>
-                    <button *ngIf="!item.isDeleted" 
+                    <button *ngIf="!item.isDeleted"
                             class="btn btn-link p-1" 
                             (click)="deleteCase(item)"
                             data-action="delete">
                       <img src="red-trashcan-icon.png" alt="Delete" style="width: 25px; height: 25px;">
                     </button>
 
-                    <button *ngIf="item.isDeleted" 
+                    <button *ngIf="item.isDeleted"
                             class="btn btn-link p-1" 
                             (click)="recoverCase(item)"
                             data-action="recover">
