@@ -2,7 +2,7 @@
     <h1>All Users</h1>
     <div style="justify-content:space-between;">
         <button class="create-btn" type="button" [routerLink]="['/register']">Create Account</button>
-        <button class="dash-btn" type="button" [routerLink]="['/admin-dashboard']">Back to Dashboard</button>
+        <button class="dash-btn" type="button" [routerLink]="['/admin-dashboard']" style="margin-right: 5px;">Back to Dashboard</button>
     </div>
     <div *ngIf="loading" class="loading">
         <div class="spinner"></div>
