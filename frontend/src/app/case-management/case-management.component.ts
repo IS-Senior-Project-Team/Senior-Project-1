@@ -105,15 +105,15 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
   private renderActions(caseItem: Case): string {
     if (caseItem.isDeleted) {
       return `
-        <button class="btn btn-link" data-action="recover" data-id="${caseItem.id}">
+        <button class="btn btn-link p-1" data-action="recover" data-id="${caseItem.id}">
           <img src="undo.png" alt="Recover" style="width: 25px; height: 25px;">
         </button>`;
     } else {
       return `
-        <button class="btn btn-link" data-action="edit" data-id="${caseItem.id}">
+        <button class="btn btn-link p-1" data-action="edit" data-id="${caseItem.id}">
           <img src="edit-icon.png" alt="Edit" style="width: 25px; height: 25px;">
         </button>
-        <button class="btn btn-link" data-action="delete" data-id="${caseItem.id}">
+        <button class="btn btn-link p-1" data-action="delete" data-id="${caseItem.id}">
           <img src="red-trashcan-icon.png" alt="Delete" style="width: 25px; height: 25px;">
         </button>`;
     }
@@ -152,6 +152,10 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       this.dtInstance.destroy();
     }
 
+    const idColumn = {
+      name: 'id'
+    };
+
     const columns = [
       {
         name: 'firstName',
@@ -161,6 +165,9 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       },
       {
         name: 'phoneNumber',
+      },
+      {
+        name: 'createdDate',
       },
       {
         name: 'notes',
@@ -184,15 +191,53 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
         ...columns.map(col => ({
           data: col.name,
           defaultContent: 'N/A',
-          orderable: ['firstName', 'lastName', 'phoneNumber', 'status', 'numOfPets', 'species'].includes(col.name), // Columns that are orderable
-          searchable: ['firstName', 'lastName', 'phoneNumber', 'status', 'species'].includes(col.name), // Columns that are searchable
-          render: (data: any, type: string) => this.renderColumn(data, type, col.maxLength)
+          orderable: ['firstName', 'lastName', 'phoneNumber', 'createdDate', 'status', 'numOfPets', 'species'].includes(col.name),
+          searchable: ['firstName', 'lastName', 'phoneNumber', 'createdDate', 'status', 'species'].includes(col.name),
+          render: (data: any, type: string) => {
+            // If column is createdDate
+            if (col.name === 'createdDate') {
+              let formattedDate = '';
+
+              // Handle null/undefined/empty values
+              if (data == null || data === '') {
+                return 'N/A';
+              }
+              
+              // Convert Firebase Timestamp to milliseconds
+              if (data?.seconds !== undefined) {
+                const timestamp = data.seconds * 1000 + data.nanoseconds / 1e6;
+                formattedDate = new Date(timestamp).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                });
+              }
+          
+              if (type === 'display' || type === 'filter') {
+                // Return formatted date for display and filtering/searching
+                return formattedDate;
+              }
+              
+              // Return timestamp for sorting
+              return data?.seconds ?? data; 
+            }
+
+            // All columns other than createdDate
+            return this.renderColumn(data, type, col.maxLength);
+          }
         })),
         {
           data: null,
           orderable: false,
           searchable: false,
           render: (data: any, type: string, row: any) => this.renderActions(row)
+        },
+        { // id column only used to search and is not visible
+          data: idColumn.name,
+          orderable: false,
+          searchable: true,
+          visible: false,
+          render: (data: any, type: string) => this.renderColumn(data, type)
         }
       ],
       pageLength: 5,

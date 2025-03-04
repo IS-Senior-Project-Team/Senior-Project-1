@@ -7,6 +7,8 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { STATUSES, SPECIES } from '../constants';
+import { v4 as uuidv4 } from 'uuid';
+import { Timestamp } from 'firebase/firestore';
 
 @Component({
   selector: 'app-add-case',
@@ -25,9 +27,10 @@ export class AddCaseComponent {
     phoneNumber: '',
     notes: '',
     status: 'Open',
-    numOfPets: 0,
+    numOfPets: 1,
     species: '',
-    isDeleted: false
+    isDeleted: false,
+    createdDate: undefined,
   };
 
   statuses: string[] = STATUSES;
@@ -52,7 +55,8 @@ export class AddCaseComponent {
     
     if (addCaseForm.valid) {
       try {
-        this.case.id = new Date().getTime().toString(); // Change later
+        this.case.id = uuidv4(); // Generate unique id using the UUID library
+        this.case.createdDate = Timestamp.fromDate(new Date()); // Generate the case's created date when a case is added
         const success = await this.casesService.createCase(this.case);
         
         if (success) {

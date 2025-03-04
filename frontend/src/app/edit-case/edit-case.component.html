@@ -56,8 +56,8 @@
                         <div *ngIf="numOfPets.invalid" class="text-danger">
                             Please enter a valid number of pets.
                         </div>
-                        <div *ngIf="case.numOfPets < 0" class="text-danger">
-                            Number of pets cannot be negative.
+                        <div *ngIf="case.numOfPets < 1" class="text-danger">
+                            Number of pets cannot be zero or negative.
                         </div>
                     </div>
                     
@@ -84,7 +84,7 @@
 
                 <div style="display: flex; justify-content: space-between; margin-top: 3%;">
                     <button class="btn btn-secondary" (click)="cancel()" style="width: 100px">Cancel</button>
-                    <button class="btn btn-primary" type="submit" style="width: 100px" (click)="save(editCaseForm)" [disabled]="editCaseForm.invalid || case.numOfPets < 0">Save</button>
+                    <button class="btn green-btn" type="submit" style="width: 100px" (click)="save(editCaseForm)" [disabled]="editCaseForm.invalid || case.numOfPets < 1">Save</button>
                 </div>
             </form>
         </div>
