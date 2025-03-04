@@ -16,7 +16,7 @@
     </div>
   </div>
   <div class="menu" *ngIf="staffInfo">
-    <button class="menu-item" [class.active]="isActive('/report')" (click)="navigateTo('/report')">
+    <button class="menu-item" *ngIf="staffInfo.isAdmin != false" [class.active]="isActive('/report')" (click)="navigateTo('/report')">
       <img src="reports.svg" style="accent-color: white; width: 15px;" />
       Reports
     </button>
@@ -28,7 +28,7 @@
       <img src="uploads.svg" style="accent-color: white; width: 15px;" />
       Uploads
     </button>
-    <button *ngIf="staffInfo && staffInfo.isAdmin != false" class="menu-item"
+    <button *ngIf="staffInfo.isAdmin != false" class="menu-item"
       [class.active]="isActive('/admin-dashboard/users')" (click)="navigateTo('/admin-dashboard/users')">
       <img src="users.svg" style="accent-color: white; width: 15px;" />
       Users

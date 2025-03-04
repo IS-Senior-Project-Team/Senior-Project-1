@@ -8,6 +8,8 @@ import { currentUserProfile, updateUser } from '../services/firebaseConnection';
 import { Observable } from 'rxjs';
 import { StaffInfo } from '../models/staff-info';
 import { FormControl, NonNullableFormBuilder } from '@angular/forms';
+import { ChangePswdDialogComponent } from '../view/change-password/change-pswd-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-account-profile',
@@ -25,7 +27,7 @@ export class AccountProfileComponent implements OnInit {
   profileForm : FormGroup
   loading = true;
 
-  constructor(private router: Router, private authSvc: AuthService, private fb: NonNullableFormBuilder) {
+  constructor(private router: Router, private authSvc: AuthService, private fb: NonNullableFormBuilder, private dialog: MatDialog) {
     this.profileForm = this.fb.group({
       email: [''],
       firstname: [''],
@@ -80,15 +82,17 @@ export class AccountProfileComponent implements OnInit {
     }
   }
 
-  changePassword() {
-
-  }
-
   //Not being used since logout button is added on sidebar
   logout(): void {
     this.loggedInUser = null; // Set to null on logout
     this.staffInfo = null;
     this.authSvc.logoutUser();
     this.router.navigate(['/login']); // Redirect to login page
+  }
+
+  changePassword(): void {
+    this.dialog.open(ChangePswdDialogComponent, {
+      width: '500px',
+    });
   }
 }
