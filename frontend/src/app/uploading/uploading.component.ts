@@ -109,10 +109,11 @@ export class UploadingComponent {
       // From there, the xlsx would be parsed and read line by line and the last line that was read would be recorded.
       let startingLine = 0;
       const thisFile: CaseFile = {name: file.name, cases: []} // Create a CaseFile object that holds the name of the file it is based off of and the cases in that file
+      /*
       for(let i = startingLine; i < jsonData.length; i += 2){
         let line1 = JSON.parse(JSON.stringify(jsonData[i]))
         let line2 = JSON.parse(JSON.stringify(jsonData[i+1]))
-  
+        
         //Create the Case that is pushed to the CaseFile object
         let c: Case = {
           id: uuidv4(),
@@ -125,9 +126,29 @@ export class UploadingComponent {
           species: line1["Species"],
           isDeleted: false,
           callDate: Timestamp.fromDate(new Date(line1["Date of Message"]))
-        }
-        thisFile.cases.push(c) // Push all of the cases to the CaseFile object
+          }
+          thisFile.cases.push(c) // Push all of the cases to the CaseFile object
+          }
+          */
+      type VMFile = {
+        phoneNum: string;
+        message: string;
+        messageNumber: string;
+        date: string;
       }
+      const caseJsonData: Case[] = JSON.parse(JSON.stringify(jsonData)) as Case[]
+      console.log(caseJsonData)
+      let lineDict: {[messageNumber: number]: Case} = {}
+      for(let row of caseJsonData){
+        //phoneExec != null ? phoneNum = phoneExec[0] : phoneNum = ""
+        let caseNum = Number()
+        //lineDict[row["# Pets (if PSN/RH)"]] = {
+        // lineDict[row[""]] = {
+        //   phoneNum: ""
+        // }
+        console.log(row)
+      }
+
       this.files.push(thisFile) // Push the CaseFile object to this.files so that the index can be used for populating the edit data modal
       console.log('Got XLSX')
     }
