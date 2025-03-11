@@ -137,17 +137,40 @@ export class UploadingComponent {
         date: string;
       }
       const caseJsonData: Case[] = JSON.parse(JSON.stringify(jsonData)) as Case[]
-      console.log(caseJsonData)
+      const parsedJsonData = JSON.parse(JSON.stringify(jsonData))
+      // console.log(JSON.parse(JSON.stringify(jsonData))[0]["Message Number"])
+      console.log(typeof parsedJsonData[0]["Message Number"])
       let lineDict: {[messageNumber: number]: Case} = {}
-      for(let row of caseJsonData){
+      for(let row of parsedJsonData){
         //phoneExec != null ? phoneNum = phoneExec[0] : phoneNum = ""
-        let caseNum = Number()
         //lineDict[row["# Pets (if PSN/RH)"]] = {
-        // lineDict[row[""]] = {
-        //   phoneNum: ""
-        // }
-        console.log(row)
+        // debugger
+        let messageNum: number = row["Message Number"]
+        let pn: string = row["Phone Number"]
+        let n: string = row["Message"]
+        if (pn == undefined && lineDict[messageNum] != undefined) { pn = lineDict[messageNum].phoneNumber } else { pn = row["Phone Number"] }
+        if (n == undefined && lineDict[messageNum] != undefined) { n = lineDict[messageNum].notes } else { n = row["Message"] }
+        //Also want to check in this spot similar to above lines for the nicely formatted date to parse and include in the Case info below
+        console.log(`messageNum: ${messageNum}, phone num: ${row["Phone Number"]}, typeof: ${typeof row["Phone Number"]}, notes: ${String(row["Message"]).substring(0, 5)}, typeof: ${typeof row["Message"]}`)
+        // console.log(`messageNum: ${messageNum}, ${pn}, ${n}`)
+        lineDict[messageNum] = {
+          id: uuidv4(),
+          firstName: "",
+          lastName: "",
+          phoneNumber: pn,
+          notes: n,
+          status: "Open",
+          numOfPets: 1,
+          species: "",
+          isDeleted: false
+        }
+        // console.log(rowNum)
+        // console.log(pn)
+        // console.log(n)
       }
+      // debugger
+      // console.log(lineDict[21])
+      console.log(lineDict)
 
       this.files.push(thisFile) // Push the CaseFile object to this.files so that the index can be used for populating the edit data modal
       console.log('Got XLSX')
