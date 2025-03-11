@@ -64,6 +64,10 @@ export class UploadingComponent {
     this.disableEditData()
   }
   
+  /**
+   * Parses the .csv file that is in the list of files to be uploaded and adds the file to the list of files to upload.
+   * @param file The file being parsed.
+   */
   async parseCSV(file: File){
     let returnable = this.papa.parse(await file.text())
     let thisFile: CaseFile = {name: file.name, cases: []}
@@ -95,6 +99,10 @@ export class UploadingComponent {
     console.log('Got CSV')
   }
 
+  /**
+   * Parses the .xlsx file that is in the list of files to be uploaded and adds the file to the list of files to upload.
+   * @param file The file being parsed.
+   */
   parseXLSX(file: File) {
     let workBook: XLSX.WorkBook;
     let jsonData: JSON[] = [];
@@ -130,13 +138,8 @@ export class UploadingComponent {
           thisFile.cases.push(c) // Push all of the cases to the CaseFile object
           }
           */
-      type VMFile = {
-        phoneNum: string;
-        message: string;
-        messageNumber: string;
-        date: string;
-      }
-      const caseJsonData: Case[] = JSON.parse(JSON.stringify(jsonData)) as Case[]
+         
+      // const caseJsonData: Case[] = JSON.parse(JSON.stringify(jsonData)) as Case[]
       const parsedJsonData = JSON.parse(JSON.stringify(jsonData))
       // console.log(JSON.parse(JSON.stringify(jsonData))[0]["Message Number"])
       console.log(typeof parsedJsonData[0]["Message Number"])
@@ -178,6 +181,10 @@ export class UploadingComponent {
     reader.readAsBinaryString(file);
   }
 
+  /**
+   * Handles the file upload event.
+   * @param event Event that is triggered when the user presses the button for uploading files and the files are selected in the file system prompt.
+   */
   handleFileInput(event: Event) {
     // Clear the files lists so that the wrong case files are not still listed
     this.files = []
@@ -207,6 +214,10 @@ export class UploadingComponent {
     }
   }
   
+  /**
+   * This method may be removed, but if there was a need to check if the fields from an edited file are valid.
+   * @returns Boolean confirming that all checked fields are valid. 
+   */
   allCasesValid(): boolean {
     // If there are any fields that are required to be filled, it would be checked here
 
@@ -214,6 +225,10 @@ export class UploadingComponent {
     return true
   }
 
+  /**
+   * Uploads the files listed in files array. 
+   * @returns Boolean representing if the upload was successful.
+   */
   async upload(): Promise<boolean> {
     // Loop through each CaseFile that is being stored in "files" and upload all of the cases and upload them using firebaseConnection
     if (this.files[0].cases[0] == undefined) { 
@@ -243,6 +258,11 @@ export class UploadingComponent {
     return true
   }
 
+  /**
+   * Remove the file or files from the list of files to be uploaded.
+   * @param index The location of the file to be removed.
+   * @param showPrompt Boolean to determine if the confirmation prompt is shown, or if the file removal is automated.
+   */
   removeFile(index: number, showPrompt: boolean = true) {
     // debugger
     let confirmation = true
