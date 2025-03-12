@@ -10,6 +10,7 @@ import { serverTimestamp, Timestamp } from 'firebase/firestore';
 import { ToastrService } from 'ngx-toastr';
 import { STATUSES, SPECIES } from '../constants';
 import { v4 as uuidv4 } from 'uuid';
+import { Time } from 'highcharts';
 
 @Component({
   selector: 'app-uploading',
@@ -118,6 +119,7 @@ export class UploadingComponent {
       let startingLine = 0;
       const thisFile: CaseFile = {name: file.name, cases: []} // Create a CaseFile object that holds the name of the file it is based off of and the cases in that file
       /*
+      ---------------THIS IS NOW OLD------------------
       for(let i = startingLine; i < jsonData.length; i += 2){
         let line1 = JSON.parse(JSON.stringify(jsonData[i]))
         let line2 = JSON.parse(JSON.stringify(jsonData[i+1]))
@@ -138,23 +140,33 @@ export class UploadingComponent {
           thisFile.cases.push(c) // Push all of the cases to the CaseFile object
           }
           */
-         
-      // const caseJsonData: Case[] = JSON.parse(JSON.stringify(jsonData)) as Case[]
+
       const parsedJsonData = JSON.parse(JSON.stringify(jsonData))
-      // console.log(JSON.parse(JSON.stringify(jsonData))[0]["Message Number"])
-      console.log(typeof parsedJsonData[0]["Message Number"])
+
       let lineDict: {[messageNumber: number]: Case} = {}
+      // lineDict[Symbol.iterator] = function* () {
+      //   return 5
+      // }
+
+      let newLines = /[\r\n]+/gm
       for(let row of parsedJsonData){
-        //phoneExec != null ? phoneNum = phoneExec[0] : phoneNum = ""
-        //lineDict[row["# Pets (if PSN/RH)"]] = {
-        // debugger
         let messageNum: number = row["Message Number"]
         let pn: string = row["Phone Number"]
         let n: string = row["Message"]
+        let t: string = row["Date of Message"]
+        
+        // Check if the value of the variables is undefined. If it is, try to assign it to the same value of the key in the dict.
+        // If the dict is undefined there too, go ahead and assign undefined. If not undefined, get the old value to avoid overwritting.
         if (pn == undefined && lineDict[messageNum] != undefined) { pn = lineDict[messageNum].phoneNumber } else { pn = row["Phone Number"] }
         if (n == undefined && lineDict[messageNum] != undefined) { n = lineDict[messageNum].notes } else { n = row["Message"] }
+        
+        // Check if there are any new lines. If so, replace them with a space.
+        if (n != undefined) { n = n.replaceAll(newLines, " ") }
+
+        // Check if the date is in the format I want (2024-11-21T19:11:21+00:00) and if it is keep it, else try to assign it to the previous timestamp
+        if (lineDict[messageNum] == undefined && t.indexOf("+") == -1) { t = ""; console.log("discarded time") }
         //Also want to check in this spot similar to above lines for the nicely formatted date to parse and include in the Case info below
-        console.log(`messageNum: ${messageNum}, phone num: ${row["Phone Number"]}, typeof: ${typeof row["Phone Number"]}, notes: ${String(row["Message"]).substring(0, 5)}, typeof: ${typeof row["Message"]}`)
+        // console.log(`messageNum: ${messageNum}, phone num: ${row["Phone Number"]}, typeof: ${typeof row["Phone Number"]}, notes: ${String(row["Message"]).substring(0, 5)}, typeof: ${typeof row["Message"]}`)
         // console.log(`messageNum: ${messageNum}, ${pn}, ${n}`)
         lineDict[messageNum] = {
           id: uuidv4(),
@@ -165,7 +177,8 @@ export class UploadingComponent {
           status: "Open",
           numOfPets: 1,
           species: "",
-          isDeleted: false
+          isDeleted: false,
+          callDate: Timestamp.fromDate(new Date(t))
         }
         // console.log(rowNum)
         // console.log(pn)
@@ -174,6 +187,10 @@ export class UploadingComponent {
       // debugger
       // console.log(lineDict[21])
       console.log(lineDict)
+      for (let c in lineDict){
+        console.log(`${c}, ${lineDict[c].numOfPets}`)
+        thisFile.cases.push(lineDict[c] as Case)
+      }
 
       this.files.push(thisFile) // Push the CaseFile object to this.files so that the index can be used for populating the edit data modal
       console.log('Got XLSX')
