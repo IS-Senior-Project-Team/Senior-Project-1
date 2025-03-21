@@ -36,7 +36,6 @@ export class SidebarComponent implements OnInit {
     //Subscribe to user login event
     this.userSubscription = this.authSvc.userLoggedIn.subscribe((userInfo: StaffInfo) => {
       this.staffInfo = userInfo;
-      console.log("Sidebar updated with user info:", userInfo);
     });
 
     //Load user info from session storage if already logged in

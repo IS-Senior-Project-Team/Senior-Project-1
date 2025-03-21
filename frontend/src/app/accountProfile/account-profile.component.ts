@@ -4,12 +4,14 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { currentUserProfile, updateUser } from '../services/firebaseConnection';
+import { currentUserProfile, updateUser, deleteAccount } from '../services/firebaseConnection';
 import { Observable } from 'rxjs';
 import { StaffInfo } from '../models/staff-info';
 import { FormControl, NonNullableFormBuilder } from '@angular/forms';
 import { ChangePswdDialogComponent } from '../view/change-password/change-pswd-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { ToastrService } from 'ngx-toastr';
+import { DeleteAccountDialogComponent } from '../view/deleteAccount/delete-account-dialog.component';
 
 @Component({
   selector: 'app-account-profile',
@@ -18,16 +20,16 @@ import { MatDialog } from '@angular/material/dialog';
   templateUrl: './account-profile.component.html',
   styleUrl: './account-profile.component.css'
 })
+
 export class AccountProfileComponent implements OnInit {
-  loggedInUser: boolean | null = null;
   currentUserProfile$: Promise<StaffInfo | null> = currentUserProfile(); // Observable for user profile data
   staffInfo: StaffInfo | null = null
-  staffName : string = ''
+  staffName: string = ''
   isEditing: boolean = false; // Track if the form is in edit mode
-  profileForm : FormGroup
+  profileForm: FormGroup
   loading = true;
 
-  constructor(private router: Router, private authSvc: AuthService, private fb: NonNullableFormBuilder, private dialog: MatDialog) {
+  constructor(private router: Router, private authSvc: AuthService, private fb: NonNullableFormBuilder, private dialog: MatDialog, private toastr: ToastrService) {
     this.profileForm = this.fb.group({
       email: [''],
       firstname: [''],
@@ -42,9 +44,7 @@ export class AccountProfileComponent implements OnInit {
       const profile = await currentUserProfile();
       if (profile) {
         this.staffInfo = profile;
-        console.log(profile)
         this.profileForm.patchValue(profile); // Populate form with user data
-        console.log(this.profileForm.value)
       } else {
         console.error('No profile found for the current user.');
       }
@@ -72,26 +72,24 @@ export class AccountProfileComponent implements OnInit {
         await updateUser(updatedUser).toPromise(); // Update Firestore with the new values
         this.staffInfo = updatedUser; // Update the local data
         this.isEditing = false; // Exit edit mode
-        alert('Profile updated successfully!');
+        this.toastr.success('Profile updated successfully!', 'Updated', { positionClass: "toast-bottom-left" });
       } catch (error) {
         console.error('Error updating profile:', error);
-        alert('Failed to update profile. Please try again later.');
+        this.toastr.error('Failed to update profile. Please try again later.', 'Error', { positionClass: "toast-bottom-left" });
       }
     } else {
-      alert('Please fill out all required fields before saving.');
+      this.toastr.warning('Please fill out all required fields before saving.', 'Fill out required fields', { positionClass: "toast-bottom-left" });
     }
-  }
-
-  //Not being used since logout button is added on sidebar
-  logout(): void {
-    this.loggedInUser = null; // Set to null on logout
-    this.staffInfo = null;
-    this.authSvc.logoutUser();
-    this.router.navigate(['/login']); // Redirect to login page
   }
 
   changePassword(): void {
     this.dialog.open(ChangePswdDialogComponent, {
+      width: '500px',
+    });
+  }
+
+  deleteAccount() : void {
+    this.dialog.open(DeleteAccountDialogComponent, {
       width: '500px',
     });
   }

@@ -56,7 +56,6 @@ export const routes: Routes = [
       component: EditCaseComponent,
     },
     {
-      canActivate: [adminGuard],
       path: 'forgot-password',
       component: ForgotPasswordComponent,
     },

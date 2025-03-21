@@ -1,51 +1,49 @@
 <div class="account-profile-page">
-    <div class="header">
-        <h1 *ngIf="!staffInfo || staffInfo.firstname == null">Account Profile</h1>
-        <h1 *ngIf="staffInfo">{{staffInfo.firstname}}'s Account Profile</h1>
-        <button *ngIf="staffInfo" class="changePswd-btn" (click)="changePassword()">Change Password</button>
-    </div>
+  <div class="header">
+    <h1>{{staffInfo?.firstname ? staffInfo?.firstname+'\'\s' : ""}} Account Profile</h1>
+    <button *ngIf="staffInfo" class="changePswd-btn" (click)="changePassword()">Change Password
+    </button>
+    <button *ngIf="staffInfo" class="delete-btn" (click)="deleteAccount()">Delete Account</button>
+  </div>
 
-    <div class="content">
-        <!-- Ensure userProfile exists before rendering the form -->
-        <form *ngIf="staffInfo && !loading" [formGroup]="profileForm" class="profile-form">
-            <div class="row">
-                <label for="firstName">First Name:</label>
-                <input type="text" id="firstName" formControlName="firstname" [readonly]="!isEditing" />
+  <div class="content">
+    <!-- Ensure userProfile exists before rendering the form -->
+    <form *ngIf="staffInfo && !loading" [formGroup]="profileForm" class="profile-form">
+      <div class="row">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" formControlName="firstname" [readonly]="!isEditing" />
 
-                <label for="lastName">Last Name:</label>
-                <input type="text" id="lastName" formControlName="lastname" [readonly]="!isEditing" />
-            </div>
-            <div class="row">
-                <label for="email">Email:</label>
-                <input type="email" id="email" formControlName="email" [readonly]="!isEditing" />
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" formControlName="lastname" [readonly]="!isEditing" />
+      </div>
+      <div class="row">
+        <label for="email">Email:</label>
+        <input type="email" id="email" formControlName="email" [readonly]="!isEditing" />
 
-                <label for="phone">Phone Number:</label>
-                <input type="text" id="phone" formControlName="phoneNumber" [readonly]="!isEditing" />
-            </div>
-            <div class="row">
-                <label for="address">Address:</label>
-                <textarea id="address" formControlName="address" [readonly]="!isEditing"></textarea>
-            </div>
+        <label for="phone">Phone Number:</label>
+        <input type="text" id="phone" formControlName="phoneNumber" [readonly]="!isEditing" />
+      </div>
+      <div class="row">
+        <label for="address">Address:</label>
+        <textarea id="address" formControlName="address" [readonly]="!isEditing"></textarea>
+      </div>
 
-            <div class="actions" style="display: flex; justify-content: space-between;">
-                <button type="button" (click)="toggleEdit()">
-                  {{ isEditing ? 'Cancel' : 'Edit' }}
-                </button>
-                <button
-                  type="button"
-                  *ngIf="isEditing"
-                  (click)="saveProfile()"
-                  class="save-btn"
-                >
-                  Save
-                </button>
-              </div>
-        </form>
-    </div>
+      <div class="actions" style="display: flex; justify-content: space-between;">
+        <button type="button" (click)="toggleEdit()">
+          {{ isEditing ? 'Cancel' : 'Edit' }}
+        </button>
+        <button type="button" *ngIf="isEditing" (click)="saveProfile()" class="save-btn">
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
 
-    <!-- Fallback if no profile is found -->
-    <div *ngIf="loading" class="loading"><div class="spinner"></div>Loading your profile...</div>
-    <div *ngIf="!loading && staffInfo === null" class="no-user"><em>You are not logged in so profile can't be loaded.</em></div>
-
+  <!-- Fallback if no profile is found -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>Loading your profile...
+  </div>
+  <div *ngIf="!loading && staffInfo === null" class="no-user"><em>You are not logged in so profile can't be loaded.</em>
+  </div>
 
 </div>

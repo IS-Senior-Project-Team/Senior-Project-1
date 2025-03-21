@@ -1,10 +1,8 @@
-import { Component, NgModule } from '@angular/core';
+import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router, RouterLink } from '@angular/router';
-import { StaffInfo } from '../../models/staff-info';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
-import { createUser } from '../../services/firebaseConnection' //Importing the firebase create user function from the firebase service file
 import { RegisterStaffEmail } from '../../models/register-staff-email';
 
 @Component({

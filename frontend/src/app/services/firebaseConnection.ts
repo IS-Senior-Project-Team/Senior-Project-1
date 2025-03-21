@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc, query, where, Timestamp, CollectionReference, DocumentReference, addDoc } from 'firebase/firestore';
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail, updatePassword, signOut, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc, query, where, Timestamp, CollectionReference, DocumentReference, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, deleteUser, signInWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail, updatePassword, signOut, reauthenticateWithCredential, EmailAuthProvider, User, onAuthStateChanged, verifyBeforeUpdateEmail } from "firebase/auth";
 import { authState } from '@angular/fire/auth'
 import { Case } from '../models/case';
 import { AuthService } from "./auth.service";
@@ -209,143 +209,89 @@ export async function createDoc(caseData: Case): Promise<boolean> {
   return true;
 }
 
-//   <== ACCOUNT MANAGEMENT FUNCTIONS BELOW ==>
+//   <== ACCOUNT MANAGEMENT FUNCTIONS BELOW ==> //
 
 // This will create a staff member based on the email and temporary password set by admin.
 // An email will then be sent for staff member to make changes and complete account creation
 const auth = getAuth();
 
-// getAuth().setPersistence(browserLocalPersistence)        //  ------Include   THIS LATER TO SET THE STORAGE TO SESSION STORAGE
-export function createUser(email: string, password: string, isAdmin: boolean, router: Router, toastr: ToastrService) {
-  createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed up 
+export async function createUser(email: string, password: string, isAdmin: boolean, router: Router, toastr: ToastrService) {
+  try {
+    const usersCollection = collection(db, "staffMembers");
 
-      const staffData = {
-        email: email,
-        firstname: "",
-        lastname: "",
-        address: "",                  //<<<<<<======= GOING TO CHANGE THIS TO AN STAFF ADDRESS ARRAY LATER
-        phoneNumber: "",
-        isAdmin: isAdmin,
-        isActive: true
-      }
+    // Check if the email already exists in database
+    const q = query(usersCollection, where("email", "==", email), where("isDeleted", "==", false));
+    const querySnapshot = await getDocs(q);
 
-      //NEED TO FIND A WAY TO INLUDE THIS MESSAGE IN THE RECIPIENTS EMAIL
+    if (!querySnapshot.empty) {
+      toastr.warning('An account with this email already exists!', 'Warning', { positionClass: "toast-bottom-left" });
+      return;
+    }
+      createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
 
-      sendEmailVerification(userCredential.user)
-        .then(() => {
-          alert("Email verification link sent. They should click \"Forgot Password\" link upon first login to setup their password")
-        });
+        const staffData = {
+          email: email,
+          firstname: "",
+          lastname: "",
+          address: "",
+          phoneNumber: "",
+          isAdmin: isAdmin,
+          isActive: true,
+          isDeleted: false
+        }
 
+        // Adding users to firestore
+        const user = userCredential.user;
+        const docRef = doc(db, "staffMembers", user.uid)
+        setDoc(docRef, staffData)
+          .catch((error) => {
+            console.log(error)
+          })
 
-      // Adding users to firestore
-      const user = userCredential.user;
-      const docRef = doc(db, "staffMembers", user.uid)
-      setDoc(docRef, staffData)
-        .catch((error) => {
-          console.log("Error writing document", error)
-        })
-
-      toastr.success('Account has been created successfully!', 'Successful', { positionClass: "toast-bottom-left" });
-      router.navigate(['/admin-dashboard/users'])
-      // ...
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      if (errorCode == 'auth/email-already-in-use') {
-        toastr.warning('Email address already exists!', 'Warning', { positionClass: "toast-bottom-left" });
-      }
-      else {
-        toastr.error('Unable to create staff member', 'Error', { positionClass: "toast-bottom-left" });
-      }
-      const errorMessage = error.message;
-    });
+        toastr.success('Account has been created successfully!', 'Successful', { positionClass: "toast-bottom-left" });
+        sendEmailVerification(userCredential.user)
+          .then(() => {
+            alert("Email verification was sent. Users should click \"Forgot Password\" link upon first login to setup their password")
+          });
+        router.navigate(['/admin-dashboard/users'])
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        if (errorCode == 'auth/email-already-in-use') {
+          toastr.warning('Email address already exists!', 'Warning', { positionClass: "toast-bottom-left" });
+        }
+        else {
+          toastr.error('Unable to create staff member', 'Error', { positionClass: "toast-bottom-left" });
+        }
+      });
+  } catch (error) {
+    console.error("Error creating user:", error);
+  }
 }
 
-auth.onAuthStateChanged((currentUser) => {
-  if (currentUser) {
-    const user_id = currentUser.uid;
-    console.log("User Status", user_id)
-  }
-});
+export async function loginUser(email: string, password: string, router: Router, toastr: ToastrService): Promise<Partial<StaffInfo> | null>  {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-// export function loginUser(email: string, password: string, router: Router) {
+    const userDocRef = doc(db, "staffMembers", user.uid);
+    const userDoc = await getDoc(userDocRef);
 
-//   const UserLoggedIn: EventEmitter<string> = new EventEmitter<string>();
-//   //  ADD A FUNCTIONALITY LATER ON THAT CHECKS IF USER IS VERIFIED BEFORE LETTING THEM LOGIN
-//   //    set the login function to check if the user's email is verified or not, the property is inside the firebase user, user.isEmailVerified, or something like that.
-//   //   And then if it's not redirect to a "Pending Verification" page
-//   signInWithEmailAndPassword(auth, email, password)
-//     .then(async (userCredential) => {
-//       // Signed in 
-//       const user = userCredential.user;
-//       // Fetch user role from Firestore
-//       const userDocRef = doc(db, "staffMembers", user.uid);
-//       const userDoc = await getDoc(userDocRef);
+    if (userDoc.exists()) {
+      const userData = userDoc.data() as StaffInfo;
 
-//       if (userDoc.exists()) {
-//         const userData = userDoc.data();
-//         sessionStorage.setItem("loggedInUser", JSON.stringify({
-//           uid: user.uid,
-//           isAdmin: userData["isAdmin"] || false,
-//         }))
-//         UserLoggedIn.emit(email);
-
-//         if (userData["isAdmin"]) {
-//           router.navigate(["/admin-dashboard"]); // Redirect admin
-//         } else {
-//           router.navigate(["/case-management"]); // Redirect staff
-//         }
-//       }
-
-//       alert("You are now logged in")
-//       return true;
-//     })
-//     .catch((error) => {
-//       const errorCode = error.code;
-//       const errorMessage = error.message;
-//       console.log(errorCode, errorMessage)
-//       if (errorCode === "auth/wrong-password") {
-//         alert("Invalid Email or Password")
-//       }
-//       else if (errorCode === "auth/invalid-email") {
-//         alert("Invalid Email or Password")
-//       }
-//       else if (errorCode === 'auth/user-not-found') {
-//         alert("Account does not exist")
-//       }
-//       // const errorMessage = error.message;
-//     });
-// }
-
-export function loginUser(email: string, password: string, router: Router, toastr: ToastrService): Promise<StaffInfo | null> {
-  return signInWithEmailAndPassword(auth, email, password)
-    .then(async (userCredential) => {
-      const user = userCredential.user;
-
-      const userDocRef = doc(db, "staffMembers", user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (userDoc.exists()) {
-        const userData = userDoc.data() as StaffInfo;
-
-        if (!userData.isActive) {
+        if (!userData.isActive || userData.isDeleted) {
           await signOut(auth);
-          alert("Your account has been deactivated. Please contact an administrator.");
+          toastr.error("Your account has been deactivated or deleted. Please contact an administrator.", 'Unauthorized', { positionClass: 'toast-bottom-left' });
           return null;
         }
 
         const userInfo = {
-          uid: user.uid,
           firstname: userData.firstname || "",
           lastname: userData.lastname || "",
-          email: userData.email || "",
           isAdmin: userData.isAdmin || false,
-          address: userData.address,
-          password: userData.password,
-          phoneNumber: userData.phoneNumber,
-          isActive: userData.isActive
         };
 
         sessionStorage.setItem("loggedInUser", JSON.stringify(userInfo));
@@ -359,10 +305,8 @@ export function loginUser(email: string, password: string, router: Router, toast
 
         return userInfo; // Return user data
       }
-
       return null;
-    })
-    .catch((error) => {
+    } catch(error: any) {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log(errorCode, errorMessage)
@@ -375,14 +319,13 @@ export function loginUser(email: string, password: string, router: Router, toast
       else if (errorCode === 'auth/user-not-found') {
         toastr.error('Account does not exist', 'Error', { positionClass: "toast-bottom-left" });
       }
-      // const errorMessage = error.message;
       return null;
-    });
+    };
 }
 
 export async function forgotPassword(email: string, toastr: ToastrService) {
   const emailExists = await checkEmailExists(email, toastr)
-  if (!emailExists) {
+  if (!emailExists) { //
     return;
   }
   sendPasswordResetEmail(auth, email)
@@ -392,7 +335,6 @@ export async function forgotPassword(email: string, toastr: ToastrService) {
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
-      // ..
     });
 }
 
@@ -414,11 +356,10 @@ export async function changePassword(currentPswd: string, newPswd: string, toast
       // Update successful.
       toastr.success('Password updated successfully', 'Updated', { positionClass: 'toast-bottom-left' })
     }).catch((error) => {
-      // An error ocurred
       console.error("Error updating password:", error);
       if (error.code === "auth/weak-password") {
-      toastr.warning('The new password is too weak.', 'Password Too Weak', { positionClass: "toast-bottom-left" })
-    }
+        toastr.warning('The new password is too weak.', 'Password Too Weak', { positionClass: "toast-bottom-left" })
+      }
       // ...
     });
 
@@ -449,13 +390,14 @@ export function updateUser(user: StaffInfo): Observable<void> {
 
 export async function deactivateUser(uid: string | null, router: Router, toastr: ToastrService) {
   try {
-    // const user = await getUserProfile(uid)
-    // const userId = user?.uid;
     let confirmDeactivate = confirm('Are you sure you want to deactivate this user?')
     if (confirmDeactivate) {
       const userDocRef = doc(db, "staffMembers", uid!);
 
-      updateDoc(userDocRef, { isActive: false })
+      updateDoc(userDocRef, {
+        isActive: false,
+        deactivationDate: serverTimestamp()
+      })
         .then(() => {
           toastr.success('User has been deactivated', 'Deactivated', { positionClass: "toast-bottom-left" });
           router.navigate(['/admin-dashboard/users'])
@@ -474,8 +416,6 @@ export async function deactivateUser(uid: string | null, router: Router, toastr:
 
 export async function activateUser(uid: string | null, router: Router, toastr: ToastrService) {
   try {
-    // const user = await getUserProfile(uid)
-    // const userId = user?.uid;
     const userDocRef = doc(db, "staffMembers", uid!);
 
     updateDoc(userDocRef, { isActive: true })
@@ -490,7 +430,6 @@ export async function activateUser(uid: string | null, router: Router, toastr: T
     console.error("Error getting current user")
   }
 }
-
 
 export async function currentUserProfile(): Promise<StaffInfo | null> {
 
@@ -511,7 +450,6 @@ export async function currentUserProfile(): Promise<StaffInfo | null> {
       console.error('Error fetching user profile:');
     }
   } else {
-    console.log('From firebase connection: No user is currently logged in.');
     return null;
   }
   return null
@@ -531,10 +469,10 @@ export async function getUserProfile(uid: string): Promise<Promise<StaffInfo> | 
         return null;
       }
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.error(error);
     }
   } else {
-    console.log('The user UID is invalid');
+    console.error('The user UID is invalid');
     return null;
   }
   return null
@@ -551,16 +489,15 @@ export async function fetchAllUsers(): Promise<StaffInfo[]> {
 
 async function checkEmailExists(email: string, toastr: ToastrService): Promise<boolean> {
   try {
-    // Check if the email format is valid
     if (!email || !validateEmail(email)) {
       toastr.warning('Invalid email format. Please enter a valid email.', 'Error', { positionClass: "toast-bottom-left" });
       return false;
     }
+  
+    // Use the database instead to check if the user email exists & for the error message since error responses won't be thrown now that enumeration protection is on
+    const signInMethods = await fetchSignInMethodsForEmail(auth, email); 
 
-    // NOTE: This is a risky method becuase it is prone to email enumeration attacks
-    // TODO: Turn the email enumeration protection back on in firebase
-    const signInMethods = await fetchSignInMethodsForEmail(auth, email);
-
+    // Use database here for error messages as well
     if (signInMethods && signInMethods.length > 0) {
       // Email exists
       return true;
@@ -581,7 +518,63 @@ async function checkEmailExists(email: string, toastr: ToastrService): Promise<b
   }
 }
 
+export async function deleteDeactivatedUsers(toastr: ToastrService) {
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+  const q = query(
+    collection(db, "staffMembers"),
+    where("isDeleted", "==", false),
+    where("isActive", "==", false),
+    where("deactivationDate", "<=", sixMonthsAgo)
+  );
+
+  const snapshot = await getDocs(q);
+  snapshot.forEach(async (doc) => {
+    await updateDoc(doc.ref, { isDeleted: true });
+  });
+
+  if (snapshot.size > 0) {
+    toastr.info(`${snapshot.size} user(s) have been deleted automatically due to account expiration after deactivation.`, 'Announcement', { positionClass: "toast-bottom-left" })
+  }
+}
+
+export async function deleteAccount(email: string, password: string, toastr: ToastrService, router: Router, authSvc: AuthService) {
+  const user = auth.currentUser;
+
+  if (!user) {
+    return;
+  }
+
+  // Re-authenticate the user before deleting
+  const credential = EmailAuthProvider.credential(email, password);
+
+  try {
+    await reauthenticateWithCredential(user, credential);
+
+    await deleteUser(user);
+
+    const userDocRef = doc(db, "staffMembers", user.uid);
+    await updateDoc(userDocRef, { isDeleted: true });
+    await deleteDoc(userDocRef)
+
+    authSvc.logoutUserAfterDeletion()
+
+  } catch (error: any) {
+    if (error.code === "auth/wrong-password") {
+      toastr.warning('Incorrect Email or Password', 'Warning', { positionClass: "toast-bottom-left" })
+    } else if (error.code === "auth/user-mismatch") {
+      toastr.warning('Incorrect Email or Password', 'Warning', { positionClass: "toast-bottom-left" });
+    }
+    else { console.error(error); }
+  }
+}
+
 function validateEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
+
+export async function signOutUser() {
+  signOut(auth)
+};
