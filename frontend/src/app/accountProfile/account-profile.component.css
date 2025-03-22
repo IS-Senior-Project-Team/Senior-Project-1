@@ -20,7 +20,7 @@
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.logout-btn {
+.changePswd-btn {
   background: none;
   border: none;
   color: white;
@@ -29,7 +29,7 @@
   cursor: pointer;
 }
 
-.changePswd-btn {
+.delete-btn {
   background: none;
   border: none;
   color: white;

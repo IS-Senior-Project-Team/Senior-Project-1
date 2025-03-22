@@ -47,12 +47,10 @@ export class AdminProfileViewComponent {
   }
 
   deactivateUser(uid : string | null) {
-    console.log(uid)
     deactivateUser(uid, this.router, this.toastr);
   }
 
   activateUser(uid : string | null) {
-    console.log(uid)
     activateUser(uid, this.router, this.toastr);
   }
 }
