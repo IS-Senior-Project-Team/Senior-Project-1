@@ -33,6 +33,17 @@ const firebaseConfig = {
   measurementId: "G-WRGY0J3QBW"
 };
 
+// UNCOMMENT BELOW TO INIATILIZE ADMIN SDK BASED ON GROUP'S DECISION
+
+// var admin = require("firebase-admin");
+
+// var serviceAccount = require("path/to/serviceAccountKey.json");
+
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount)
+// });
+
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
@@ -493,13 +504,12 @@ async function checkEmailExists(email: string, toastr: ToastrService): Promise<b
       toastr.warning('Invalid email format. Please enter a valid email.', 'Error', { positionClass: "toast-bottom-left" });
       return false;
     }
-  
-    // Use the database instead to check if the user email exists & for the error message since error responses won't be thrown now that enumeration protection is on
-    const signInMethods = await fetchSignInMethodsForEmail(auth, email); 
 
-    // Use database here for error messages as well
-    if (signInMethods && signInMethods.length > 0) {
-      // Email exists
+    const usersCollection = collection(db, "staffMembers");
+    const q = query(usersCollection, where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
       return true;
     } else {
       toastr.error('This email does not exist. Please try again.', 'Error', { positionClass: "toast-bottom-left" });
