@@ -9,14 +9,13 @@
       <div class="profile-name">
         <a  class="userNameLink" [routerLink]="['account']">
           {{staffInfo.firstname}} {{staffInfo.lastname}}
-          ({{staffInfo.isAdmin ? "Admin" : "Staff"}})
         </a>
       </div>
-      <div class="profile-email" style="color: black;">{{staffInfo.email}}</div>
+      <div class="profile-role" style="color: black;">{{staffInfo.isAdmin ? "Administrator" : "Volunteer Staff"}}</div>
     </div>
   </div>
   <div class="menu" *ngIf="staffInfo">
-    <button class="menu-item" [class.active]="isActive('/report')" (click)="navigateTo('/report')">
+    <button class="menu-item" *ngIf="staffInfo.isAdmin != false" [class.active]="isActive('/report')" (click)="navigateTo('/report')">
       <img src="reports.svg" style="accent-color: white; width: 15px;" />
       Reports
     </button>
@@ -28,7 +27,7 @@
       <img src="uploads.svg" style="accent-color: white; width: 15px;" />
       Uploads
     </button>
-    <button *ngIf="staffInfo && staffInfo.isAdmin != false" class="menu-item"
+    <button *ngIf="staffInfo.isAdmin != false" class="menu-item"
       [class.active]="isActive('/admin-dashboard/users')" (click)="navigateTo('/admin-dashboard/users')">
       <img src="users.svg" style="accent-color: white; width: 15px;" />
       Users

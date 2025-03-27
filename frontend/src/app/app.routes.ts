@@ -19,7 +19,7 @@ export const routes: Routes = [
     {
       path: '',
       component: StaffLoginComponent,
-      canActivate: [redirectIfLoggedIn], // Redirect based on role
+      canActivate: [redirectIfLoggedIn],
     },
     {
       path: 'login',
@@ -90,6 +90,11 @@ export const routes: Routes = [
     {
       path: 'admin-dashboard/report',
       component: ReportingComponent,
+      canActivate: [adminGuard],
+    },
+    {
+      path: 'admin-dashboard/case-management',
+      component: CaseManagementComponent,
       canActivate: [adminGuard],
     },
   ];

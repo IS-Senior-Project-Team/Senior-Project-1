@@ -68,11 +68,13 @@ export class UploadingComponent {
     let returnable = this.papa.parse(await file.text())
     let thisFile: CaseFile = {name: file.name, cases: []}
     let data = returnable.data
-    // console.log(data)
+    //Use this console.log to see what column number data is located at
+    //console.log(data)
     for(let row = 1; row < returnable.data.length-1; row++){
       // debugger;
       let phoneNum: string = data[row][4]
       let phoneExec: RegExpExecArray | null = this.phoneShape.exec(phoneNum)
+      // Checks if the regular expression works, and if it does not, sets the phone number to be blank.
       phoneExec != null ? phoneNum = phoneExec[0] : phoneNum = ""
 
       let c: Case = {
@@ -80,10 +82,10 @@ export class UploadingComponent {
         firstName: data[row][2],
         lastName: data[row][3],
         phoneNumber: phoneNum,
-        notes: "",
-        status: data[row][153],
-        numOfPets: data[row][168],
-        species: data[row][158],
+        notes: data[row][228],
+        status: data[row][213],
+        numOfPets: data[row][233],
+        species: data[row][218],
         isDeleted: false
       }
       // console.log(c)

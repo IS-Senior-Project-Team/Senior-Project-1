@@ -9,4 +9,5 @@ export interface StaffInfo {
     password: string;
     isAdmin : boolean
     isActive: boolean;
+    isDeleted: boolean;
 }

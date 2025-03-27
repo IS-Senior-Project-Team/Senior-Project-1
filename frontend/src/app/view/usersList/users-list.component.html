@@ -1,38 +1,52 @@
-<div class="user-list-page">
-    <h1>All Users</h1>
-    <div style="justify-content:space-between;">
-        <button class="create-btn" type="button" [routerLink]="['/register']">Create Account</button>
-        <button class="dash-btn" type="button" [routerLink]="['/admin-dashboard']">Back to Dashboard</button>
-    </div>
-    <div *ngIf="loading" class="loading">
-        <div class="spinner"></div>
-        <p>Loading users...</p>
-    </div>
+<div class="user-list-page p-3">
 
-    <div *ngIf="!loading && users.length === 0" class="no-users">
-        <p>No users found.</p>
-    </div>
+    <div class="card shadow-sm" *ngIf="displayedUsers.length > 0">
+        <div class="card-body">
+            <h2 class="text-center p-3">All Users</h2>
 
-    <div *ngIf="!loading && users.length > 0">
-        <table class="user-table">
-            <thead>
-                <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let user of users">
-                    <td>{{ user.firstname}}</td>
-                    <td>{{ user.lastname }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>
-                        <button class="view-btn" (click)="viewProfile(user.uid)">View Profile</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            <div class="d-flex justify-content-start mb-3">
+                <button class="btn btn-secondary me-3" (click)="toggleShowDeactivated()"
+                    [disabled]="!hasDeactivatedUsers()">
+                    {{ showDeactivated ? 'Hide' : 'Show' }} Deactivated Users
+                </button>
+                <button class="btn create-btn" [routerLink]="['/register']">Create Account</button>
+                <button class="btn dash-btn" [routerLink]="['/admin-dashboard']">Back to Dashboard</button>
+            </div>
+            <div *ngIf="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Loading users...</p>
+            </div>
+
+            <div *ngIf="!loading && users.length === 0" class="no-users">
+                <p>No users found.</p>
+            </div>
+
+            <div class="table-responsive" *ngIf="!loading && users.length > 0">
+                <table #dataTable class="display table table-striped table-hover mb-0"
+                    style="margin:0 auto;width: 135vh;">
+                    <thead>
+                        <tr class="text-center">
+                            <th scope="col">First Name</th>
+                            <th scope="col">Last Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">User Role</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let user of displayedUsers">
+                            <tr [class.table-danger]="!user.isActive && user.isDeleted" class="text-center">
+                                <td>{{ user.firstname }}</td>
+                                <td>{{ user.lastname }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.isAdmin ? 'Admin' : 'Staff' }}</td>
+                                <td>
+                                </td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
