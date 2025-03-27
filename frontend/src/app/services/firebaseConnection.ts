@@ -238,7 +238,7 @@ export async function createUser(email: string, password: string, isAdmin: boole
       toastr.warning('An account with this email already exists!', 'Warning', { positionClass: "toast-bottom-left" });
       return;
     }
-      createUserWithEmailAndPassword(auth, email, password)
+    createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
 
         const staffData = {
@@ -282,7 +282,19 @@ export async function createUser(email: string, password: string, isAdmin: boole
   }
 }
 
-export async function loginUser(email: string, password: string, router: Router, toastr: ToastrService): Promise<Partial<StaffInfo> | null>  {
+export async function loginUser(email: string, password: string, router: Router, toastr: ToastrService): Promise<Partial<StaffInfo> | null> {
+  
+  const usersCollection = collection(db, "staffMembers");
+
+    // Check if the email already exists in database
+    const q = query(usersCollection, where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      toastr.error('Account does not exist', 'Error', { positionClass: "toast-bottom-left" });
+      return null;
+    }
+  
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -293,45 +305,41 @@ export async function loginUser(email: string, password: string, router: Router,
     if (userDoc.exists()) {
       const userData = userDoc.data() as StaffInfo;
 
-        if (!userData.isActive || userData.isDeleted) {
-          await signOut(auth);
-          toastr.error("Your account has been deactivated or deleted. Please contact an administrator.", 'Unauthorized', { positionClass: 'toast-bottom-left' });
-          return null;
-        }
-
-        const userInfo = {
-          firstname: userData.firstname || "",
-          lastname: userData.lastname || "",
-          isAdmin: userData.isAdmin || false,
-        };
-
-        sessionStorage.setItem("loggedInUser", JSON.stringify(userInfo));
-
-        // Redirect based on user role
-        if (userData["isAdmin"]) {
-          router.navigate(["/admin-dashboard"]);
-        } else {
-          router.navigate(["/case-management"]);
-        }
-
-        return userInfo; // Return user data
+      if (!userData.isActive || userData.isDeleted) {
+        await signOut(auth);
+        toastr.error("Your account has been deactivated or deleted. Please contact an administrator.", 'Unauthorized', { positionClass: 'toast-bottom-left' });
+        return null;
       }
-      return null;
-    } catch(error: any) {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(errorCode, errorMessage)
-      if (errorCode === "auth/wrong-password") {
-        toastr.warning('Invalid Email or Password', 'Warning', { positionClass: "toast-bottom-left" });
+
+      const userInfo = {
+        firstname: userData.firstname || "",
+        lastname: userData.lastname || "",
+        isAdmin: userData.isAdmin || false,
+      };
+
+      sessionStorage.setItem("loggedInUser", JSON.stringify(userInfo));
+
+      // Redirect based on user role
+      if (userData["isAdmin"]) {
+        router.navigate(["/admin-dashboard"]);
+      } else {
+        router.navigate(["/case-management"]);
       }
-      else if (errorCode === "auth/invalid-email") {
-        toastr.warning('Invalid Email or Password', 'Warning', { positionClass: "toast-bottom-left" });
-      }
-      else if (errorCode === 'auth/user-not-found') {
-        toastr.error('Account does not exist', 'Error', { positionClass: "toast-bottom-left" });
-      }
-      return null;
-    };
+
+      return userInfo; // Return user data
+    }
+    return null;
+  } catch (error: any) {
+    console.error("Login Error:", error);
+
+    if (error.code === "auth/wrong-password" || error.code === "auth/invalid-email" || error.code === "auth/invalid-credential") {
+      toastr.warning('Invalid Email or Password', 'Warning', { positionClass: "toast-bottom-left" });
+    } else if (error.code === 'auth/user-not-found') {
+      toastr.error('Account does not exist', 'Error', { positionClass: "toast-bottom-left" });
+    }
+    
+    return null;
+  }
 }
 
 export async function forgotPassword(email: string, toastr: ToastrService) {
@@ -444,26 +452,28 @@ export async function activateUser(uid: string | null, router: Router, toastr: T
 
 export async function currentUserProfile(): Promise<StaffInfo | null> {
 
-  const user = auth.currentUser
-  if (user && user.uid) {
-    try {
-      const ref = doc(db, 'staffMembers', user.uid);
-      const docSnap = await getDoc(ref);
+  return new Promise((resolve) => {
+    onAuthStateChanged(auth, async (user) => {
+      if (user && user.uid) {
+        try {
+          const ref = doc(db, 'staffMembers', user.uid);
+          const docSnap = await getDoc(ref);
 
-      if (docSnap.exists()) {
-        const profile = docSnap.data() as StaffInfo;
-        return profile;
+          if (docSnap.exists()) {
+            resolve(docSnap.data() as StaffInfo);
+          } else {
+            console.error("No document found for the current user.");
+            resolve(null);
+          }
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+          resolve(null);
+        }
       } else {
-        console.error('No document found for the current user.');
-        return null;
+        resolve(null);
       }
-    } catch (error) {
-      console.error('Error fetching user profile:');
-    }
-  } else {
-    return null;
-  }
-  return null
+    });
+  });
 }
 
 export async function getUserProfile(uid: string): Promise<Promise<StaffInfo> | null> {

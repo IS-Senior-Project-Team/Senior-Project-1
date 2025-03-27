@@ -40,11 +40,12 @@ export class AccountProfileComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    this.loading = true;
     try {
       const profile = await currentUserProfile();
       if (profile) {
         this.staffInfo = profile;
-        this.profileForm.patchValue(profile); // Populate form with user data
+        this.profileForm.patchValue(profile);
       } else {
         console.error('No profile found for the current user.');
       }
@@ -88,7 +89,7 @@ export class AccountProfileComponent implements OnInit {
     });
   }
 
-  deleteAccount() : void {
+  deleteAccount(): void {
     this.dialog.open(DeleteAccountDialogComponent, {
       width: '500px',
     });
