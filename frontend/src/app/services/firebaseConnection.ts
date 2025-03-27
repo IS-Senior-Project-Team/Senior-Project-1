@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc, query, where, Timestamp, CollectionReference, DocumentReference, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc, query, where, Timestamp, CollectionReference, DocumentReference, addDoc, deleteDoc } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail, Auth, browserSessionPersistence, browserLocalPersistence, signOut } from "firebase/auth";
 import { authState } from '@angular/fire/auth'
 import { Case } from '../models/case';
@@ -189,6 +189,32 @@ export async function updateCase(caseData: Case): Promise<void> {
   await updateDoc(caseRef, data as { [key: string]: any });
 
   console.log(`Case with Firestore document ID ${caseRef.id} updated successfully`);
+}
+
+export async function permDeleteCase(caseData: Case): Promise<void> {
+  console.log(`Deleting case with stored ID: ${caseData.id}`);
+
+  // Get the collection reference
+  const casesCol = collection(db, 'cases');
+  const casesSnapshot = await getDocs(casesCol);
+
+  // Find the document that matches the stored case ID
+  const caseDoc = casesSnapshot.docs.find(doc => {
+    const caseFromDb = doc.data();
+    return caseFromDb['id'] === caseData.id; // Match based on the stored 'id'
+  });
+
+  // If the document is not found, throw an error
+  if (!caseDoc) {
+    throw new Error(`Case with stored ID ${caseData.id} not found in Firestore`);
+  }
+
+  // Use the Firestore document ID to get the document
+  const caseRef = doc(db, 'cases', caseDoc.id);
+  
+  await deleteDoc(caseRef);
+
+  console.log(`Case with Firestore document ID ${caseRef.id} deleted successfully`);
 }
 
 export async function createDoc(caseData: Case): Promise<boolean> {

@@ -5,7 +5,9 @@ import 'datatables.net-buttons-dt';
 import DataTable from 'datatables.net-dt';
 import { Router } from '@angular/router';
 import { Case } from '../models/case';
+import { StaffInfo } from '../models/staff-info';
 import { CasesService } from '../services/cases.service';
+import { permDeleteCase } from '../services/firebaseConnection'
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 
@@ -23,8 +25,10 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
   private dtInstance: any | null = null;
   private dtInitialized = false; // Track the DataTable initialization state
 
+  staffInfo: StaffInfo | null = null
   cases: Case[] = [];
   showDeleted: boolean = false; // Toggle to show/hide deleted cases
+  loading = true;
 
   constructor (
     private router: Router, 
@@ -34,9 +38,33 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
   ) {}
 
   ngOnInit(): void {
-    //Load case data
-    this.loadCases();
-    this.bindTableEvents();
+    try {
+      //Load case data
+      this.loadCases();
+      this.bindTableEvents();
+
+      const userProfile = sessionStorage.getItem('loggedInUser');
+      if (userProfile) {
+        this.staffInfo = JSON.parse(userProfile);
+      }
+      else {
+        console.error("No profile found for user.")
+      }
+    }
+    catch (error) {
+      console.error("Error fetching user profile.", error);
+    }
+    finally {
+      this.loading = false;
+    }
+  }
+  
+  //Fetch and load all case data
+  loadCases(): void {
+    this.casesService.getAll().then((data: Case[]) => {
+      this.cases = data;
+      this.reInitDataTable(); // Reinitialize the DataTable after data is loaded
+    });
   }
 
   ngOnDestroy(): void {
@@ -51,6 +79,16 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     if (this.dtInstance) {
       this.dtInstance.destroy();
       this.dtInstance = null;
+    }
+  }
+
+  ngAfterViewInit() {
+    this.cdr.detectChanges();
+  }
+  
+  ngAfterViewChecked() {
+    if (this.dataTable && !this.dtInitialized) {
+      this.initDataTable();
     }
   }
 
@@ -80,19 +118,12 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       case 'delete':
         this.deleteCase(rowData);
         break;
+      case 'permanentdelete':
+        this.permanentDelete(rowData);
+        break;
       case 'recover':
         this.recoverCase(rowData);
         break;
-    }
-  }
-  
-  ngAfterViewInit() {
-    this.cdr.detectChanges();
-  }
-  
-  ngAfterViewChecked() {
-    if (this.dataTable && !this.dtInitialized) {
-      this.initDataTable();
     }
   }
 
@@ -104,19 +135,42 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
 
   private renderActions(caseItem: Case): string {
     if (caseItem.isDeleted) {
-      return `
-        <button class="btn btn-link p-1" data-action="recover" data-id="${caseItem.id}">
-          <img src="undo.png" alt="Recover" style="width: 25px; height: 25px;">
-        </button>`;
-    } else {
-      return `
+      if (this.staffInfo?.isAdmin == true) {
+        return (
+          `
+          <button class="btn btn-link p-1" data-action="recover" data-id="${caseItem.id}">
+            <img src="undo.png" alt="Recover" style="width: 25px; height: 25px;">
+          </button>
+          <button class="btn btn-link p-1" data-action="permanentdelete" data-id="${caseItem.id}">
+            <img src="red-trashcan-icon.png" alt="Delete" style="width: 25px; height: 25px;">
+          </button>
+          `
+        );
+      }
+      else if (this.staffInfo?.isAdmin == false) {
+        return (
+          `
+          <button class="btn btn-link p-1" data-action="recover" data-id="${caseItem.id}">
+            <img src="undo.png" alt="Recover" style="width: 25px; height: 25px;">
+          </button>
+          `
+        );
+      }
+    }
+    else {
+      return (
+        `
         <button class="btn btn-link p-1" data-action="edit" data-id="${caseItem.id}">
           <img src="edit-icon.png" alt="Edit" style="width: 25px; height: 25px;">
         </button>
         <button class="btn btn-link p-1" data-action="delete" data-id="${caseItem.id}">
           <img src="red-trashcan-icon.png" alt="Delete" style="width: 25px; height: 25px;">
-        </button>`;
+        </button>
+        `
+      );
     }
+
+    return "";
   }
 
   // Method to render column data in the DataTable
@@ -226,7 +280,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
             return this.renderColumn(data, type, col.maxLength);
           }
         })),
-        {
+        { // actions column
           data: null,
           orderable: false,
           searchable: false,
@@ -271,14 +325,6 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       .rows.add(this.displayedCases)
       .draw();
   }
-  
-  //Fetch and load all case data
-  loadCases(): void {
-    this.casesService.getAll().then((data: Case[]) => {
-      this.cases = data;
-      this.reInitDataTable(); // Reinitialize the DataTable after data is loaded
-    });
-  }
 
   // Method to toggle the showDeleted 
   toggleShowDeleted() {
@@ -297,7 +343,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     // this functionality will be needed to temporarily store the deleted cases
     // for recovery later if needed 
   deleteCase(caseItem: Case) {
-    const confirmDelete = window.confirm(`Are you sure you want to DELETE Case #${caseItem.id}?`);
+    const confirmDelete = window.confirm(`Are you sure you want to mark this case for deletion?\nCase ID: ${caseItem.id}`);
 
     if (confirmDelete) {
       // set the case's deleted flag to true
@@ -307,8 +353,25 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       });
 
       // Display success message
-      this.toastr.success('Case deleted successfully', 'Success');
+      this.toastr.success('Case is marked for deletion', 'Success');
     } else {
+      // User canceled
+      this.toastr.info('Mark for deletion was canceled', 'Canceled');
+    }
+  }
+
+  permanentDelete(caseItem: Case) {
+    const confirmDelete = window.confirm(`Are you sure you want to PERMANENTLY DELETE this case?\nCase ID: ${caseItem.id}`);
+
+    if (confirmDelete) {
+      permDeleteCase(caseItem);
+
+      this.reInitDataTable();
+
+      // Display success message
+      this.toastr.success('Case deleted successfully', 'Success');
+    } 
+    else {
       // User canceled
       this.toastr.info('Delete case was canceled', 'Canceled');
     }

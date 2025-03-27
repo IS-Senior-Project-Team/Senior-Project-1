@@ -1,7 +1,7 @@
 
 <div class="case-management p-3">
 
-  <div class="card shadow-sm" *ngIf="displayedCases.length > 0">
+  <div class="card shadow-sm" *ngIf="displayedCases.length > 0 && !loading">
     <div class="card-body">
       <h2 class="text-center p-3">Manage Pet Cases</h2>
 
@@ -44,27 +44,6 @@
                 <td>{{ item.numOfPets }}</td>
                 <td>{{ item.species }}</td>
                 <td>
-                  <div class="d-flex justify-content-center gap-2">
-                    <button *ngIf="!item.isDeleted"
-                            class="btn btn-link p-1" 
-                            (click)="editCase(item.id)"
-                            data-action="edit">
-                      <img src="edit-icon.png" alt="Edit" style="width: 25px; height: 25px;">
-                    </button>
-                    <button *ngIf="!item.isDeleted"
-                            class="btn btn-link p-1" 
-                            (click)="deleteCase(item)"
-                            data-action="delete">
-                      <img src="red-trashcan-icon.png" alt="Delete" style="width: 25px; height: 25px;">
-                    </button>
-
-                    <button *ngIf="item.isDeleted"
-                            class="btn btn-link p-1" 
-                            (click)="recoverCase(item)"
-                            data-action="recover">
-                      <img src="undo.png" alt="Recover" style="width: 25px; height: 25px;">
-                    </button>
-                  </div>
                 </td>
               </tr>
             </ng-container>
@@ -73,4 +52,9 @@
       </div>
     </div>
   </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>Loading pet cases...
+  </div>
+
 </div>
