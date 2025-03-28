@@ -48,7 +48,10 @@ export class AddCaseComponent {
     let value = input.value.replace(/[^a-zA-Z]/g, ''); // Remove all non-letter characters
     
     let formattedValue = value;
-    formattedValue = formattedValue[0].toUpperCase() + formattedValue.substring(1);
+
+    if (formattedValue != '') {
+      formattedValue = formattedValue[0].toUpperCase() + formattedValue.substring(1);
+    }
 
     input.value = formattedValue;
 
