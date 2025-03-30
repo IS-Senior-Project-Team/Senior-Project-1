@@ -1,16 +1,15 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Papa, ParseResult } from "ngx-papaparse";
+import { Papa } from "ngx-papaparse";
 import * as XLSX from "xlsx";
 import { Case } from '../models/case';
 import { CasesService } from '../services/cases.service';
 import { CaseFile } from '../models/caseFile';
 import { FormsModule } from '@angular/forms';
-import { serverTimestamp, Timestamp } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 import { ToastrService } from 'ngx-toastr';
 import { STATUSES, SPECIES } from '../constants';
 import { v4 as uuidv4 } from 'uuid';
-import { Time } from 'highcharts';
 
 @Component({
   selector: 'app-uploading',
@@ -74,6 +73,7 @@ export class UploadingComponent {
     let thisFile: CaseFile = {name: file.name, cases: []}
     let data = returnable.data
     //Use this console.log to see what column number data is located at
+    // console.log("data:")
     //console.log(data)
     for(let row = 1; row < returnable.data.length-1; row++){
       // debugger;
@@ -82,6 +82,19 @@ export class UploadingComponent {
       // Checks if the regular expression works, and if it does not, sets the phone number to be blank.
       phoneExec != null ? phoneNum = phoneExec[0] : phoneNum = ""
 
+      // This is the Case created with the first sample file sent to us by Lauren. This file has now changed to the new Case
+      // let c: Case = {
+      //   id: "",
+      //   firstName: data[row][2],
+      //   lastName: data[row][3],
+      //   phoneNumber: phoneNum,
+      //   notes: "",
+      //   status: data[row][153],
+      //   numOfPets: data[row][168],
+      //   species: data[row][158],
+      //   isDeleted: false,
+      //   createdDate: Timestamp.now()
+      // }
       let c: Case = {
         id: uuidv4(),
         firstName: data[row][2],
@@ -91,7 +104,8 @@ export class UploadingComponent {
         status: data[row][213],
         numOfPets: data[row][233],
         species: data[row][218],
-        isDeleted: false
+        isDeleted: false,
+        createdDate: Timestamp.now() //Change to uuid
       }
       // console.log(c)
       thisFile.cases.push(c)
