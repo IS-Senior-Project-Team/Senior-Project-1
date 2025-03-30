@@ -82,19 +82,6 @@ export class UploadingComponent {
       // Checks if the regular expression works, and if it does not, sets the phone number to be blank.
       phoneExec != null ? phoneNum = phoneExec[0] : phoneNum = ""
 
-      // This is the Case created with the first sample file sent to us by Lauren. This file has now changed to the new Case
-      // let c: Case = {
-      //   id: "",
-      //   firstName: data[row][2],
-      //   lastName: data[row][3],
-      //   phoneNumber: phoneNum,
-      //   notes: "",
-      //   status: data[row][153],
-      //   numOfPets: data[row][168],
-      //   species: data[row][158],
-      //   isDeleted: false,
-      //   createdDate: Timestamp.now()
-      // }
       let c: Case = {
         id: uuidv4(),
         firstName: data[row][2],
@@ -123,54 +110,31 @@ export class UploadingComponent {
     let jsonData: JSON[] = [];
     const reader = new FileReader();
     reader.onload = (event) => {
-      // debugger
       const data = reader.result;
       workBook = XLSX.read(data, { type: 'binary' });
       jsonData = XLSX.utils.sheet_to_json(workBook.Sheets["VM log"]);
 
-      // In this spot, startingLine would need to be held (more likely held in firebase) to get the current line that is being read. 
-      // From there, the xlsx would be parsed and read line by line and the last line that was read would be recorded.
-      let startingLine = 0;
-      const thisFile: CaseFile = {name: file.name, cases: []} // Create a CaseFile object that holds the name of the file it is based off of and the cases in that file
-      /*
-      ---------------THIS IS NOW OLD------------------
-      for(let i = startingLine; i < jsonData.length; i += 2){
-        let line1 = JSON.parse(JSON.stringify(jsonData[i]))
-        let line2 = JSON.parse(JSON.stringify(jsonData[i+1]))
-        
-        //Create the Case that is pushed to the CaseFile object
-        let c: Case = {
-          id: uuidv4(),
-          firstName: "",
-          lastName: "",
-          phoneNumber: String(line2["Phone Number"]),
-          notes: line1["Message"],
-          status: line1["Status"],
-          numOfPets: line1["# Pets (if PSN/RH)"],
-          species: line1["Species"],
-          isDeleted: false,
-          callDate: Timestamp.fromDate(new Date(line1["Date of Message"]))
-          }
-          thisFile.cases.push(c) // Push all of the cases to the CaseFile object
-          }
-          */
-
+      // Create the CaseFile that holds the name of the file it is based off of (being processed in this function call),
+      // and the cases in that file to be pushed to the global variable so that it can be seen and edited in the UI
+      const thisFile: CaseFile = {name: file.name, cases: []}
+      
+      // Variable that contains all of the JSON data from the XLSX file
       const parsedJsonData = JSON.parse(JSON.stringify(jsonData))
 
+      // Dictionary to house all of the objects to be converted to Cases.
+      // As it is added to, it safely manages the lines from parsedJsonData such that all messages are grouped and keyed by message numbers
       let lineDict: {[messageNumber: number]: Case} = {}
-      // lineDict[Symbol.iterator] = function* () {
-      //   return 5
-      // }
 
+      // Loops through all lines in parsedJsonData, collects data from the rows and groups them into lineDict
       let newLines = /[\r\n]+/gm
-      for(let row of parsedJsonData){
+      for(let row of parsedJsonData) {
         let messageNum: number = row["Message Number"]
         let pn: string = row["Phone Number"]
         let n: string = row["Message"]
         let t: string = row["Date of Message"]
         
         // Check if the value of the variables is undefined. If it is, try to assign it to the same value of the key in the dict.
-        // If the dict is undefined there too, go ahead and assign undefined. If not undefined, get the old value to avoid overwritting.
+        // If the dict is undefined there too, go ahead and assign undefined. If the old value is not undefined, get the old value to avoid overwritting.
         if (pn == undefined && lineDict[messageNum] != undefined) { pn = lineDict[messageNum].phoneNumber } else { pn = row["Phone Number"] }
         if (n == undefined && lineDict[messageNum] != undefined) { n = lineDict[messageNum].notes } else { n = row["Message"] }
         
@@ -179,9 +143,12 @@ export class UploadingComponent {
 
         // Check if the date is in the format I want (2024-11-21T19:11:21+00:00) and if it is keep it, else try to assign it to the previous timestamp
         if (lineDict[messageNum] == undefined && t.indexOf("+") == -1) { t = ""; console.log("discarded time") }
+
+        // Debugging lines //
         //Also want to check in this spot similar to above lines for the nicely formatted date to parse and include in the Case info below
         // console.log(`messageNum: ${messageNum}, phone num: ${row["Phone Number"]}, typeof: ${typeof row["Phone Number"]}, notes: ${String(row["Message"]).substring(0, 5)}, typeof: ${typeof row["Message"]}`)
         // console.log(`messageNum: ${messageNum}, ${pn}, ${n}`)
+        
         lineDict[messageNum] = {
           id: uuidv4(),
           firstName: "",
@@ -194,15 +161,14 @@ export class UploadingComponent {
           isDeleted: false,
           callDate: Timestamp.fromDate(new Date(t))
         }
-        // console.log(rowNum)
-        // console.log(pn)
-        // console.log(n)
       }
-      // debugger
-      // console.log(lineDict[21])
+      // Debugging lines //
+      /* 
+      console.log(lineDict[21])
       console.log(lineDict)
+      */
       for (let c in lineDict){
-        console.log(`${c}, ${lineDict[c].numOfPets}`)
+        // console.log(`${c}, ${lineDict[c].numOfPets}`)
         thisFile.cases.push(lineDict[c] as Case)
       }
 
