@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc, query, where, Timestamp, CollectionReference, DocumentReference, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, getDoc, updateDoc, Firestore, doc, setDoc, query, Query, where, orderBy, limit, Timestamp, CollectionReference, DocumentReference, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, deleteUser, signInWithEmailAndPassword, sendPasswordResetEmail, fetchSignInMethodsForEmail, updatePassword, signOut, reauthenticateWithCredential, EmailAuthProvider, User, onAuthStateChanged, verifyBeforeUpdateEmail } from "firebase/auth";
 import { authState } from '@angular/fire/auth'
 import { Case } from '../models/case';
@@ -49,15 +49,23 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
-// Get all cases with an optional status filter
+// Get cases with optional filters
 export async function getCases(
   status?: string,
   specie?: string,
   timeFrame?: string,
-  offset: number = 0
+  offset: number = 0,
+  createdStartDate?: Date,
+  createdEndDate?: Date,
+  updatedStartDate?: Date,
+  updatedEndDate?: Date,
+  searchValue?: string,
+  casesDefault?: boolean,
+  deletedCases?: boolean
 ): Promise<Case[]> {
   const casesCollection = collection(db, 'cases');
   let q = query(casesCollection);
+  let results: Case[] = []
 
   // Apply status filter
   if (status) {
@@ -96,29 +104,127 @@ export async function getCases(
       q = query(q, where('createdDate', '<=', Timestamp.fromDate(endDate)));
     }
   }
-  // q = query(q, where('isDeleted', '==', false));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Case));
-}
-/*
-// Gets a case from Firebase by id 
-export async function getCaseById(caseId: string): Promise<Case | null> {
-  console.log(`Fetching case with stored case ID: ${caseId}`);
-  const casesCol = collection(db, 'cases');
-  const casesSnapshot = await getDocs(casesCol);
 
-  for (const doc of casesSnapshot.docs) {
-    const caseData = { id: doc.id, ...doc.data() };
-    if (caseData.id === caseId) {
-      console.log("Case found:", caseData);
-      return caseData as Case;
+  if (createdStartDate && createdEndDate) {
+    q = query(q, where('createdDate', '>=', Timestamp.fromDate(createdStartDate)));
+    q = query(q, where('createdDate', '<=', Timestamp.fromDate(createdEndDate)));
+  }
+
+  if (updatedStartDate && updatedEndDate) {
+    q = query(q, where('updateDate', '>=', Timestamp.fromDate(updatedStartDate)));
+    q = query(q, where('updateDate', '<=', Timestamp.fromDate(updatedEndDate)));
+  }
+
+  // Apply if no date range/filter applied
+  if (casesDefault === true) {
+    if (searchValue === '' || searchValue === undefined) {
+      if (deletedCases === false) {
+        // Up to 10 most recently created cases
+        q = query(q, where('isDeleted', '==', false), orderBy('createdDate', 'desc'), limit(10));
+      }
+      else if (deletedCases === true) {
+        // Up to 50 most recently created cases that are marked as deleted
+        q = query(q, where('isDeleted', '==', true), orderBy('createdDate', 'desc'), limit(50));
+      }
+      const snapshot = await getDocs(q);
+      results = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Case));
+      return results; // Exit early
     }
   }
 
-  console.log("No such document!");
-  return null;
+  // Apply if date range/filter is applied
+  if (casesDefault === false) {
+    if (deletedCases === false) {
+      // Most recently created cases
+      q = query(q, where('isDeleted', '==', false), orderBy('createdDate', 'desc'));
+    }
+    if (deletedCases === true) {
+      // Most recently created cases that are marked as deleted
+      q = query(q, where('isDeleted', '==', true), orderBy('createdDate', 'desc'));
+    }
+  }
+
+  // Search value is defined and not empty
+  if (searchValue && searchValue !== '') {
+    // Parse search terms
+    const searchTerms = searchValue.trim().split(/\s+/);
+    
+    // Array to hold all query results
+    const allResults: Case[] = [];
+    
+    // Try exact search for first & last name
+    if (searchTerms.length === 2) {
+      // Try first name + last name match
+      const firstNameQuery = query(
+        q,
+        where('firstName', '>=', searchTerms[0]),
+        where('firstName', '<=', searchTerms[0] + '\uf8ff')
+      );
+      
+      const snapshot = await getDocs(firstNameQuery);
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        // Check if last name also matches
+        if (
+          data['lastName'] && 
+          data['lastName'].toLowerCase().startsWith(searchTerms[1].toLowerCase())
+        ) {
+          allResults.push({ id: doc.id, ...data } as Case);
+        }
+      });
+    }
+    
+    // If no results from combined name search or not a 2-term search,
+    // try individual term searches
+    if (allResults.length === 0) {
+      // Run individual term searches
+      for (const term of searchTerms) {
+        if (term.trim() === '') continue;
+        
+        const searchQueries: Query[] = [
+          query(q, where('firstName', '>=', term), where('firstName', '<=', term + '\uf8ff')),
+          query(q, where('lastName', '>=', term), where('lastName', '<=', term + '\uf8ff')),
+          query(q, where('phoneNumber', '>=', term), where('phoneNumber', '<=', term + '\uf8ff')),
+          query(q, where('id', '>=', term), where('id', '<=', term + '\uf8ff')),
+        ];
+      
+        // Execute all search queries for this term
+        for (const searchQuery of searchQueries) {
+          const snapshot = await getDocs(searchQuery);
+          snapshot.forEach(doc => {
+            // Check if this document is already in results
+            if (!allResults.some(item => item.id === doc.id)) {
+              allResults.push({ id: doc.id, ...doc.data() } as Case);
+            }
+          });
+        }
+      }
+    }
+    
+    results = allResults;
+  }
+  // Empty search value
+  else if (searchValue === '') {
+    if (casesDefault === false) {
+      if (!status && !specie && !timeFrame && !createdStartDate && !createdEndDate && !updatedStartDate && !updatedEndDate) {
+        // No filters applied - return empty results
+        results = [];
+      }
+      else {
+        // Empty search but other filters are applied - apply the filters
+        const snapshot = await getDocs(q);
+        results = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Case));
+      }
+    }
+  }
+  else {
+    // When searchValue == undefined, return filtered cases
+    const snapshot = await getDocs(q);
+    results = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Case));
+  }
+
+  return results;
 }
-*/
 
 // Gets a case from Firebase by id 
 export async function getCaseById(caseId: string): Promise<Case | null> {
@@ -200,6 +306,31 @@ export async function updateCase(caseData: Case): Promise<void> {
   await updateDoc(caseRef, data as { [key: string]: any });
 
   console.log(`Case with Firestore document ID ${caseRef.id} updated successfully`);
+}
+
+export async function permDeleteCase(caseData: Case): Promise<void> {
+  console.log(`Deleting case with stored ID: ${caseData.id}`);
+
+  // Get the collection reference
+  const casesCol = collection(db, 'cases');
+  const casesSnapshot = await getDocs(casesCol);
+
+  // Find the document that matches the stored case ID
+  const caseDoc = casesSnapshot.docs.find(doc => {
+    const caseFromDb = doc.data();
+    return caseFromDb['id'] === caseData.id; // Match based on the stored 'id'
+  });
+
+  // If the document is not found, throw an error
+  if (!caseDoc) {
+    throw new Error(`Case with stored ID ${caseData.id} not found in Firestore`);
+  }
+
+  // Use the Firestore document ID to get the document
+  const caseRef = doc(db, 'cases', caseDoc.id);
+  await deleteDoc(caseRef); // Delete the document in Firestore
+
+  console.log(`Case with Firestore document ID ${caseRef.id} deleted successfully`);
 }
 
 export async function createDoc(caseData: Case): Promise<boolean> {

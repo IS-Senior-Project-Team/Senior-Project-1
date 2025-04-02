@@ -1,5 +1,5 @@
 <div class="edit-case p-3">
-    <div class="card shadow-sm">
+    <div *ngIf="!loading" class="card shadow-sm">
         <div class="card-body">
             <h2 class="text-center p-3">Edit Pet Case</h2>
             <p class="text-center">Case ID: {{ case.id }}</p>
@@ -10,12 +10,25 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label>First Name: </label>
-                        <input class="form-control" [(ngModel)]="case.firstName" name="firstName" required #firstName="ngModel" placeholder="First Name"/>
-                        <div *ngIf="firstName.invalid" class="text-danger">First Name is required.</div>
+                        <input class="form-control" 
+                            [(ngModel)]="case.firstName" 
+                            name="firstName" 
+                            required 
+                            #firstName="ngModel" 
+                            placeholder="First Name"
+                            (blur)="formatName($event, firstName)"
+                        />
+                        <div *ngIf="firstName.dirty && firstName.invalid" class="text-danger">First Name is required.</div>
                     </div>
                     <div class="col-md-6">
                         <label>Last Name: </label>
-                        <input class="form-control" [(ngModel)]="case.lastName" name="lastName" #lastName="ngModel" placeholder="Last Name"/>
+                        <input class="form-control" 
+                            [(ngModel)]="case.lastName" 
+                            name="lastName" 
+                            #lastName="ngModel" 
+                            placeholder="Last Name"
+                            (blur)="formatName($event, lastName)"
+                        />
                     </div>
                 </div>
 
@@ -28,15 +41,26 @@
                             type="text" 
                             required 
                             #phoneNumber="ngModel" 
-                            placeholder="e.g. 1234567890"
-                            pattern="^\d{10}$"
+                            placeholder="e.g. 123-456-7890"
+                            pattern="^(?:\d{3}-){2}\d{4}$"
+                            (blur)="formatPhoneNumber($event, phoneNumber)"
                         />
-                        <div *ngIf="phoneNumber.invalid" class="text-danger">
+                        <div *ngIf="phoneNumber.dirty && phoneNumber.invalid" class="text-danger">
                             <div *ngIf="phoneNumber.errors?.['required']">Phone Number is required.</div>
-                            <div *ngIf="phoneNumber.errors?.['pattern']">Invalid phone number format.<br>(e.g., 1234567890)</div>
+                            <div *ngIf="phoneNumber.errors?.['pattern']">Invalid phone number format.<br>(e.g., 123-456-7890)</div>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <label>Interaction Date: </label>
+                        <input class="form-control" 
+                            [(ngModel)]="case.callDate" 
+                            name="interactionDate" 
+                            type="date"  
+                            #interactionDate="ngModel"
+                        />
+                    </div>
                 </div>
+                
 
                 <hr class="p-3">
 
@@ -48,15 +72,15 @@
                         <select class="form-select" [(ngModel)]="case.status" name="status" #status="ngModel" required>
                             <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
                         </select>
-                        <div *ngIf="status.invalid" class="text-danger">Status is required.</div>
+                        <div *ngIf="status.dirty && status.invalid" class="text-danger">Status is required.</div>
                     </div>
                     <div class="col-md-4">
                         <label># of Pets: </label>
                         <input class="form-control" [(ngModel)]="case.numOfPets" name="numOfPets" type="number" required #numOfPets="ngModel" placeholder="Number of Pets"/>
-                        <div *ngIf="numOfPets.invalid" class="text-danger">
+                        <div *ngIf="numOfPets.dirty && numOfPets.invalid" class="text-danger">
                             Please enter a valid number of pets.
                         </div>
-                        <div *ngIf="case.numOfPets < 1" class="text-danger">
+                        <div *ngIf="numOfPets.dirty && case.numOfPets < 1" class="text-danger">
                             Number of pets cannot be zero or negative.
                         </div>
                     </div>
@@ -71,7 +95,7 @@
                                 {{ specie }}
                             </option>
                         </select>
-                        <div *ngIf="caseSpecies.invalid" class="text-danger">Species is required.</div>
+                        <div *ngIf="caseSpecies.dirty && caseSpecies.invalid" class="text-danger">Species is required.</div>
                     </div>
                 </div>
 
@@ -88,5 +112,9 @@
                 </div>
             </form>
         </div>
+    </div>
+
+    <div *ngIf="loading" class="loading">
+        <div class="spinner"></div>Loading case details...
     </div>
 </div>
