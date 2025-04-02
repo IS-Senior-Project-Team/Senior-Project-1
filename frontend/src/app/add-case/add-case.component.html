@@ -50,6 +50,15 @@
                             <div *ngIf="phoneNumber.errors?.['pattern']">Invalid phone number format.<br>(e.g., 123-456-7890)</div>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <label>Interaction Date: </label>
+                        <input class="form-control" 
+                            [(ngModel)]="case.callDate" 
+                            name="interactionDate" 
+                            type="date"
+                            #interactionDate="ngModel"
+                        />
+                    </div>
                 </div>
 
                 <hr class="p-3">

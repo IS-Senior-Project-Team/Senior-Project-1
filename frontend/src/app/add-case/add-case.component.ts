@@ -25,6 +25,7 @@ export class AddCaseComponent {
     firstName: '',
     lastName: '',
     phoneNumber: '',
+    callDate: new Date().toISOString().slice(0, 10),  // Sets callDate (interaction date) to the current date formatted as YYYY-MM-DD
     notes: '',
     status: 'Open',
     numOfPets: 1,
@@ -34,7 +35,6 @@ export class AddCaseComponent {
   };
 
   statuses: string[] = STATUSES;
-
   species: string[] = SPECIES;
 
   constructor (private router: Router, 
@@ -67,7 +67,7 @@ export class AddCaseComponent {
     // Limit to 10 digits
     value = value.substring(0, 10);
   
-    // Format as xxx-xxx-xxxx
+    // Format as XXX-XXX-XXXX
     let formattedValue = '';
     if (value.length > 3) {
       formattedValue = value.slice(0, 3) + '-';

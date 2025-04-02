@@ -1,3 +1,7 @@
+.card {
+    width: 100%;
+}
+
 .card:hover {
     transform: scale(1);
 }
@@ -5,6 +9,14 @@
 .green-btn {
     background-color: #4CAF50;
     color: white;
+}
+
+.ms-2 {
+    margin-left: 0.5rem; 
+}
+  
+.ms-3 {
+    margin-left: 1rem; 
 }
 
 .green-btn:hover {
@@ -35,6 +47,106 @@
     to {
         transform: rotate(360deg);
     }
+}
+
+.clear-button {
+    border-radius: 4px;
+    padding: 0;
+    min-width: 60px; 
+    border: 0px;
+}
+
+.clear-button:disabled {
+    cursor: not-allowed;
+}
+
+.date-clear-button {
+    border-radius: 4px;
+    padding: 0;
+    min-width: 60px; 
+    border: 0px;
+    margin-bottom: 5px;
+    background-color: #4CAF50;
+    color: white;
+}
+
+.date-clear-button:hover {
+    background-color: #45a049;
+}
+
+.date-clear-button:disabled {
+    cursor: not-allowed;
+    background-color: #83c784;
+}
+
+.enter-button {
+    border-radius: 4px;
+    padding: 0;
+    min-width: 60px; 
+    border: 0px;
+}
+
+.enter-button:disabled {
+    cursor: not-allowed;
+}
+
+.button-group {
+    display: flex;
+    align-items: center;
+}
+  
+.date-range-container {
+    display: flex;
+    align-items: flex-start;
+}
+
+.date-picker-wrapper {
+    display: flex;
+    flex-direction: column; /* Stack date picker and button vertically */
+    align-items: flex-end; /* Align button to the right edge */
+}
+  
+.date-picker-field {
+    width: 220px; 
+    font-size: 14px; 
+    margin-bottom: 0; 
+}
+
+.date-picker-field .mat-form-field-infix {
+    padding: 0.25em 0; 
+    border-top: 0;
+}
+
+.date-picker-field .mat-form-field-flex {
+    padding: 0 0.75em;
+    align-items: center;
+}
+
+.date-picker-field input {
+    font-size: 14px; 
+}
+
+.custom-search {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: right;
+    gap: 5px; /* Optional: adds spacing between elements */
+}
+  
+.custom-search input {
+    padding: 5px;
+    margin-right: 10px;
+    width: 330px; /* Adjust this value as needed */
+}
+
+.custom-search button {
+    border-radius: 4px;
+    padding: 5px 15px;
+    min-width: 60px;
+}
+
+.phone-column {
+    white-space: nowrap; /* Prevents wrapping */
 }
 
 .case-management {
@@ -72,12 +184,12 @@
     .dataTables_wrapper {
         .dataTables_length,
         .dataTables_filter {
-        padding: 1rem 1rem 0 1rem;
+            padding: 1rem 1rem 0 1rem;
         }
 
         .dataTables_info,
         .dataTables_paginate {
-        padding: 1rem;
+            padding: 1rem;
         }
         
         .dataTables_filter {
@@ -101,11 +213,11 @@
 
     @media (max-width: 768px) {
         .card {
-        margin: 0.5rem;
+            margin: 0.5rem;
         }
         
         .table-responsive {
-        border: none;
+            border: none;
         }
     }
 }

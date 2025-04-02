@@ -1,4 +1,6 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, ChangeDetectorRef, AfterViewChecked, HostListener } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import 'datatables.net';
 import 'datatables.net-buttons';
 import 'datatables.net-buttons-dt';
@@ -7,20 +9,32 @@ import { Router } from '@angular/router';
 import { Case } from '../models/case';
 import { StaffInfo } from '../models/staff-info';
 import { CasesService } from '../services/cases.service';
-import { permDeleteCase } from '../services/firebaseConnection'
-import { CommonModule } from '@angular/common';
+import { permDeleteCase } from '../services/firebaseConnection';
+import { Timestamp } from 'firebase/firestore';
 import { ToastrService } from 'ngx-toastr';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-case-management',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule
+  ],  
   templateUrl: './case-management.component.html',
   styleUrl: './case-management.component.css',
   providers: [CasesService]
 })
 export class CaseManagementComponent implements OnInit, AfterViewInit, AfterViewChecked {
   @ViewChild('dataTable', { static: false }) dataTable!: ElementRef;
+  @ViewChild('customSearch') searchInput!: ElementRef;
 
   private dtInstance: any | null = null;
   private dtInitialized = false; // Track the DataTable initialization state
@@ -29,6 +43,16 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
   cases: Case[] = [];
   showDeleted: boolean = false; // Toggle to show/hide deleted cases
   loading = true;
+
+  // Default values for Created Date Range (last 7 days)
+  startDate: Date | undefined = new Date(new Date().setDate(new Date().getDate() - 7)); // 7 days ago
+  endDate: Date | undefined = new Date(); // Today
+
+  // Updated Date Range (no default values)
+  updatedStartDate: Date | undefined = undefined;
+  updatedEndDate: Date | undefined = undefined;
+
+  searchInputValue: string = '';
 
   constructor (
     private router: Router, 
@@ -39,10 +63,11 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
 
   ngOnInit(): void {
     try {
-      //Load case data
-      this.loadCases();
+      // Load initial case data
+      this.loadInitialData();
       this.bindTableEvents();
 
+      // Check for user
       const userProfile = sessionStorage.getItem('loggedInUser');
       if (userProfile) {
         this.staffInfo = JSON.parse(userProfile);
@@ -59,16 +84,13 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     }
   }
   
-  //Fetch and load all case data
-  loadCases(): void {
-    this.casesService.getAll().then((data: Case[]) => {
-      this.cases = data;
-      this.reInitDataTable(); // Reinitialize the DataTable after data is loaded
-    });
+  // Fetch and load case data from the past week
+  // startDate and endDate are initialized already
+  private loadInitialData() {
+    this.getFilteredCases(false);
   }
 
   ngOnDestroy(): void {
-
     const actionButtons = document.querySelectorAll('[data-action]');
 
     actionButtons.forEach(button => {
@@ -84,6 +106,9 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
 
   ngAfterViewInit() {
     this.cdr.detectChanges();
+    if (this.dataTable && !this.dtInitialized) {
+      this.initDataTable();
+    }
   }
   
   ngAfterViewChecked() {
@@ -119,7 +144,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
         this.deleteCase(rowData);
         break;
       case 'permanentdelete':
-        this.permanentDelete(rowData);
+        this.permDeleteWithPrompt(rowData);
         break;
       case 'recover':
         this.recoverCase(rowData);
@@ -133,7 +158,10 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     }
   }
 
+  // Used to render the 'Actions' column in the DataTable
   private renderActions(caseItem: Case): string {
+    // If case is deleted, display recover and perm delete buttons for admin
+    // display only recover button for non admins
     if (caseItem.isDeleted) {
       if (this.staffInfo?.isAdmin == true) {
         return (
@@ -157,6 +185,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
         );
       }
     }
+    // If case is not deleted, display edit and delete buttons
     else {
       return (
         `
@@ -262,7 +291,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
                 const timestamp = data.seconds * 1000 + data.nanoseconds / 1e6;
                 formattedDate = new Date(timestamp).toLocaleDateString('en-US', {
                   year: 'numeric',
-                  month: 'short',
+                  month: 'numeric',
                   day: 'numeric'
                 });
               }
@@ -310,7 +339,27 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
             placeholder: 'Search',
           }
         }
-      }
+      },
+      order: [[3, 'desc']], // Default sort by 'createdDate' in descending order
+      searching: false, // Disable searching for custom search bar
+      // Column Definitions
+      columnDefs: [
+        {
+          targets: 2, // phoneNumber column
+          width: '150px', // Add width
+          className: 'phone-column' 
+        },
+        {
+          targets: 3, // createdDate column
+          width: '150px', // Reduce width
+          className: 'dt-left' // align left
+        },
+        {
+          targets: 6, // numOfPets column
+          width: '80px', // Reduce width
+          className: 'dt-center' // align center
+        }
+      ]
     });
 
     this.dtInitialized = true;
@@ -318,7 +367,10 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
   }
 
   private reInitDataTable(): void {
-    if (!this.dtInstance) return;
+    if (!this.dtInstance) {
+      this.initDataTable();
+      return;
+    }
 
     this.dtInstance
       .clear()
@@ -326,12 +378,180 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       .draw();
   }
 
-  // Method to toggle the showDeleted 
-  toggleShowDeleted() {
-    this.showDeleted = !this.showDeleted;
-    this.reInitDataTable(); // Reinitialize the DataTable when toggling the view
+  async getFilteredCases(getDefaultCases: boolean) {
+    await this.casesService
+      .getAll(
+        undefined, // status
+        "", // specie
+        "", // timeframe
+        0, // offset
+        this.startDate, // created date start date
+        this.endDate, // created date end date
+        this.updatedStartDate, // updated date start date
+        this.updatedEndDate, // updated date end date
+        this.searchInputValue, // search bar input 
+        getDefaultCases, // gets "default" cases if true, active cases: limit of 10 | deleted cases: limit of 50
+        this.showDeleted // deleted cases (true or false)
+      )
+      .then((data: Case[]) => {
+        this.cases = data;
+        this.reInitDataTable();
+      })
+      .catch((error) => {
+        console.error('Error searching cases:', error);
+      });
   }
 
+  performSearch() {
+    if (!this.searchInput || !this.searchInput.nativeElement) {
+      console.error('Search input not available yet');
+      return;
+    }
+
+    this.searchInputValue = this.searchInput.nativeElement.value;
+
+    // Split into words and capitalize each if it contains only letters
+    if (/^[a-zA-Z\s]+$/.test(this.searchInputValue)) { // Check for letters and spaces only
+      this.searchInputValue = this.searchInputValue
+        .split(' ')
+        .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+
+      this.searchInput.nativeElement.value = this.searchInputValue;
+    }
+
+    if (this.searchInputValue === '') {
+      this.getFilteredCases(true);
+    }
+    else {
+      this.getFilteredCases(false);
+    }
+  }
+
+  clearSearch(inputElement: HTMLInputElement) {
+    inputElement.value = '';
+    this.searchInputValue = '';
+
+    if (this.startDate && this.endDate || this.updatedStartDate && this.updatedEndDate) {
+      this.getFilteredCases(false);
+    }
+    else {
+      //Get most recently created cases (limited - 10 for active, 50 for deleted)
+      this.getFilteredCases(true);
+    }
+  }
+
+  // Trigger search on Enter key
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    if (event.key === 'Enter' && this.searchInput.nativeElement === document.activeElement) {
+      this.performSearch();
+    }
+  }
+
+  // Handle input: decide if it's a phone number or something else
+  handleInput(input: HTMLInputElement): void {
+    const value = input.value.trim();
+    const cleanedValue = value.replace(/\D/g, ''); // Remove non-digits
+
+    // Treat as phone number if cleaned value is at least 3 digits and original value is mostly numeric
+    if (cleanedValue.length >= 3 && this.isMostlyNumeric(value)) {
+      this.formatPhoneNumber(input);
+    } else {
+      this.searchInputValue = value;
+    }
+  }
+
+  // Check if the value is mostly numeric (allows dashes for phone numbers)
+  isMostlyNumeric(value: string): boolean {
+    const cleanedValue = value.replace(/-/g, ''); // Remove dashes only
+    return /^\d*$/.test(cleanedValue); // Check if remaining characters are all digits (or empty)
+  }
+
+  // Format phone number with dashes when searching
+  formatPhoneNumber(input: HTMLInputElement): void {
+    let value = input.value.replace(/\D/g, ''); // Remove all non-digits
+
+    // Limit to 10 digits (standard US phone number)
+    if (value.length > 10) {
+      value = value.slice(0, 10);
+    }
+
+    // Apply formatting based on length
+    let formattedValue = value;
+    if (value.length > 6) {
+      formattedValue = `${value.slice(0, 3)}-${value.slice(3, 6)}-${value.slice(6)}`;
+    } else if (value.length > 3) {
+      formattedValue = `${value.slice(0, 3)}-${value.slice(3)}`;
+    } else {
+      formattedValue = value;
+    }
+
+    input.value = formattedValue;
+    this.searchInputValue = formattedValue;
+  }
+
+  onDateChange() {
+    if (this.startDate && this.endDate) {
+      //Filter cases by date range
+      this.getFilteredCases(false);
+    }
+    else if (!this.startDate && !this.endDate && this.updatedStartDate && this.updatedEndDate) {
+      //Filter cases by updated date range
+      this.getFilteredCases(false);
+    }
+    // Get default cases
+    else {
+      //Get up to 10 most recently created cases
+      this.getFilteredCases(true);
+    }
+  }
+
+  clearDateRange() {
+    this.startDate = undefined;
+    this.endDate = undefined;
+    this.onDateChange();
+  }
+
+  clearUpdatedDateRange() {
+    this.updatedStartDate = undefined;
+    this.updatedEndDate = undefined;
+    this.onDateChange();
+  }
+
+  // Method to toggle the showDeleted filter
+  async toggleShowDeleted(): Promise<void> {
+    this.showDeleted = !this.showDeleted;
+
+    if (this.showDeleted === true) {
+      // Clear date range and search value filters
+      this.startDate = undefined;
+      this.endDate = undefined;
+      this.updatedStartDate = undefined;
+      this.updatedEndDate = undefined;
+      this.searchInput.nativeElement.value = '';
+      this.searchInputValue = '';
+
+      //Get most recently created  "deleted" cases (limited - 50 for deleted)
+      await this.getFilteredCases(true);
+
+      // Check for deleted cases that have passed the 30 day expiration
+      await this.checkDeletedCaseExpiration();
+    }
+
+    if (this.showDeleted === false) {
+      // Set default created date range filter, clear updated date range and search value
+      this.startDate = new Date(new Date().setDate(new Date().getDate() - 7)); // 7 days ago
+      this.endDate = new Date(); // current date
+      this.updatedStartDate = undefined;
+      this.updatedEndDate = undefined;
+      this.searchInput.nativeElement.value = '';
+      this.searchInputValue = '';
+
+      //Get cases that have been created in the past week
+      await this.getFilteredCases(false);
+    }
+  }
 
   // Check if there are any deleted cases
   hasDeletedCases(): boolean {
@@ -348,6 +568,9 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     if (confirmDelete) {
       // set the case's deleted flag to true
       caseItem.isDeleted = true;
+      // set the case's deletedDate to a timestamp of the current date
+      caseItem.deletedDate = Timestamp.fromDate(new Date());
+
       this.casesService.updateCase(caseItem).subscribe(() => {
         this.reInitDataTable(); // Reinitialize the DataTable after deleting a case
       });
@@ -360,13 +583,47 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     }
   }
 
-  permanentDelete(caseItem: Case) {
+  // Check expiration and permanently delete cases
+  async checkDeletedCaseExpiration(): Promise<void> {
+    if (!this.cases || !Array.isArray(this.cases)) {
+      console.error("this.cases is not defined or not an array");
+      return;
+    }
+
+    const deletionPromises: Promise<void>[] = [];
+
+    this.cases.forEach((caseItem: Case) => {
+      if (caseItem.deletedDate) {
+        const deletedJsDate: Date = caseItem.deletedDate.toDate();
+        const currentDate: Date = new Date();
+        const timeDifference: number = currentDate.getTime() - deletedJsDate.getTime();
+        // Use lower threshold to take into account variation when measuring time between dates
+        const twentyNineAndHalfDaysInMs: number = 29.5 * 24 * 60 * 60 * 1000;
+
+        if (timeDifference >= twentyNineAndHalfDaysInMs) {
+          deletionPromises.push(
+            this.permDeleteNoPrompt(caseItem).catch((error) => {
+              console.error(`Error when permanently deleting case: ${caseItem.id}:`, error);
+            })
+          );
+        }
+      }
+    });
+  
+    // Wait for all deletions to complete
+    await Promise.all(deletionPromises);
+
+    this.getFilteredCases(true);
+  }
+
+  // Permanently delete a case with a prompt
+  permDeleteWithPrompt(caseItem: Case) {
     const confirmDelete = window.confirm(`Are you sure you want to PERMANENTLY DELETE this case?\nCase ID: ${caseItem.id}`);
 
     if (confirmDelete) {
       permDeleteCase(caseItem);
 
-      this.reInitDataTable();
+      this.getFilteredCases(true);
 
       // Display success message
       this.toastr.success('Case deleted successfully', 'Success');
@@ -375,6 +632,11 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       // User canceled
       this.toastr.info('Delete case was canceled', 'Canceled');
     }
+  }
+
+  // Permanently delete a case without a prompt
+  async permDeleteNoPrompt(caseItem: Case): Promise<void> {
+    await permDeleteCase(caseItem);
   }
 
   // Method to recover a deleted case
@@ -410,15 +672,11 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
 
   // Filter cases based on the deleted flag
   get displayedCases() {
-    // Return deleted cases if showDeleted is active or "true"
-    // Return regular cases if showDeleted is not active or "false"
-    const filteredCases = this.showDeleted ? this.cases.filter(item => item.isDeleted) : this.cases.filter(item => !item.isDeleted);
+    // Return deleted cases if showDeleted is true
+    // Return active cases if showDeleted is false
+    const filteredCases = this.showDeleted 
+      ? this.cases.filter(item => item.isDeleted) 
+      : this.cases.filter(item => !item.isDeleted);
     return filteredCases;
   }
-
-  // Get the amount/count of deleted cases
-  get deletedCasesCount() {
-    return this.cases.filter(item => item.isDeleted).length;
-  }
-
 }

@@ -1,25 +1,100 @@
 
 <div class="case-management p-3">
 
-  <div class="card shadow-sm" *ngIf="displayedCases.length > 0 && !loading">
+  <div class="card shadow-sm" *ngIf="!loading">
     <div class="card-body">
       <h2 class="text-center p-3">Manage Pet Cases</h2>
-
-      <div class="d-flex justify-content-start mb-3">
-        <button class="btn btn-secondary me-3" 
-                (click)="toggleShowDeleted()" 
-                [disabled]="!hasDeletedCases()">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Left side: Buttons -->
+        <div class="button-group">
+          <button 
+            class="btn btn-secondary me-3" 
+            (click)="toggleShowDeleted()" 
+          >
             {{ showDeleted ? 'Hide' : 'Show' }} Deleted Cases
-        </button>
-        <button class="btn green-btn" 
-                *ngIf="showDeleted === false"
-                (click)="addCase()">
-          Add New Case
-        </button>
+          </button>
+          <button 
+            class="btn green-btn" 
+            *ngIf="showDeleted === false" 
+            (click)="addCase()">
+            Add New Case
+          </button>
+        </div>
+      
+        <!-- Right side: Two Date Range Pickers -->
+        <div class="date-range-container d-flex">
+          <!-- Created Date Range Picker -->
+          <div class="date-picker-wrapper">
+            <button 
+              mat-button 
+              color="warn" 
+              (click)="clearDateRange()" 
+              [disabled]="!startDate && !endDate" 
+              class="date-clear-button">
+              Clear
+            </button>
+            <mat-form-field appearance="fill" class="date-picker-field">
+              <mat-label>Created Date Range</mat-label>
+              <mat-date-range-input [rangePicker]="createdPicker">
+                <input 
+                  matStartDate 
+                  placeholder="Start" 
+                  [(ngModel)]="startDate" 
+                  (dateChange)="onDateChange()"
+                >
+                <input 
+                  matEndDate 
+                  placeholder="End" 
+                  [(ngModel)]="endDate" 
+                  (dateChange)="onDateChange()"
+                >
+              </mat-date-range-input>
+              <mat-datepicker-toggle matIconSuffix [for]="createdPicker"></mat-datepicker-toggle>
+              <mat-date-range-picker #createdPicker></mat-date-range-picker>
+            </mat-form-field>
+          </div>
+        
+          <!-- Updated Date Range Picker -->
+          <div class="date-picker-wrapper ms-1">
+            <button 
+              mat-button 
+              color="warn" 
+              (click)="clearUpdatedDateRange()" 
+              [disabled]="!updatedStartDate && !updatedEndDate" 
+              class="date-clear-button btn-secondary">
+              Clear
+            </button>
+            <mat-form-field appearance="fill" class="date-picker-field ms-3">
+              <mat-label>Updated Date Range</mat-label>
+              <mat-date-range-input [rangePicker]="updatedPicker">
+                <input 
+                  matStartDate 
+                  placeholder="Start" 
+                  [(ngModel)]="updatedStartDate" 
+                  (dateChange)="onDateChange()"
+                >
+                <input 
+                  matEndDate 
+                  placeholder="End" 
+                  [(ngModel)]="updatedEndDate" 
+                  (dateChange)="onDateChange()"
+                >
+              </mat-date-range-input>
+              <mat-datepicker-toggle matIconSuffix [for]="updatedPicker"></mat-datepicker-toggle>
+              <mat-date-range-picker #updatedPicker></mat-date-range-picker>
+            </mat-form-field>
+          </div>
+        </div>
       </div>
 
-      <div class="table-responsive">
-        <table #dataTable class="display table table-striped table-hover mb-0" style="width: 100%">
+      <div class="custom-search">
+        <input #customSearch type="text" placeholder="Search by name or phone number..." (input)="handleInput(customSearch)">
+        <button class="clear-button btn-secondary" (click)="clearSearch(customSearch)" [disabled]="customSearch.value === ''">Clear</button>
+        <button class="enter-button btn-secondary" (click)="performSearch()" [disabled]="customSearch.value === ''">Enter</button>
+      </div>
+
+      <div class="table-responsive" style="width: 100%; max-width: 100%; overflow-x: auto;">
+        <table #dataTable class="display table table-striped table-hover mb-0" style="width: 100%; table-layout: fixed;">
           <thead>
             <tr class="text-center">
               <th scope="col">First Name</th>
