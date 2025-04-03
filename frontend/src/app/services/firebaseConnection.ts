@@ -9,11 +9,10 @@ import { AuthService } from "./auth.service";
 import { Router } from "@angular/router";
 import { StaffInfo } from "../models/staff-info";
 import { from, Observable, of, switchMap } from "rxjs";
-import { RegisterStaffComponent } from '../view/register-staff/register-staff.component';
 // Required for side-effects
 import "firebase/firestore";
-import { EventEmitter, inject } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
+import { HttpClient } from "@angular/common/http";
 
 // Follow this pattern to import other Firebase services
 // import { } from 'firebase/<service>';
@@ -33,20 +32,8 @@ const firebaseConfig = {
   measurementId: "G-WRGY0J3QBW"
 };
 
-// UNCOMMENT BELOW TO INIATILIZE ADMIN SDK BASED ON GROUP'S DECISION
-
-// var admin = require("firebase-admin");
-
-// var serviceAccount = require("path/to/serviceAccountKey.json");
-
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount)
-// });
-
-
-// Initialize Firebase
+// Initialize Client Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
 // Get all cases with an optional status filter
@@ -226,8 +213,10 @@ export async function createDoc(caseData: Case): Promise<boolean> {
 // An email will then be sent for staff member to make changes and complete account creation
 const auth = getAuth();
 
-export async function createUser(email: string, password: string, isAdmin: boolean, router: Router, toastr: ToastrService) {
+export async function createUser(email: string, password: string, isAdmin: boolean, router: Router, toastr: ToastrService, httpClient: HttpClient) {
+  var apiUrl = "http://localhost:5001/create-user"; // using a backend server for admin sdk to create users
   try {
+
     const usersCollection = collection(db, "staffMembers");
 
     // Check if the email already exists in database
@@ -237,64 +226,52 @@ export async function createUser(email: string, password: string, isAdmin: boole
     if (!querySnapshot.empty) {
       toastr.warning('An account with this email already exists!', 'Warning', { positionClass: "toast-bottom-left" });
       return;
+    } else {
+      return httpClient.post(apiUrl, { email, password, isAdmin }).toPromise();   //Include error notification here to be shown when a firebase issue occurs
     }
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-
-        const staffData = {
-          email: email,
-          firstname: "",
-          lastname: "",
-          address: "",
-          phoneNumber: "",
-          isAdmin: isAdmin,
-          isActive: true,
-          isDeleted: false
-        }
-
-        // Adding users to firestore
-        const user = userCredential.user;
-        const docRef = doc(db, "staffMembers", user.uid)
-        setDoc(docRef, staffData)
-          .catch((error) => {
-            console.log(error)
-          })
-
-        toastr.success('Account has been created successfully!', 'Successful', { positionClass: "toast-bottom-left" });
-        sendEmailVerification(userCredential.user)
-          .then(() => {
-            alert("Email verification was sent. Users should click \"Forgot Password\" link upon first login to setup their password")
-          });
-        router.navigate(['/admin-dashboard/users'])
-        // ...
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        if (errorCode == 'auth/email-already-in-use') {
-          toastr.warning('Email address already exists!', 'Warning', { positionClass: "toast-bottom-left" });
-        }
-        else {
-          toastr.error('Unable to create staff member', 'Error', { positionClass: "toast-bottom-left" });
-        }
-      });
-  } catch (error) {
-    console.error("Error creating user:", error);
+  } catch (err) {
+    console.log(err)
+    return;
   }
 }
 
+// TO GENERATE AN EMAIL VERIFICATION LINK (NOT COMPLETED)
+//     // admin.auth().generateEmailVerificationLink(email)
+//     // sendEmailVerification(userCredential.user)
+//     //   .then(() => {
+//     //     alert("Email verification was sent. Users should click \"Forgot Password\" link upon first login to setup their password")
+//     //   });
+
+//     router.navigate(['/admin-dashboard/users'])
+//       // ...
+
+//       .catch((error) => {
+//         const errorCode = error.code;
+//         if (errorCode == 'auth/email-already-in-use') {
+//           toastr.warning('Email address already exists!', 'Warning', { positionClass: "toast-bottom-left" });
+//         }
+//         else {
+//           toastr.error('Unable to create staff member', 'Error', { positionClass: "toast-bottom-left" });
+//         }
+//       });
+//   } catch (error) {
+//     console.error("Error creating user:", error);
+//   }
+// }
+
 export async function loginUser(email: string, password: string, router: Router, toastr: ToastrService): Promise<Partial<StaffInfo> | null> {
-  
+
   const usersCollection = collection(db, "staffMembers");
 
-    // Check if the email already exists in database
-    const q = query(usersCollection, where("email", "==", email));
-    const querySnapshot = await getDocs(q);
+  // Check if the email already exists in database
+  const q = query(usersCollection, where("email", "==", email));
+  const querySnapshot = await getDocs(q);
 
-    if (querySnapshot.empty) {
-      toastr.error('Account does not exist', 'Error', { positionClass: "toast-bottom-left" });
-      return null;
-    }
-  
+  if (querySnapshot.empty) {
+    toastr.error('Account does not exist', 'Error', { positionClass: "toast-bottom-left" });
+    return null;
+  }
+
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -337,7 +314,7 @@ export async function loginUser(email: string, password: string, router: Router,
     } else if (error.code === 'auth/user-not-found') {
       toastr.error('Account does not exist', 'Error', { positionClass: "toast-bottom-left" });
     }
-    
+
     return null;
   }
 }
@@ -556,37 +533,6 @@ export async function deleteDeactivatedUsers(toastr: ToastrService) {
 
   if (snapshot.size > 0) {
     toastr.info(`${snapshot.size} user(s) have been deleted automatically due to account expiration after deactivation.`, 'Announcement', { positionClass: "toast-bottom-left" })
-  }
-}
-
-export async function deleteAccount(email: string, password: string, toastr: ToastrService, router: Router, authSvc: AuthService) {
-  const user = auth.currentUser;
-
-  if (!user) {
-    return;
-  }
-
-  // Re-authenticate the user before deleting
-  const credential = EmailAuthProvider.credential(email, password);
-
-  try {
-    await reauthenticateWithCredential(user, credential);
-
-    await deleteUser(user);
-
-    const userDocRef = doc(db, "staffMembers", user.uid);
-    await updateDoc(userDocRef, { isDeleted: true });
-    await deleteDoc(userDocRef)
-
-    authSvc.logoutUserAfterDeletion()
-
-  } catch (error: any) {
-    if (error.code === "auth/wrong-password") {
-      toastr.warning('Incorrect Email or Password', 'Warning', { positionClass: "toast-bottom-left" })
-    } else if (error.code === "auth/user-mismatch") {
-      toastr.warning('Incorrect Email or Password', 'Warning', { positionClass: "toast-bottom-left" });
-    }
-    else { console.error(error); }
   }
 }
 
