@@ -135,10 +135,10 @@ export async function getCases(
   if (searchValue && searchValue !== '') {
     // Parse search terms
     const searchTerms = searchValue.trim().split(/\s+/);
-    
+
     // Array to hold all query results
     const allResults: Case[] = [];
-    
+
     // Try exact search for first & last name
     if (searchTerms.length === 2) {
       // Try first name + last name match
@@ -147,34 +147,34 @@ export async function getCases(
         where('firstName', '>=', searchTerms[0]),
         where('firstName', '<=', searchTerms[0] + '\uf8ff')
       );
-      
+
       const snapshot = await getDocs(firstNameQuery);
       snapshot.forEach(doc => {
         const data = doc.data();
         // Check if last name also matches
         if (
-          data['lastName'] && 
+          data['lastName'] &&
           data['lastName'].toLowerCase().startsWith(searchTerms[1].toLowerCase())
         ) {
           allResults.push({ id: doc.id, ...data } as Case);
         }
       });
     }
-    
+
     // If no results from combined name search or not a 2-term search,
     // try individual term searches
     if (allResults.length === 0) {
       // Run individual term searches
       for (const term of searchTerms) {
         if (term.trim() === '') continue;
-        
+
         const searchQueries: Query[] = [
           query(q, where('firstName', '>=', term), where('firstName', '<=', term + '\uf8ff')),
           query(q, where('lastName', '>=', term), where('lastName', '<=', term + '\uf8ff')),
           query(q, where('phoneNumber', '>=', term), where('phoneNumber', '<=', term + '\uf8ff')),
           query(q, where('id', '>=', term), where('id', '<=', term + '\uf8ff')),
         ];
-      
+
         // Execute all search queries for this term
         for (const searchQuery of searchQueries) {
           const snapshot = await getDocs(searchQuery);
@@ -187,7 +187,7 @@ export async function getCases(
         }
       }
     }
-    
+
     results = allResults;
   }
   // Empty search value
@@ -358,7 +358,14 @@ export async function createUser(email: string, password: string, isAdmin: boole
       toastr.warning('An account with this email already exists!', 'Warning', { positionClass: "toast-bottom-left" });
       return;
     } else {
-      return httpClient.post(apiUrl, { email, password, isAdmin }).toPromise();   //Include error notification here to be shown when a firebase issue occurs
+      return httpClient.post(apiUrl, { email, password, isAdmin }).toPromise()
+        .then(() =>
+          toastr.success('User Created', 'Success', { positionClass: 'toast-bottom-left' })
+        ).then(() =>
+          router.navigate(['/admin-dashboard/users']))
+        .catch(()=> {
+            toastr.error('Error creating staff member: Invalid Email', 'Error', { positionClass: 'toast-bottom-left' })
+        })
     }
   } catch (err) {
     console.log(err)

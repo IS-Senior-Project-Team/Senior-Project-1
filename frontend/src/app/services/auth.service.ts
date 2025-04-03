@@ -17,7 +17,7 @@ export class AuthService {
 
   //This should only take in the email and then temp password is generated somewhere in between
   CreateUser(email: RegisterStaffEmail, isAdminRole: boolean): void { //This is calling the create user function from firebase service 
-    createUser(email.staffEmail, this.generateTempPassword(), isAdminRole, this.router, this.toastr);
+    createUser(email.staffEmail, this.generateTempPassword(), isAdminRole, this.router, this.toastr, this.httpClient);
   }
 
   loginUser(email: string, password: string) {
@@ -53,20 +53,8 @@ export class AuthService {
     })
   }
 
-  logoutUserAfterDeletion(): void {
-    signOutUser().then(()=>{
-      sessionStorage.removeItem('loggedInUser');
-      window.location.href = '/login'
-    })
-  }
-
   isLoggedIn(): boolean {
     return !!sessionStorage.getItem('loggedInUser');
-  }
-
-  updateUser(userData: StaffInfo): Observable<void> {
-
-    return from(updateUser(userData));
   }
 
 }
