@@ -86,7 +86,7 @@
   color: white;
 }
 
-.create-btn,.dash-btn:hover {
+.create-btn:hover, .dash-btn:hover {
   background-color: #45a049;
 }
 

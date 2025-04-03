@@ -16,9 +16,28 @@ export class CasesService {
     status: string | undefined = undefined,
     specie: string = "",
     timeFrame: string = "",
-    offset: number = 0
+    offset: number = 0,
+    createdStartDate: Date | undefined = undefined,
+    createdEndDate: Date | undefined = undefined,
+    updatedStartDate: Date | undefined = undefined,
+    updatedEndDate: Date | undefined = undefined,
+    searchValue: string | undefined = undefined,
+    casesDefault: boolean | undefined = undefined,
+    deletedCases: boolean | undefined = undefined
   ): Promise<Case[]> {
-    return await getCases(status, specie, timeFrame, offset);
+    return await getCases(
+      status, 
+      specie, 
+      timeFrame, 
+      offset, 
+      createdStartDate, 
+      createdEndDate, 
+      updatedStartDate, 
+      updatedEndDate,
+      searchValue,
+      casesDefault, 
+      deletedCases
+    );
   }
 
   getOne(caseId: string): Observable<Case | null> {

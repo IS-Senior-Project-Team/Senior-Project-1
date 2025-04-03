@@ -9,34 +9,55 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label>First Name: </label>
-                        <input class="form-control" [(ngModel)]="case.firstName" name="firstName" required #firstName="ngModel" placeholder="First Name" autofocus/>
+                        <input class="form-control" 
+                            [(ngModel)]="case.firstName" 
+                            name="firstName" 
+                            required 
+                            #firstName="ngModel" 
+                            placeholder="First Name" 
+                            (blur)="formatName($event, firstName)" 
+                            autofocus
+                        />
                         <div *ngIf="firstName.invalid && firstName.touched" class="text-danger">First Name is required.</div>
                     </div>
                     <div class="col-md-6">
                         <label>Last Name: </label>
-                        <input class="form-control" [(ngModel)]="case.lastName" name="lastName" #lastName="ngModel" placeholder="Last Name"/>
+                        <input class="form-control" 
+                            [(ngModel)]="case.lastName" 
+                            name="lastName" 
+                            #lastName="ngModel" 
+                            placeholder="Last Name"
+                            (blur)="formatName($event, lastName)"
+                        />
                     </div>
                 </div>
 
                 <div class="row mb-5">
                     <div class="col-md-6">
                         <label>Phone Number: </label>
-                        <!--
-                            pattern="^(?:\d{3}-){2}\d{4}$"
-                        -->
                         <input class="form-control" 
                             [(ngModel)]="case.phoneNumber" 
                             name="phoneNumber" 
                             type="text" 
                             required 
                             #phoneNumber="ngModel" 
-                            placeholder="e.g. 1234567890"
-                            pattern="^\d{10}$" 
+                            placeholder="e.g. 123-456-7890"
+                            pattern="^(?:\d{3}-){2}\d{4}$"
+                            (blur)="formatPhoneNumber($event, phoneNumber)"
                         />
                         <div *ngIf="phoneNumber.invalid && (phoneNumber.dirty || phoneNumber.touched)" class="text-danger">
                             <div *ngIf="phoneNumber.errors?.['required']">Phone Number is required.</div>
-                            <div *ngIf="phoneNumber.errors?.['pattern']">Invalid phone number format.<br>(e.g., 1234567890)</div>
+                            <div *ngIf="phoneNumber.errors?.['pattern']">Invalid phone number format.<br>(e.g., 123-456-7890)</div>
                         </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Interaction Date: </label>
+                        <input class="form-control" 
+                            [(ngModel)]="case.callDate" 
+                            name="interactionDate" 
+                            type="date"
+                            #interactionDate="ngModel"
+                        />
                     </div>
                 </div>
 
