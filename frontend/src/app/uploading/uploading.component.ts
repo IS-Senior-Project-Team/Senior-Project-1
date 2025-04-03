@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Papa, ParseResult } from "ngx-papaparse";
+import { Papa } from "ngx-papaparse";
 import * as XLSX from "xlsx";
 import { Case } from '../models/case';
 import { CasesService } from '../services/cases.service';
 import { CaseFile } from '../models/caseFile';
 import { FormsModule } from '@angular/forms';
-import { serverTimestamp, Timestamp } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 import { ToastrService } from 'ngx-toastr';
 import { STATUSES, SPECIES } from '../constants';
 import { v4 as uuidv4 } from 'uuid';
@@ -64,11 +64,16 @@ export class UploadingComponent {
     this.disableEditData()
   }
   
+  /**
+   * Parses the .csv file that is in the list of files to be uploaded and adds the file to the list of files to upload.
+   * @param file The file being parsed.
+   */
   async parseCSV(file: File){
     let returnable = this.papa.parse(await file.text())
     let thisFile: CaseFile = {name: file.name, cases: []}
     let data = returnable.data
     //Use this console.log to see what column number data is located at
+    // console.log("data:")
     //console.log(data)
     for(let row = 1; row < returnable.data.length-1; row++){
       // debugger;
@@ -86,7 +91,8 @@ export class UploadingComponent {
         status: data[row][213],
         numOfPets: data[row][233],
         species: data[row][218],
-        isDeleted: false
+        isDeleted: false,
+        createdDate: Timestamp.now() //Change to uuid
       }
       // console.log(c)
       thisFile.cases.push(c)
@@ -95,45 +101,87 @@ export class UploadingComponent {
     console.log('Got CSV')
   }
 
+  /**
+   * Parses the .xlsx file that is in the list of files to be uploaded and adds the file to the list of files to upload.
+   * @param file The file being parsed.
+   */
   parseXLSX(file: File) {
     let workBook: XLSX.WorkBook;
     let jsonData: JSON[] = [];
     const reader = new FileReader();
     reader.onload = (event) => {
-      // debugger
       const data = reader.result;
       workBook = XLSX.read(data, { type: 'binary' });
       jsonData = XLSX.utils.sheet_to_json(workBook.Sheets["VM log"]);
 
-      // In this spot, startingLine would need to be held (more likely held in firebase) to get the current line that is being read. 
-      // From there, the xlsx would be parsed and read line by line and the last line that was read would be recorded.
-      let startingLine = 0;
-      const thisFile: CaseFile = {name: file.name, cases: []} // Create a CaseFile object that holds the name of the file it is based off of and the cases in that file
-      for(let i = startingLine; i < jsonData.length; i += 2){
-        let line1 = JSON.parse(JSON.stringify(jsonData[i]))
-        let line2 = JSON.parse(JSON.stringify(jsonData[i+1]))
-  
-        //Create the Case that is pushed to the CaseFile object
-        let c: Case = {
+      // Create the CaseFile that holds the name of the file it is based off of (being processed in this function call),
+      // and the cases in that file to be pushed to the global variable so that it can be seen and edited in the UI
+      const thisFile: CaseFile = {name: file.name, cases: []}
+      
+      // Variable that contains all of the JSON data from the XLSX file
+      const parsedJsonData = JSON.parse(JSON.stringify(jsonData))
+
+      // Dictionary to house all of the objects to be converted to Cases.
+      // As it is added to, it safely manages the lines from parsedJsonData such that all messages are grouped and keyed by message numbers
+      let lineDict: {[messageNumber: number]: Case} = {}
+
+      // Loops through all lines in parsedJsonData, collects data from the rows and groups them into lineDict
+      let newLines = /[\r\n]+/gm
+      for(let row of parsedJsonData) {
+        let messageNum: number = row["Message Number"]
+        let pn: string = row["Phone Number"]
+        let n: string = row["Message"]
+        let t: string = row["Date of Message"]
+        
+        // Check if the value of the variables is undefined. If it is, try to assign it to the same value of the key in the dict.
+        // If the dict is undefined there too, go ahead and assign undefined. If the old value is not undefined, get the old value to avoid overwritting.
+        if (pn == undefined && lineDict[messageNum] != undefined) { pn = lineDict[messageNum].phoneNumber } else { pn = row["Phone Number"] }
+        if (n == undefined && lineDict[messageNum] != undefined) { n = lineDict[messageNum].notes } else { n = row["Message"] }
+        
+        // Check if there are any new lines. If so, replace them with a space.
+        if (n != undefined) { n = n.replaceAll(newLines, " ") }
+
+        // Check if the date is in the format I want (2024-11-21T19:11:21+00:00) and if it is keep it, else try to assign it to the previous timestamp
+        if (lineDict[messageNum] == undefined && t.indexOf("+") == -1) { t = ""; console.log("discarded time") }
+
+        // Debugging lines //
+        //Also want to check in this spot similar to above lines for the nicely formatted date to parse and include in the Case info below
+        // console.log(`messageNum: ${messageNum}, phone num: ${row["Phone Number"]}, typeof: ${typeof row["Phone Number"]}, notes: ${String(row["Message"]).substring(0, 5)}, typeof: ${typeof row["Message"]}`)
+        // console.log(`messageNum: ${messageNum}, ${pn}, ${n}`)
+        
+        lineDict[messageNum] = {
           id: uuidv4(),
           firstName: "",
           lastName: "",
-          phoneNumber: String(line2["Phone Number"]),
-          notes: line1["Message"],
-          status: line1["Status"],
-          numOfPets: line1["# Pets (if PSN/RH)"],
-          species: line1["Species"],
+          phoneNumber: pn,
+          notes: n,
+          status: "Open",
+          numOfPets: 1,
+          species: "",
           isDeleted: false,
-          callDate: Timestamp.fromDate(new Date(line1["Date of Message"]))
+          callDate: Timestamp.fromDate(new Date(t))
         }
-        thisFile.cases.push(c) // Push all of the cases to the CaseFile object
       }
+      // Debugging lines //
+      /* 
+      console.log(lineDict[21])
+      console.log(lineDict)
+      */
+      for (let c in lineDict){
+        // console.log(`${c}, ${lineDict[c].numOfPets}`)
+        thisFile.cases.push(lineDict[c] as Case)
+      }
+
       this.files.push(thisFile) // Push the CaseFile object to this.files so that the index can be used for populating the edit data modal
       console.log('Got XLSX')
     }
     reader.readAsBinaryString(file);
   }
 
+  /**
+   * Handles the file upload event.
+   * @param event Event that is triggered when the user presses the button for uploading files and the files are selected in the file system prompt.
+   */
   handleFileInput(event: Event) {
     // Clear the files lists so that the wrong case files are not still listed
     this.files = []
@@ -163,6 +211,10 @@ export class UploadingComponent {
     }
   }
   
+  /**
+   * This method may be removed, but if there was a need to check if the fields from an edited file are valid.
+   * @returns Boolean confirming that all checked fields are valid. 
+   */
   allCasesValid(): boolean {
     // If there are any fields that are required to be filled, it would be checked here
 
@@ -170,6 +222,10 @@ export class UploadingComponent {
     return true
   }
 
+  /**
+   * Uploads the files listed in files array. 
+   * @returns Boolean representing if the upload was successful.
+   */
   async upload(): Promise<boolean> {
     // Loop through each CaseFile that is being stored in "files" and upload all of the cases and upload them using firebaseConnection
     if (this.files[0].cases[0] == undefined) { 
@@ -199,6 +255,11 @@ export class UploadingComponent {
     return true
   }
 
+  /**
+   * Remove the file or files from the list of files to be uploaded.
+   * @param index The location of the file to be removed.
+   * @param showPrompt Boolean to determine if the confirmation prompt is shown, or if the file removal is automated.
+   */
   removeFile(index: number, showPrompt: boolean = true) {
     // debugger
     let confirmation = true
