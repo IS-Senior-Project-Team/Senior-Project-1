@@ -242,13 +242,6 @@ export class UserListComponent implements OnInit, AfterViewInit, AfterViewChecke
       .draw();
   }
 
-  loadUsers(): void {
-    fetchAllUsers().then((data: StaffInfo[]) => {
-      this.users = data;
-      this.reInitDataTable(); // Reinitialize the DataTable after data is loaded
-    });
-  }
-
   toggleShowDeactivated() {
     this.showDeactivated = !this.showDeactivated;
     this.reInitDataTable(); // Reinitialize the DataTable when toggling the view
