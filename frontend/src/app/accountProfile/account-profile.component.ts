@@ -4,14 +4,13 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { currentUserProfile, updateUser, deleteAccount } from '../services/firebaseConnection';
+import { currentUserProfile, updateUser } from '../services/firebaseConnection';
 import { Observable } from 'rxjs';
 import { StaffInfo } from '../models/staff-info';
 import { FormControl, NonNullableFormBuilder } from '@angular/forms';
 import { ChangePswdDialogComponent } from '../view/change-password/change-pswd-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
-import { DeleteAccountDialogComponent } from '../view/deleteAccount/delete-account-dialog.component';
 
 @Component({
   selector: 'app-account-profile',
@@ -85,12 +84,6 @@ export class AccountProfileComponent implements OnInit {
 
   changePassword(): void {
     this.dialog.open(ChangePswdDialogComponent, {
-      width: '500px',
-    });
-  }
-
-  deleteAccount(): void {
-    this.dialog.open(DeleteAccountDialogComponent, {
       width: '500px',
     });
   }

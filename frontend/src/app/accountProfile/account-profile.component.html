@@ -3,7 +3,6 @@
     <h1>{{staffInfo?.firstname ? staffInfo?.firstname+'\'\s' : ""}} Account Profile</h1>
     <button *ngIf="staffInfo" class="changePswd-btn" (click)="changePassword()">Change Password
     </button>
-    <button *ngIf="staffInfo" class="delete-btn" (click)="deleteAccount()">Delete Account</button>
   </div>
 
   <div class="content">
