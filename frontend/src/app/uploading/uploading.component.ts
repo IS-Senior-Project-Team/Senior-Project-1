@@ -63,6 +63,31 @@ export class UploadingComponent {
     this.toast.info("Changes saved.")
     this.disableEditData()
   }
+
+  isEmptyCase(thisCase: Case): boolean {
+    if (
+      thisCase.firstName == "" && 
+      thisCase.lastName == "" &&
+      thisCase.species == "" &&
+      String(thisCase.numOfPets) == "" &&
+      thisCase.phoneNumber == "" &&
+      thisCase.status == "" &&
+      thisCase.notes == ""
+    ) { return true }
+    else { return false }
+  }
+
+  isEmptyValues(thisCase: Case): boolean {
+    if (
+      thisCase.firstName == "" || 
+      thisCase.lastName == "" ||
+      thisCase.species == "" ||
+      String(thisCase.numOfPets) == "" ||
+      thisCase.phoneNumber == "" ||
+      thisCase.notes == ""
+    ) { return true }
+    else { return false }
+  }
   
   /**
    * Parses the .csv file that is in the list of files to be uploaded and adds the file to the list of files to upload.
@@ -72,9 +97,40 @@ export class UploadingComponent {
     let returnable = this.papa.parse(await file.text())
     let thisFile: CaseFile = {name: file.name, cases: []}
     let data = returnable.data
-    //Use this console.log to see what column number data is located at
+    //Use this console.log to see what column numbers data values are located at (manually through the browser console)
     // console.log("data:")
-    //console.log(data)
+    // console.log(data[1][5])
+
+    // Create variables to hold the column numbers that are being searched for in the nested for loops below and 
+    // booleans to represent which values have been found
+    let outcomeColumn: number = 1;
+    let speciesColumn: number = 1;
+    let notesColumn: number = 1;
+    let numOfPetsColumn: number = 1;
+    let outcomeColumnFound: boolean = false;
+    let speciesColumnFound: boolean = false;
+    let notesColumnFound: boolean = false;
+    let numOfPetsColumnFound: boolean = false;
+    let columnsFound: boolean = false;
+
+    // Loop through the columns (first) and rows (second) to find where data is located at 
+    // (not every row contains data for that piece of data, and the columns can change locations between WaitWhile exports)
+    for(let row = 1; row < returnable.data.length-1; row++){
+      for(let currentColumn = 1; data[0][currentColumn] != undefined; currentColumn++){
+        // if (currentColumn == 155) { debugger }
+        if (data[row][currentColumn] == "Outcome" && outcomeColumnFound == false) { outcomeColumn = currentColumn + 3; outcomeColumnFound = true; /* console.log(`outcomeColumn: ${outcomeColumn}, Outcome: ${data[row][outcomeColumn]}`) */ }
+        if (data[row][currentColumn] == "Animal Type" && speciesColumnFound == false) { speciesColumn = currentColumn + 3; speciesColumnFound = true; /* console.log(`speciesColumn: ${speciesColumn}, Species: ${data[row][speciesColumn]}`) */ }
+        if (data[row][currentColumn] == "Notes" && notesColumnFound == false) { notesColumn = currentColumn + 3; notesColumnFound = true; /* console.log(`notesColumn: ${notesColumn}, Notes: ${data[row][notesColumn]}`) */ }
+        if (data[row][currentColumn] == "# of Pets" && numOfPetsColumnFound == false) { numOfPetsColumn = currentColumn + 3; numOfPetsColumnFound = true; /* console.log(`numOfPetsColumn: ${numOfPetsColumn}, # of Pets: ${data[row][numOfPetsColumn]}`) */ }
+
+        if (outcomeColumnFound && speciesColumnFound && notesColumnFound && numOfPetsColumnFound) { columnsFound = true }
+        if (columnsFound) { break }
+      }
+      if (columnsFound) { break }
+    }
+
+    let missingImportantValue: boolean = false
+
     for(let row = 1; row < returnable.data.length-1; row++){
       // debugger;
       let phoneNum: string = data[row][4]
@@ -87,18 +143,31 @@ export class UploadingComponent {
         firstName: data[row][2],
         lastName: data[row][3],
         phoneNumber: phoneNum,
-        notes: data[row][228],
-        status: data[row][213],
-        numOfPets: data[row][233],
-        species: data[row][218],
+        // notes: data[row][228],
+        notes: data[row][notesColumn],
+        // status: data[row][213],
+        status: data[row][outcomeColumn],
+        // numOfPets: data[row][233],
+        numOfPets: data[row][numOfPetsColumn],
+        // species: data[row][218],
+        species: data[row][speciesColumn],
         isDeleted: false,
-        createdDate: Timestamp.now() //Change to uuid
+        createdDate: Timestamp.now()
       }
-      // console.log(c)
+
+      // Skip adding a completely empty case to the case list (to avoid uploading an empty case)
+      if (this.isEmptyCase(c)) { continue }
+
+      // If important missing values are not already found in the case set and there are some found missing, set the variable here...
+      if (missingImportantValue != true && this.isEmptyValues(c)) { missingImportantValue = true }
+
       thisFile.cases.push(c)
     }
     this.files.push(thisFile)
     console.log('Got CSV')
+
+    // ...To alert the user here
+    if (missingImportantValue) { this.toast.warning("Important values are missing in the csv file(s), please be sure all values are filled to the best of your ability.") }
   }
 
   /**
@@ -129,23 +198,29 @@ export class UploadingComponent {
       let newLines = /[\r\n]+/gm
       for(let row of parsedJsonData) {
         let messageNum: number = row["Message Number"]
-        let pn: string = row["Phone Number"]
-        let n: string = row["Message"]
-        let t: string = row["Date of Message"]
+        let phone: string = row["Phone Number"]
+        let notes: string = row["Message"]
+        let time: string = row["Date of Message"]
+        let petNum: number = row["# Pets (if PSN/RH)"]
+        let species: string = row["Species"]
+        let status: string = row["Status"]
         
         // Check if the value of the variables is undefined. If it is, try to assign it to the same value of the key in the dict.
         // If the dict is undefined there too, go ahead and assign undefined. If the old value is not undefined, get the old value to avoid overwritting.
-        if (pn == undefined && lineDict[messageNum] != undefined) { pn = lineDict[messageNum].phoneNumber } else { pn = row["Phone Number"] }
-        if (n == undefined && lineDict[messageNum] != undefined) { n = lineDict[messageNum].notes } else { n = row["Message"] }
+        if (phone == undefined && lineDict[messageNum] != undefined) { phone = lineDict[messageNum].phoneNumber } else { phone = row["Phone Number"] }
+        if (notes == undefined && lineDict[messageNum] != undefined) { notes = lineDict[messageNum].notes } else { notes = row["Message"] }
+        if (petNum == undefined && lineDict[messageNum] != undefined) { petNum = lineDict[messageNum].numOfPets } else { petNum = row["# Pets (if PSN/RH)"] }
+        if (species == undefined && lineDict[messageNum] != undefined) { species = lineDict[messageNum].species } else { species = row["Species"] }
+        if (status == undefined && lineDict[messageNum] != undefined) { status = lineDict[messageNum].status } else { status = row["Status"] }
         
-        // Check if there are any new lines. If so, replace them with a space.
-        if (n != undefined) { n = n.replaceAll(newLines, " ") }
+        // Check if there are any new lines in notes column. If so, replace them with a space.
+        if (notes != undefined) { notes= notes.replaceAll(newLines, " ") }
 
         // Check if the date is in the format I want (2024-11-21T19:11:21+00:00) and if it is keep it, else try to assign it to the previous timestamp
-        if (lineDict[messageNum] == undefined && t.indexOf("+") == -1) { t = ""; console.log("discarded time") }
+        if (lineDict[messageNum] == undefined && time.indexOf("+") == -1) { time = ""; console.log("discarded time") }
 
         // Debugging lines //
-        //Also want to check in this spot similar to above lines for the nicely formatted date to parse and include in the Case info below
+        // Also want to check in this spot similar to above lines for the nicely formatted date to parse and include in the Case info below
         // console.log(`messageNum: ${messageNum}, phone num: ${row["Phone Number"]}, typeof: ${typeof row["Phone Number"]}, notes: ${String(row["Message"]).substring(0, 5)}, typeof: ${typeof row["Message"]}`)
         // console.log(`messageNum: ${messageNum}, ${pn}, ${n}`)
         
@@ -153,13 +228,13 @@ export class UploadingComponent {
           id: uuidv4(),
           firstName: "",
           lastName: "",
-          phoneNumber: pn,
-          notes: n,
-          status: "Open",
-          numOfPets: 1,
-          species: "",
+          phoneNumber: phone,
+          notes: notes,
+          status: status,
+          numOfPets: petNum,
+          species: species,
           isDeleted: false,
-          callDate: Timestamp.fromDate(new Date(t))
+          callDate: Timestamp.fromDate(new Date(time))
         }
       }
       // Debugging lines //
