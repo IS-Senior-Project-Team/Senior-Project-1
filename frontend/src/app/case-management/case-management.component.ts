@@ -167,10 +167,10 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
         return (
           `
           <button class="btn btn-link p-1" data-action="recover" data-id="${caseItem.id}">
-            <img src="undo.png" alt="Recover" style="width: 25px; height: 25px;">
+            <img src="undo.png" alt="Recover" title="Recover" style="width: 25px; height: 25px;">
           </button>
           <button class="btn btn-link p-1" data-action="permanentdelete" data-id="${caseItem.id}">
-            <img src="red-trashcan-icon.png" alt="Delete" style="width: 25px; height: 25px;">
+            <img src="red-trashcan-icon.png" alt="Delete" title="Delete" style="width: 25px; height: 25px;">
           </button>
           `
         );
@@ -179,7 +179,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
         return (
           `
           <button class="btn btn-link p-1" data-action="recover" data-id="${caseItem.id}">
-            <img src="undo.png" alt="Recover" style="width: 25px; height: 25px;">
+            <img src="undo.png" alt="Recover" title="Recover" style="width: 25px; height: 25px;">
           </button>
           `
         );
@@ -190,10 +190,10 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       return (
         `
         <button class="btn btn-link p-1" data-action="edit" data-id="${caseItem.id}">
-          <img src="edit-icon.png" alt="Edit" style="width: 25px; height: 25px;">
+          <img src="edit-icon.png" alt="Edit" title="Edit" style="width: 25px; height: 25px;">
         </button>
         <button class="btn btn-link p-1" data-action="delete" data-id="${caseItem.id}">
-          <img src="red-trashcan-icon.png" alt="Delete" style="width: 25px; height: 25px;">
+          <img src="red-trashcan-icon.png" alt="Delete" title="Delete" style="width: 25px; height: 25px;">
         </button>
         `
       );
@@ -351,8 +351,16 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
         },
         {
           targets: 3, // createdDate column
-          width: '150px', // Reduce width
+          width: '120px', // Reduce width
           className: 'dt-left' // align left
+        },
+        {
+          targets: 4, // notes column
+          width: '150px' // Add width
+        },
+        {
+          targets: 5, // status column
+          width: '150px' // Add width
         },
         {
           targets: 6, // numOfPets column
