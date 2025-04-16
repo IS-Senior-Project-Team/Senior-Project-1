@@ -9,11 +9,10 @@ import { AuthService } from "./auth.service";
 import { Router } from "@angular/router";
 import { StaffInfo } from "../models/staff-info";
 import { from, Observable, of, switchMap } from "rxjs";
-import { RegisterStaffComponent } from '../view/register-staff/register-staff.component';
 // Required for side-effects
 import "firebase/firestore";
-import { EventEmitter, inject } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
+import { HttpClient } from "@angular/common/http";
 
 // Follow this pattern to import other Firebase services
 // import { } from 'firebase/<service>';
@@ -33,20 +32,8 @@ const firebaseConfig = {
   measurementId: "G-WRGY0J3QBW"
 };
 
-// UNCOMMENT BELOW TO INIATILIZE ADMIN SDK BASED ON GROUP'S DECISION
-
-// var admin = require("firebase-admin");
-
-// var serviceAccount = require("path/to/serviceAccountKey.json");
-
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount)
-// });
-
-
-// Initialize Firebase
+// Initialize Client Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
 // Get cases with optional filters
@@ -148,10 +135,10 @@ export async function getCases(
   if (searchValue && searchValue !== '') {
     // Parse search terms
     const searchTerms = searchValue.trim().split(/\s+/);
-    
+
     // Array to hold all query results
     const allResults: Case[] = [];
-    
+
     // Try exact search for first & last name
     if (searchTerms.length === 2) {
       // Try first name + last name match
@@ -160,34 +147,34 @@ export async function getCases(
         where('firstName', '>=', searchTerms[0]),
         where('firstName', '<=', searchTerms[0] + '\uf8ff')
       );
-      
+
       const snapshot = await getDocs(firstNameQuery);
       snapshot.forEach(doc => {
         const data = doc.data();
         // Check if last name also matches
         if (
-          data['lastName'] && 
+          data['lastName'] &&
           data['lastName'].toLowerCase().startsWith(searchTerms[1].toLowerCase())
         ) {
           allResults.push({ id: doc.id, ...data } as Case);
         }
       });
     }
-    
+
     // If no results from combined name search or not a 2-term search,
     // try individual term searches
     if (allResults.length === 0) {
       // Run individual term searches
       for (const term of searchTerms) {
         if (term.trim() === '') continue;
-        
+
         const searchQueries: Query[] = [
           query(q, where('firstName', '>=', term), where('firstName', '<=', term + '\uf8ff')),
           query(q, where('lastName', '>=', term), where('lastName', '<=', term + '\uf8ff')),
           query(q, where('phoneNumber', '>=', term), where('phoneNumber', '<=', term + '\uf8ff')),
           query(q, where('id', '>=', term), where('id', '<=', term + '\uf8ff')),
         ];
-      
+
         // Execute all search queries for this term
         for (const searchQuery of searchQueries) {
           const snapshot = await getDocs(searchQuery);
@@ -200,7 +187,7 @@ export async function getCases(
         }
       }
     }
-    
+
     results = allResults;
   }
   // Empty search value
@@ -353,12 +340,12 @@ export async function createDoc(caseData: Case): Promise<boolean> {
 
 //   <== ACCOUNT MANAGEMENT FUNCTIONS BELOW ==> //
 
-// This will create a staff member based on the email and temporary password set by admin.
-// An email will then be sent for staff member to make changes and complete account creation
 const auth = getAuth();
 
-export async function createUser(email: string, password: string, isAdmin: boolean, router: Router, toastr: ToastrService) {
+export async function createUser(email: string, password: string, isAdmin: boolean, router: Router, toastr: ToastrService, httpClient: HttpClient) {
+  var apiUrl = "http://localhost:3200/create-user"; // using a backend server for admin sdk to create users
   try {
+
     const usersCollection = collection(db, "staffMembers");
 
     // Check if the email already exists in database
@@ -368,64 +355,69 @@ export async function createUser(email: string, password: string, isAdmin: boole
     if (!querySnapshot.empty) {
       toastr.warning('An account with this email already exists!', 'Warning', { positionClass: "toast-bottom-left" });
       return;
+    } else {
+      return httpClient.post(apiUrl, { email, password, isAdmin }).toPromise()
+        .then(() =>
+          toastr.success('User Created', 'Success', { positionClass: 'toast-bottom-left' })
+        ).then(() =>
+          router.navigate(['/admin-dashboard/users']))
+        .catch(()=> {
+            toastr.error('Error creating staff member: Invalid Email', 'Error', { positionClass: 'toast-bottom-left' })
+        })
     }
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+  } catch (err) {
+    return;
+  }
+}
 
-        const staffData = {
-          email: email,
-          firstname: "",
-          lastname: "",
-          address: "",
-          phoneNumber: "",
-          isAdmin: isAdmin,
-          isActive: true,
-          isDeleted: false
-        }
+export async function deleteUserByAdmin(userUid: string, toastr: ToastrService, router: Router) {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
 
-        // Adding users to firestore
-        const user = userCredential.user;
-        const docRef = doc(db, "staffMembers", user.uid)
-        setDoc(docRef, staffData)
-          .catch((error) => {
-            console.log(error)
-          })
+  if (!currentUser) {
+    toastr.error("Admin not logged in.");
+    return;
+  }
 
-        toastr.success('Account has been created successfully!', 'Successful', { positionClass: "toast-bottom-left" });
-        sendEmailVerification(userCredential.user)
-          .then(() => {
-            alert("Email verification was sent. Users should click \"Forgot Password\" link upon first login to setup their password")
-          });
-        router.navigate(['/admin-dashboard/users'])
-        // ...
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        if (errorCode == 'auth/email-already-in-use') {
-          toastr.warning('Email address already exists!', 'Warning', { positionClass: "toast-bottom-left" });
-        }
-        else {
-          toastr.error('Unable to create staff member', 'Error', { positionClass: "toast-bottom-left" });
-        }
-      });
+  try {
+    const idToken = await currentUser.getIdToken(); // Get admin's ID token
+
+    const response = await fetch(`http://localhost:3200/admin/delete-user/${userUid}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${idToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      toastr.success("User deleted successfully.",'User Deleted', { positionClass: 'toast-bottom-left' });
+      router.createUrlTree(['/admin-dashboard/users'])
+
+    } else {
+      toastr.error(data.error || "Failed to delete user.",'Error', { positionClass: 'toast-bottom-left'});
+    }
+
   } catch (error) {
-    console.error("Error creating user:", error);
+    toastr.error("An unexpected error occurred.",'Error', { positionClass: 'toast-bottom-left'});
   }
 }
 
 export async function loginUser(email: string, password: string, router: Router, toastr: ToastrService): Promise<Partial<StaffInfo> | null> {
-  
+
   const usersCollection = collection(db, "staffMembers");
 
-    // Check if the email already exists in database
-    const q = query(usersCollection, where("email", "==", email));
-    const querySnapshot = await getDocs(q);
+  // Check if the email already exists in database
+  const q = query(usersCollection, where("email", "==", email));
+  const querySnapshot = await getDocs(q);
 
-    if (querySnapshot.empty) {
-      toastr.error('Account does not exist', 'Error', { positionClass: "toast-bottom-left" });
-      return null;
-    }
-  
+  if (querySnapshot.empty) {
+    toastr.error('Account does not exist', 'Error', { positionClass: "toast-bottom-left" });
+    return null;
+  }
+
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -447,7 +439,7 @@ export async function loginUser(email: string, password: string, router: Router,
         lastname: userData.lastname || "",
         isAdmin: userData.isAdmin || false,
       };
-
+      
       sessionStorage.setItem("loggedInUser", JSON.stringify(userInfo));
 
       // Redirect based on user role
@@ -461,7 +453,6 @@ export async function loginUser(email: string, password: string, router: Router,
     }
     return null;
   } catch (error: any) {
-    console.error("Login Error:", error);
 
     if (error.code === "auth/wrong-password" || error.code === "auth/invalid-email" || error.code === "auth/invalid-credential") {
       toastr.warning('Invalid Email or Password', 'Warning', { positionClass: "toast-bottom-left" });
@@ -499,22 +490,19 @@ export async function changePassword(currentPswd: string, newPswd: string, toast
   const credential = EmailAuthProvider.credential(user.email!, currentPswd);
 
   try {
-    // Reauthenticate the user
+    // Reauthenticate the user before password change
     await reauthenticateWithCredential(user, credential);
 
     await updatePassword(user, newPswd).then(() => {
       // Update successful.
       toastr.success('Password updated successfully', 'Updated', { positionClass: 'toast-bottom-left' })
     }).catch((error) => {
-      console.error("Error updating password:", error);
       if (error.code === "auth/weak-password") {
         toastr.warning('The new password is too weak.', 'Password Too Weak', { positionClass: "toast-bottom-left" })
       }
-      // ...
     });
 
   } catch (error: any) {
-    console.error("Error reauthenticating", error);
     if (error.code === "auth/wrong-password") {
       toastr.error('The current password is incorrect.', 'Incorrect Password', { positionClass: "toast-bottom-left" })
     }
@@ -553,14 +541,14 @@ export async function deactivateUser(uid: string | null, router: Router, toastr:
           router.navigate(['/admin-dashboard/users'])
         })
         .catch((error) => {
-          console.error("Error deactivating user:", error);
+          console.error(error);
         });
     }
     else {
       toastr.info('Deactivation was canceled', 'Canceled', { positionClass: "toast-bottom-left" });
     }
   } catch (error) {
-    console.error("Error getting current user")
+    console.error(error)
   }
 }
 
@@ -624,7 +612,6 @@ export async function getUserProfile(uid: string): Promise<Promise<StaffInfo> | 
       console.error(error);
     }
   } else {
-    console.error('The user UID is invalid');
     return null;
   }
   return null
@@ -662,12 +649,12 @@ async function checkEmailExists(email: string, toastr: ToastrService): Promise<b
     } else if (error.code === "auth/user-not-found") {
       toastr.error('No user found with this email address. Please try again.', 'Error', { positionClass: "toast-bottom-left" });
     } else {
-      console.error("Error checking email:", error);
       toastr.error('An unexpected error occurred. Please try again later', 'Error', { positionClass: "toast-bottom-left" });
     }
     return false;
   }
 }
+
 
 export async function deleteDeactivatedUsers(toastr: ToastrService) {
   const sixMonthsAgo = new Date();
@@ -687,37 +674,6 @@ export async function deleteDeactivatedUsers(toastr: ToastrService) {
 
   if (snapshot.size > 0) {
     toastr.info(`${snapshot.size} user(s) have been deleted automatically due to account expiration after deactivation.`, 'Announcement', { positionClass: "toast-bottom-left" })
-  }
-}
-
-export async function deleteAccount(email: string, password: string, toastr: ToastrService, router: Router, authSvc: AuthService) {
-  const user = auth.currentUser;
-
-  if (!user) {
-    return;
-  }
-
-  // Re-authenticate the user before deleting
-  const credential = EmailAuthProvider.credential(email, password);
-
-  try {
-    await reauthenticateWithCredential(user, credential);
-
-    await deleteUser(user);
-
-    const userDocRef = doc(db, "staffMembers", user.uid);
-    await updateDoc(userDocRef, { isDeleted: true });
-    await deleteDoc(userDocRef)
-
-    authSvc.logoutUserAfterDeletion()
-
-  } catch (error: any) {
-    if (error.code === "auth/wrong-password") {
-      toastr.warning('Incorrect Email or Password', 'Warning', { positionClass: "toast-bottom-left" })
-    } else if (error.code === "auth/user-mismatch") {
-      toastr.warning('Incorrect Email or Password', 'Warning', { positionClass: "toast-bottom-left" });
-    }
-    else { console.error(error); }
   }
 }
 
