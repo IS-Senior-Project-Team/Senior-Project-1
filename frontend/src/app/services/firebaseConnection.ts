@@ -340,8 +340,6 @@ export async function createDoc(caseData: Case): Promise<boolean> {
 
 //   <== ACCOUNT MANAGEMENT FUNCTIONS BELOW ==> //
 
-// This will create a staff member based on the email and temporary password set by admin.
-// An email will then be sent for staff member to make changes and complete account creation
 const auth = getAuth();
 
 export async function createUser(email: string, password: string, isAdmin: boolean, router: Router, toastr: ToastrService, httpClient: HttpClient) {
@@ -371,30 +369,6 @@ export async function createUser(email: string, password: string, isAdmin: boole
     return;
   }
 }
-
-// TO GENERATE AN EMAIL VERIFICATION LINK (NOT COMPLETED)
-//     // admin.auth().generateEmailVerificationLink(email)
-//     // sendEmailVerification(userCredential.user)
-//     //   .then(() => {
-//     //     alert("Email verification was sent. Users should click \"Forgot Password\" link upon first login to setup their password")
-//     //   });
-
-//     router.navigate(['/admin-dashboard/users'])
-//       // ...
-
-//       .catch((error) => {
-//         const errorCode = error.code;
-//         if (errorCode == 'auth/email-already-in-use') {
-//           toastr.warning('Email address already exists!', 'Warning', { positionClass: "toast-bottom-left" });
-//         }
-//         else {
-//           toastr.error('Unable to create staff member', 'Error', { positionClass: "toast-bottom-left" });
-//         }
-//       });
-//   } catch (error) {
-//     console.error("Error creating user:", error);
-//   }
-// }
 
 export async function deleteUserByAdmin(userUid: string, toastr: ToastrService, router: Router) {
   const auth = getAuth();
