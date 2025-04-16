@@ -5,8 +5,8 @@
   "main": "index.ts",
   "private": true,
   "scripts": {
-    "start": "npm run start-frontend",
-    "start-backend": "nodemon backend/src/index.ts",
+    "start": "concurrently \"npm run start-backend\" \" npm run start-frontend\"",
+    "start-backend": "cd backend/src/ && node index.js",
     "start-frontend": "cd frontend && ng serve",
     "build": "npm run build-frontend",
     "build-backend": "tsc -p backend/tsconfig.json",
@@ -72,6 +72,7 @@
     "@types/pg": "^8.11.10",
     "chai": "^5.1.1",
     "chai-http": "^5.0.0",
+    "concurrently": "^9.1.2",
     "jasmine-core": "~5.2.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

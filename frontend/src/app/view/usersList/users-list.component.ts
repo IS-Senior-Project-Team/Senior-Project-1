@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
-import { fetchAllUsers } from '../../services/firebaseConnection';
+import { deleteUserByAdmin, fetchAllUsers } from '../../services/firebaseConnection';
 import { StaffInfo } from '../../models/staff-info';
 import { Router, RouterLink } from '@angular/router';
 import { NgFor, NgIf } from '@angular/common';
@@ -27,6 +27,7 @@ export class UserListComponent implements OnInit, AfterViewInit, AfterViewChecke
   private dtInitialized = false; // Track the DataTable initialization state
 
   showDeactivated: boolean = false;
+  showActivated: boolean = false;
 
   constructor(
     private router: Router,
@@ -37,7 +38,6 @@ export class UserListComponent implements OnInit, AfterViewInit, AfterViewChecke
 
   private initDataTable(): void {
     if (!this.dataTable) {
-      console.error('DataTable element not found.');
       return;
     }
 
@@ -83,7 +83,7 @@ export class UserListComponent implements OnInit, AfterViewInit, AfterViewChecke
             if (col.format) {
               return col.format(data);
             }
-            
+
             // All columns other than createdDate
             return this.renderColumn(data, type, col.maxLength);
           }
@@ -147,12 +147,15 @@ export class UserListComponent implements OnInit, AfterViewInit, AfterViewChecke
     if (!user.isActive) {
       return `
         <button class="btn btn-link p-1" data-action="activate" data-id="${user.uid || ''}">
-          <img src="reactivate-icon.png" alt="Activate" style="width: 25px; height: 25px;">
+          <img src="reactivate-icon.png" title="Activate User" alt="Activate" style="width: 25px; height: 25px;">
+        </button>
+        <button class="btn btn-link p-1" data-action="delete" data-id="${user.uid || ''}">
+          <img src="bin.png" title="Delete User" alt="Delete" style="width: 25px; height: 25px;">
         </button>`;
     } else {
       return `
         <button class="btn btn-link p-1" data-action="viewProfile" data-id="${user.uid || ''}">
-          <img src="edit.png" alt="View Profile" style="width: 25px; height: 25px;">
+          <img src="edit.png" title="Deactivate User" alt="View Profile" style="width: 25px; height: 25px;">
         </button>`;
     }
   }
@@ -191,6 +194,13 @@ export class UserListComponent implements OnInit, AfterViewInit, AfterViewChecke
           this.viewProfile(userId); //Make the page persist if the user reactivation is cancelled
         }
         break;
+      case 'delete':
+        if (userId) {
+          let confirmDeletion = confirm("Are you sure you want to permanently delete this user?")
+          if (confirmDeletion)
+            this.deleteUser(userId)
+        }
+        break;
     }
   }
 
@@ -211,7 +221,7 @@ export class UserListComponent implements OnInit, AfterViewInit, AfterViewChecke
     actionButtons.forEach(button => {
       button.removeEventListener('click', this.handleActionClick);
     });
-    
+
     // Destroy DataTable instance if it exists
     if (this.dtInstance) {
       this.dtInstance.destroy();
@@ -233,6 +243,10 @@ export class UserListComponent implements OnInit, AfterViewInit, AfterViewChecke
     this.router.navigate(['/profile', uid]);
   }
 
+  deleteUser(uid: string) {
+    deleteUserByAdmin(uid, this.toastr, this.router).then(() => { this.showActivatedView() });
+  }
+
   private reInitDataTable(): void {
     if (!this.dtInstance) return;
 
@@ -247,6 +261,10 @@ export class UserListComponent implements OnInit, AfterViewInit, AfterViewChecke
     this.reInitDataTable(); // Reinitialize the DataTable when toggling the view
   }
 
+  showActivatedView() {
+    this.showActivated = !this.showActivated;
+    this.reInitDataTable();
+  }
   hasDeactivatedUsers(): boolean {
     return this.users.some(user => user.isActive == false);
   }

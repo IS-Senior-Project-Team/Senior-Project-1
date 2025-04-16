@@ -345,7 +345,7 @@ export async function createDoc(caseData: Case): Promise<boolean> {
 const auth = getAuth();
 
 export async function createUser(email: string, password: string, isAdmin: boolean, router: Router, toastr: ToastrService, httpClient: HttpClient) {
-  var apiUrl = "http://localhost:5001/create-user"; // using a backend server for admin sdk to create users
+  var apiUrl = "http://localhost:3200/create-user"; // using a backend server for admin sdk to create users
   try {
 
     const usersCollection = collection(db, "staffMembers");
@@ -368,7 +368,6 @@ export async function createUser(email: string, password: string, isAdmin: boole
         })
     }
   } catch (err) {
-    console.log(err)
     return;
   }
 }
@@ -396,6 +395,41 @@ export async function createUser(email: string, password: string, isAdmin: boole
 //     console.error("Error creating user:", error);
 //   }
 // }
+
+export async function deleteUserByAdmin(userUid: string, toastr: ToastrService, router: Router) {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+
+  if (!currentUser) {
+    toastr.error("Admin not logged in.");
+    return;
+  }
+
+  try {
+    const idToken = await currentUser.getIdToken(); // Get admin's ID token
+
+    const response = await fetch(`http://localhost:3200/admin/delete-user/${userUid}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${idToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      toastr.success("User deleted successfully.",'User Deleted', { positionClass: 'toast-bottom-left' });
+      router.createUrlTree(['/admin-dashboard/users'])
+
+    } else {
+      toastr.error(data.error || "Failed to delete user.",'Error', { positionClass: 'toast-bottom-left'});
+    }
+
+  } catch (error) {
+    toastr.error("An unexpected error occurred.",'Error', { positionClass: 'toast-bottom-left'});
+  }
+}
 
 export async function loginUser(email: string, password: string, router: Router, toastr: ToastrService): Promise<Partial<StaffInfo> | null> {
 
@@ -431,7 +465,7 @@ export async function loginUser(email: string, password: string, router: Router,
         lastname: userData.lastname || "",
         isAdmin: userData.isAdmin || false,
       };
-
+      
       sessionStorage.setItem("loggedInUser", JSON.stringify(userInfo));
 
       // Redirect based on user role
@@ -445,14 +479,13 @@ export async function loginUser(email: string, password: string, router: Router,
     }
     return null;
   } catch (error: any) {
-    console.error("Login Error:", error);
 
     if (error.code === "auth/wrong-password" || error.code === "auth/invalid-email" || error.code === "auth/invalid-credential") {
       toastr.warning('Invalid Email or Password', 'Warning', { positionClass: "toast-bottom-left" });
     } else if (error.code === 'auth/user-not-found') {
       toastr.error('Account does not exist', 'Error', { positionClass: "toast-bottom-left" });
     }
-
+    
     return null;
   }
 }
@@ -483,22 +516,19 @@ export async function changePassword(currentPswd: string, newPswd: string, toast
   const credential = EmailAuthProvider.credential(user.email!, currentPswd);
 
   try {
-    // Reauthenticate the user
+    // Reauthenticate the user before password change
     await reauthenticateWithCredential(user, credential);
 
     await updatePassword(user, newPswd).then(() => {
       // Update successful.
       toastr.success('Password updated successfully', 'Updated', { positionClass: 'toast-bottom-left' })
     }).catch((error) => {
-      console.error("Error updating password:", error);
       if (error.code === "auth/weak-password") {
         toastr.warning('The new password is too weak.', 'Password Too Weak', { positionClass: "toast-bottom-left" })
       }
-      // ...
     });
 
   } catch (error: any) {
-    console.error("Error reauthenticating", error);
     if (error.code === "auth/wrong-password") {
       toastr.error('The current password is incorrect.', 'Incorrect Password', { positionClass: "toast-bottom-left" })
     }
@@ -537,14 +567,14 @@ export async function deactivateUser(uid: string | null, router: Router, toastr:
           router.navigate(['/admin-dashboard/users'])
         })
         .catch((error) => {
-          console.error("Error deactivating user:", error);
+          console.error(error);
         });
     }
     else {
       toastr.info('Deactivation was canceled', 'Canceled', { positionClass: "toast-bottom-left" });
     }
   } catch (error) {
-    console.error("Error getting current user")
+    console.error(error)
   }
 }
 
@@ -608,7 +638,6 @@ export async function getUserProfile(uid: string): Promise<Promise<StaffInfo> | 
       console.error(error);
     }
   } else {
-    console.error('The user UID is invalid');
     return null;
   }
   return null
@@ -646,12 +675,12 @@ async function checkEmailExists(email: string, toastr: ToastrService): Promise<b
     } else if (error.code === "auth/user-not-found") {
       toastr.error('No user found with this email address. Please try again.', 'Error', { positionClass: "toast-bottom-left" });
     } else {
-      console.error("Error checking email:", error);
       toastr.error('An unexpected error occurred. Please try again later', 'Error', { positionClass: "toast-bottom-left" });
     }
     return false;
   }
 }
+
 
 export async function deleteDeactivatedUsers(toastr: ToastrService) {
   const sixMonthsAgo = new Date();
