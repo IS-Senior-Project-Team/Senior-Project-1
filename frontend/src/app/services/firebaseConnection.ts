@@ -356,13 +356,14 @@ export async function createUser(email: string, password: string, isAdmin: boole
       toastr.warning('An account with this email already exists!', 'Warning', { positionClass: "toast-bottom-left" });
       return;
     } else {
+      toastr.info("Please Wait", "User is being created...", { positionClass: 'toast-bottom-left' })
       return httpClient.post(apiUrl, { email, password, isAdmin }).toPromise()
         .then(() =>
           toastr.success('User Created', 'Success', { positionClass: 'toast-bottom-left' })
         ).then(() =>
           router.navigate(['/admin-dashboard/users']))
         .catch(()=> {
-            toastr.error('Error creating staff member: Invalid Email', 'Error', { positionClass: 'toast-bottom-left' })
+            toastr.error('Error creating staff member', 'Error', { positionClass: 'toast-bottom-left' })
         })
     }
   } catch (err) {
