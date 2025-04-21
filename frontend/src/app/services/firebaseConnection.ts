@@ -343,7 +343,7 @@ export async function createDoc(caseData: Case): Promise<boolean> {
 const auth = getAuth();
 
 export async function createUser(email: string, password: string, isAdmin: boolean, router: Router, toastr: ToastrService, httpClient: HttpClient) {
-  var apiUrl = "http://localhost:3200/create-user"; // using a backend server for admin sdk to create users
+  var apiUrl = "https://jax-humane-pet-center-system.onrender.com/create-user"; // using a backend server for admin sdk to create users
   try {
 
     const usersCollection = collection(db, "staffMembers");
@@ -382,7 +382,7 @@ export async function deleteUserByAdmin(userUid: string, toastr: ToastrService, 
   try {
     const idToken = await currentUser.getIdToken(); // Get admin's ID token
 
-    const response = await fetch(`http://localhost:3200/admin/delete-user/${userUid}`, {
+    const response = await fetch(`https://jax-humane-pet-center-system.onrender.com/admin/delete-user/${userUid}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${idToken}`,
