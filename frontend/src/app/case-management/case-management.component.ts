@@ -44,11 +44,11 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
   showDeleted: boolean = false; // Toggle to show/hide deleted cases
   loading = true;
 
-  // Default values for Created Date Range (last 7 days)
-  startDate: Date | undefined = new Date(new Date().setDate(new Date().getDate() - 7)); // 7 days ago
-  endDate: Date | undefined = new Date(); // Today
+  // Default values for Created Date Range
+  startDate: Date | undefined = undefined;
+  endDate: Date | undefined = undefined;
 
-  // Updated Date Range (no default values)
+  // Default values for Updated Date Range
   updatedStartDate: Date | undefined = undefined;
   updatedEndDate: Date | undefined = undefined;
 
@@ -81,6 +81,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     }
     finally {
       this.loading = false;
+      this.onDateChange();
     }
   }
   
@@ -549,15 +550,15 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
 
     if (this.showDeleted === false) {
       // Set default created date range filter, clear updated date range and search value
-      this.startDate = new Date(new Date().setDate(new Date().getDate() - 7)); // 7 days ago
-      this.endDate = new Date(); // current date
+      this.startDate = undefined;
+      this.endDate = undefined;
       this.updatedStartDate = undefined;
       this.updatedEndDate = undefined;
       this.searchInput.nativeElement.value = '';
       this.searchInputValue = '';
 
       //Get cases that have been created in the past week
-      await this.getFilteredCases(false);
+      await this.getFilteredCases(true);
     }
   }
 
