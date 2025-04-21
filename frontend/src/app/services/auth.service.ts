@@ -15,15 +15,14 @@ export class AuthService {
   userLoggedIn: EventEmitter <Partial<StaffInfo>> = new EventEmitter<Partial<StaffInfo>>();
   constructor(private httpClient: HttpClient, private router: Router, private toastr: ToastrService) { }
 
-  //This should only take in the email and then temp password is generated somewhere in between
-  CreateUser(email: RegisterStaffEmail, isAdminRole: boolean): void { //This is calling the create user function from firebase service 
-    createUser(email.staffEmail, this.generateTempPassword(), isAdminRole, this.router, this.toastr);
+  CreateUser(email: RegisterStaffEmail, isAdminRole: boolean): void {
+    createUser(email.staffEmail, this.generateTempPassword(), isAdminRole, this.router, this.toastr, this.httpClient);
   }
 
   loginUser(email: string, password: string) {
     loginUser(email, password, this.router, this.toastr).then((userData) => {
       if (userData) {
-        this.userLoggedIn.emit(userData); // Emit the user data when logged in
+        this.userLoggedIn.emit(userData); // Emit the user data when logged in for sidebar
       }
     });
   }
@@ -32,7 +31,7 @@ export class AuthService {
     return forgotPassword(email, this.toastr)
   }
 
-  //This is intended to generate temp password along with admin creating a new account using just the user email
+  //This is intended to generate temp password along with admin creating a new account using just the user email per firebase setup
   private generateTempPassword(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let tempPassword = '';
@@ -53,20 +52,8 @@ export class AuthService {
     })
   }
 
-  logoutUserAfterDeletion(): void {
-    signOutUser().then(()=>{
-      sessionStorage.removeItem('loggedInUser');
-      window.location.href = '/login'
-    })
-  }
-
   isLoggedIn(): boolean {
     return !!sessionStorage.getItem('loggedInUser');
-  }
-
-  updateUser(userData: StaffInfo): Observable<void> {
-
-    return from(updateUser(userData));
   }
 
 }

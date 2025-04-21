@@ -8,6 +8,6 @@
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true
     },
-    "include": ["src/**/*.ts", "../frontend/src/app/services/firebaseConnection.ts"],
+    "include": ["src/**/*.ts", "../frontend/src/app/services/firebaseConnection.ts", "src/index.js"],
     "exclude": ["../node_modules"]
 }
