@@ -7,7 +7,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: true }));
 
 admin.initializeApp({
   credential: admin.credential.cert({
@@ -99,9 +99,6 @@ app.delete("/admin/delete-user/:uid", verifyAdmin, async (req, res) => {
   }
 });
 
-
-const PORT = 3200;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+const PORT = process.env.PORT || 3200;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 module.exports = verifyAdmin;
