@@ -24,7 +24,7 @@
 }
 
 .green-btn:focus {
-    border: 3px solid #1f4f21;
+    border: 3px solid #357d3a;
 }
 
 .loading {
@@ -109,7 +109,52 @@
 .date-picker-field {
     width: 220px; 
     font-size: 14px; 
-    margin-bottom: 0; 
+    margin-bottom: 0;
+}
+
+/* Date range picker: dropdown header class */
+::ng-deep .mat-calendar-header {
+    background-color: #4CAF50;
+}
+
+/* Date range picker: title text when focused */
+::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled).mdc-text-field--focused .mdc-floating-label {
+    color: #4CAF50 !important;
+}
+
+/* Date range picker: bottom border line when focused class */
+::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-line-ripple::after {
+    border-bottom-color: #4CAF50 !important;
+}
+
+/* Date range picker: input text field when focused class */
+::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-text-field__input {
+    caret-color: #4CAF50 !important; /* cursor color */
+}
+
+/* Date range picker: selected start and end dates class */
+::ng-deep .mat-calendar-body-cell-content.mat-focus-indicator.mat-calendar-body-selected {
+    background-color: #4CAF50;
+}
+
+/* Date range picker: selected range class */
+::ng-deep .mat-calendar-body-cell.mat-calendar-body-in-range::after {
+    background-color: rgba(76, 175, 80, 0.75);
+}
+
+/* Date range picker: today (current date) with dates selected class */
+::ng-deep .mat-calendar-body-selected.mat-calendar-body-today {
+    box-shadow: inset 0 0 0 1px #4CAF50 !important;
+}
+
+/* Date range picker: today (current date) with no dates selected class */
+::ng-deep .mat-calendar-body-today:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical) {
+    border-color: #4CAF50 !important;
+}
+
+/* Date range picker: date range preview class */
+::ng-deep .mat-calendar-body-in-preview {
+    color: #4CAF50 !important;
 }
 
 .date-picker-field .mat-form-field-infix {
@@ -130,7 +175,7 @@
     margin-bottom: 15px;
     display: flex;
     justify-content: right;
-    gap: 5px; /* Optional: adds spacing between elements */
+    gap: 5px; /* Spacing between search elements */
 }
   
 .custom-search input {

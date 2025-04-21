@@ -625,13 +625,14 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
   }
 
   // Permanently delete a case with a prompt
-  permDeleteWithPrompt(caseItem: Case) {
+  async permDeleteWithPrompt(caseItem: Case) {
     const confirmDelete = window.confirm(`Are you sure you want to PERMANENTLY DELETE this case?\nCase ID: ${caseItem.id}`);
 
     if (confirmDelete) {
-      permDeleteCase(caseItem);
+      await permDeleteCase(caseItem);
 
       this.getFilteredCases(true);
+      this.reInitDataTable();
 
       // Display success message
       this.toastr.success('Case deleted successfully', 'Success');
@@ -642,7 +643,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     }
   }
 
-  // Permanently delete a case without a prompt
+  // Permanently delete a case without a prompt - used for 30 day expiration
   async permDeleteNoPrompt(caseItem: Case): Promise<void> {
     await permDeleteCase(caseItem);
   }
