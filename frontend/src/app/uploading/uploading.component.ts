@@ -143,13 +143,9 @@ export class UploadingComponent {
         firstName: data[row][2],
         lastName: data[row][3],
         phoneNumber: phoneNum,
-        // notes: data[row][228],
         notes: data[row][notesColumn],
-        // status: data[row][213],
         status: data[row][outcomeColumn],
-        // numOfPets: data[row][233],
         numOfPets: data[row][numOfPetsColumn],
-        // species: data[row][218],
         species: data[row][speciesColumn],
         isDeleted: false,
         createdDate: Timestamp.now()
@@ -184,46 +180,108 @@ export class UploadingComponent {
       jsonData = XLSX.utils.sheet_to_json(workBook.Sheets["VM log"]);
 
       // Create the CaseFile that holds the name of the file it is based off of (being processed in this function call),
-      // and the cases in that file to be pushed to the global variable so that it can be seen and edited in the UI
+      // as well as the cases in that file to be pushed to the global variable so that it can be seen and edited in the UI
       const thisFile: CaseFile = {name: file.name, cases: []}
       
       // Variable that contains all of the JSON data from the XLSX file
       const parsedJsonData = JSON.parse(JSON.stringify(jsonData))
+      // console.log(parsedJsonData) //;;;;
 
       // Dictionary to house all of the objects to be converted to Cases.
       // As it is added to, it safely manages the lines from parsedJsonData such that all messages are grouped and keyed by message numbers
       let lineDict: {[messageNumber: number]: Case} = {}
 
-      // Loops through all lines in parsedJsonData, collects data from the rows and groups them into lineDict
+      // Regular Expressions for cleaning data
       let newLines = /[\r\n]+/gm
+      let notNumbers = /\D/g
+      
+      console.log(parsedJsonData)
+      
+      // Loops through all lines in parsedJsonData, collects data from the rows and groups them into lineDict
       for(let row of parsedJsonData) {
+        // Detect if the header of the file is intact (date always exists correctly formatted). Exits the parseXLSX function gracefully
+        if (row["__EMPTY"] != undefined) 
+          {this.toast.warning("There was an error reading the file. Please confirm the header is intact."); return }
+
         let messageNum: number = row["Message Number"]
         let phone: string = row["Phone Number"]
         let notes: string = row["Message"]
-        let time: string = row["Date of Message"]
+        let time: Timestamp | string = row["Date of Message"]
         let petNum: number = row["# Pets (if PSN/RH)"]
         let species: string = row["Species"]
         let status: string = row["Status"]
         
-        // Check if the value of the variables is undefined. If it is, try to assign it to the same value of the key in the dict.
+
+
+        // Check if the value of the variables are undefined. If it is, try to assign it to the same value of the key in the dict.
         // If the dict is undefined there too, go ahead and assign undefined. If the old value is not undefined, get the old value to avoid overwritting.
-        if (phone == undefined && lineDict[messageNum] != undefined) { phone = lineDict[messageNum].phoneNumber } else { phone = row["Phone Number"] }
+
+        // Execute a phone number checker to grab just numbers from the phone number in the case the value in the phone number section is something other than a clean number
+        if (phone == undefined && lineDict[messageNum] != undefined) { phone = lineDict[messageNum].phoneNumber } else { 
+          phone = row["Phone Number"]
+          // debugger
+          // If phone number is no longer undefined when checking within this row and get only the numbers and check if that number is in the correct format.
+          // In the case the value that is grabbed from the file does not come up to a clean 10-digit number, state an alert and clear the phone value
+          if (phone != undefined) { 
+            phone = String(phone).replace(notNumbers, "") 
+            if (this.phoneShape.exec(phone) === null) { 
+              this.toast.warning("Some phone numbers were not correct in the file. Please confirm.")
+              // console.log(this.phoneShape.exec(phone))
+              phone = ""
+            }
+          }
+        }
         if (notes == undefined && lineDict[messageNum] != undefined) { notes = lineDict[messageNum].notes } else { notes = row["Message"] }
         if (petNum == undefined && lineDict[messageNum] != undefined) { petNum = lineDict[messageNum].numOfPets } else { petNum = row["# Pets (if PSN/RH)"] }
         if (species == undefined && lineDict[messageNum] != undefined) { species = lineDict[messageNum].species } else { species = row["Species"] }
         if (status == undefined && lineDict[messageNum] != undefined) { status = lineDict[messageNum].status } else { status = row["Status"] }
         
         // Check if there are any new lines in notes column. If so, replace them with a space.
-        if (notes != undefined) { notes= notes.replaceAll(newLines, " ") }
-
+        if (notes != undefined) { notes = String(notes).replaceAll(newLines, " ") }
+        
         // Check if the date is in the format I want (2024-11-21T19:11:21+00:00) and if it is keep it, else try to assign it to the previous timestamp
-        if (lineDict[messageNum] == undefined && time.indexOf("+") == -1) { time = ""; console.log("discarded time") }
+        // if ((lineDict[messageNum] === undefined) && time.indexOf("+") == -1 && time.indexOf(".") == -1) { time = ""; console.log("discarded time") }
+        // if (lineDict[messageNum] === undefined) { time = ""; console.log("discarded time") }
+        // if (time == undefined && lineDict[messageNum] != undefined) { time = lineDict[messageNum].callDate?.toString() ?? "" } else { time = row["Date of Message"] }
+        // if (time == undefined && lineDict[messageNum] == undefined) { time = "" } else { time = lineDict[messageNum].callDate ?? new Date().toString() }
+        // if (time == undefined && lineDict[messageNum] != undefined) { 
+        //   time = lineDict[messageNum].callDate ?? new Date().toISOString() 
+        //   try {
+        //     new Date(time).toISOString()
+        //   }
+        // } else { time = row["Date of Message"] }
+        // gotta get time to be gotten from file and if it doesnt read correctly try getting the previous file but if that doesnt exist just default to now
 
+        if (typeof(time) === "string") { 
+          console.log(row)
+          console.log(time)
+          console.log(new Date(time))
+          console.log(new Date(time).toISOString())        
+        }
+        
+        
         // Debugging lines //
         // Also want to check in this spot similar to above lines for the nicely formatted date to parse and include in the Case info below
         // console.log(`messageNum: ${messageNum}, phone num: ${row["Phone Number"]}, typeof: ${typeof row["Phone Number"]}, notes: ${String(row["Message"]).substring(0, 5)}, typeof: ${typeof row["Message"]}`)
         // console.log(`messageNum: ${messageNum}, ${pn}, ${n}`)
         
+        // "Dog", "Cat", "Small Dog", "Small Cat" set to Adult Dog, Adult Cat, Puppy and Kitten respectively based on discussion with Lauren.
+        // This is to keep it consistent between both WaitWhile and Excel file inputs
+        switch(species){
+          case "Dog":
+            species = "Adult Dog"
+            break
+          case "Small Dog":
+            species = "Puppy"
+            break
+          case "Cat":
+            species = "Adult Cat"
+            break
+          case "Small Cat":
+            species = "Kitten"
+            break
+        }
+
         lineDict[messageNum] = {
           id: uuidv4(),
           firstName: "",
@@ -234,7 +292,7 @@ export class UploadingComponent {
           numOfPets: petNum,
           species: species,
           isDeleted: false,
-          callDate: Timestamp.fromDate(new Date(time))
+          callDate: time
         }
       }
       // Debugging lines //
@@ -244,7 +302,14 @@ export class UploadingComponent {
       */
       for (let c in lineDict){
         // console.log(`${c}, ${lineDict[c].numOfPets}`)
+        // Setting case values to something clean and readable for users (and system) in the upload case edit modal, in the case the dropdown supports it, and to avoid errors uploading to Firebase
+        if (lineDict[c].species === undefined) { lineDict[c].species = "Unknown"; console.log("Values have been edited to defaults to accommodate missing data") /* console.log("undefined species") */}
+        if (lineDict[c].status === undefined) { lineDict[c].status = ""; /* console.log("undefined status") */}
+        if (lineDict[c].notes === undefined) { lineDict[c].notes = ""; /* console.log("undefined notes") */}
+        if (lineDict[c].phoneNumber === undefined) { lineDict[c].phoneNumber = ""; /* console.log("undefined phone") */}
+        if (lineDict[c].numOfPets === undefined) { lineDict[c].numOfPets = 1; /* console.log("undefined number of pets") */}
         thisFile.cases.push(lineDict[c] as Case)
+        // console.log(lineDict[c].callDate)
       }
 
       this.files.push(thisFile) // Push the CaseFile object to this.files so that the index can be used for populating the edit data modal
@@ -260,6 +325,7 @@ export class UploadingComponent {
   handleFileInput(event: Event) {
     // Clear the files lists so that the wrong case files are not still listed
     this.files = []
+    this.filesToUpload = []
 
     const input = event.currentTarget as HTMLInputElement;
     const fileList: FileList | null = input.files;
@@ -302,22 +368,20 @@ export class UploadingComponent {
    * @returns Boolean representing if the upload was successful.
    */
   async upload(): Promise<boolean> {
+    // Checks that the lists are not empty
+    if (this.files.length == 0 || this.filesToUpload.length == 0) { return false }
+    
     // Loop through each CaseFile that is being stored in "files" and upload all of the cases and upload them using firebaseConnection
-    if (this.files[0].cases[0] == undefined) { 
-      // TEMP SETUP, gets the first Case of the first CaseFile and checks it
-      return false
-    } else {
-      // if (!allCasesValid()) { halt upload and show required fields }
-      let errorLevel: boolean;
-      this.files.forEach(caseFile => { 
-        caseFile.cases.forEach(async uploadCase => {
-          // console.log(uploadCase.id)
-          errorLevel = await this.caseService.createCase(uploadCase)
-          if (errorLevel == false) { return uploadCase }
-          return true
-        })
+    // if (!allCasesValid()) { halt upload and show required fields }
+    let errorLevel: boolean;
+    this.files.forEach(caseFile => { 
+      caseFile.cases.forEach(async uploadCase => {
+        // console.log(uploadCase.id)
+        errorLevel = await this.caseService.createCase(uploadCase)
+        if (errorLevel == false) { return uploadCase }
+        return true
       })
-    }
+    })
 
     // Clear the upload queue
     this.filesToUpload = []
@@ -336,7 +400,6 @@ export class UploadingComponent {
    * @param showPrompt Boolean to determine if the confirmation prompt is shown, or if the file removal is automated.
    */
   removeFile(index: number, showPrompt: boolean = true) {
-    // debugger
     let confirmation = true
     if (showPrompt) {
       // Need to add more to this, removing the file from this.files as well
@@ -348,6 +411,10 @@ export class UploadingComponent {
         this.files?.splice((index ?? 0), 1);
       }
     }
+
+    console.log(this.files)
+    console.log(this.filesToUpload)
+
   }
 }
 
