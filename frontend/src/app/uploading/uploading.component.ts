@@ -195,69 +195,80 @@ export class UploadingComponent {
       let newLines = /[\r\n]+/gm
       let notNumbers = /\D/g
       
-      console.log(parsedJsonData)
+      console.log(parsedJsonData) //;;;;;
       
-      // Loops through all lines in parsedJsonData, collects data from the rows and groups them into lineDict
+      // Loops through all lines in parsedJsonData, collects data from the rows and groups them into lineDict based on message number
       for(let row of parsedJsonData) {
-        // Detect if the header of the file is intact (date always exists correctly formatted). Exits the parseXLSX function gracefully
+
+        // Detect if the header of the file is intact (date always* exists correctly formatted). Exits the parseXLSX function gracefully
         if (row["__EMPTY"] != undefined) 
           {this.toast.warning("There was an error reading the file. Please confirm the header is intact."); return }
 
+        // Gets the message number of the current row (Should always exist)
         let messageNum: number = row["Message Number"]
-        let phone: string = row["Phone Number"]
-        let notes: string = row["Message"]
-        let time: Timestamp | string = row["Date of Message"]
-        let petNum: number = row["# Pets (if PSN/RH)"]
-        let species: string = row["Species"]
-        let status: string = row["Status"]
-        
 
+        // Create the instance of the case in the lineDict dictionary so we can start editing the values
+        lineDict[messageNum] = {
+          id: uuidv4(),
+          firstName: "",
+          lastName: "",
+          phoneNumber: "",
+          notes: "",
+          status: "",
+          numOfPets: 1,
+          species: "",
+          isDeleted: false,
+          callDate: Timestamp.now()
+        }
+
+        let phone, notes, species, status: string = ""
+        let petNum: number = 1
+        let time: Timestamp | string = ""
+        
+        phone = row["Phone Number"]
+        notes = row["Message"]
+        petNum = row["# Pets (if PSN/RH)"]
+        species = row["Species"]
+        status = row["Status"]
+        time = row["Date of Message"]
+
+console.log(Timestamp.toString())
 
         // Check if the value of the variables are undefined. If it is, try to assign it to the same value of the key in the dict.
         // If the dict is undefined there too, go ahead and assign undefined. If the old value is not undefined, get the old value to avoid overwritting.
 
+
+        // Get time in the format I want based on content of the line
+        if (phone == undefined) { time = row["Date of Message"] }
+        if (time == undefined) { 
+          time = lineDict[messageNum].callDate?.toString().replace(notNumbers, "") ?? new Date().getSeconds().toString() }
+          
+        else { time = new Date(time.toString().replace(notNumbers, "")).getSeconds().toString() }
+
+        console.log(time)
+        console.log("AAAAAAAAA")
+
+
         // Execute a phone number checker to grab just numbers from the phone number in the case the value in the phone number section is something other than a clean number
-        if (phone == undefined && lineDict[messageNum] != undefined) { phone = lineDict[messageNum].phoneNumber } else { 
-          phone = row["Phone Number"]
-          // debugger
-          // If phone number is no longer undefined when checking within this row and get only the numbers and check if that number is in the correct format.
-          // In the case the value that is grabbed from the file does not come up to a clean 10-digit number, state an alert and clear the phone value
-          if (phone != undefined) { 
-            phone = String(phone).replace(notNumbers, "") 
-            if (this.phoneShape.exec(phone) === null) { 
-              this.toast.warning("Some phone numbers were not correct in the file. Please confirm.")
-              // console.log(this.phoneShape.exec(phone))
-              phone = ""
-            }
+        if (phone != undefined) {
+          phone = String(phone).replace(notNumbers, "").trim()
+          if (this.phoneShape.exec(phone) === null) { 
+            this.toast.warning("Some phone numbers were not correct in the file. Please confirm.")
+            // console.log(this.phoneShape.exec(phone))
+            phone = ""
           }
+        } else {
+          phone = lineDict[messageNum].phoneNumber
         }
-        if (notes == undefined && lineDict[messageNum] != undefined) { notes = lineDict[messageNum].notes } else { notes = row["Message"] }
-        if (petNum == undefined && lineDict[messageNum] != undefined) { petNum = lineDict[messageNum].numOfPets } else { petNum = row["# Pets (if PSN/RH)"] }
-        if (species == undefined && lineDict[messageNum] != undefined) { species = lineDict[messageNum].species } else { species = row["Species"] }
-        if (status == undefined && lineDict[messageNum] != undefined) { status = lineDict[messageNum].status } else { status = row["Status"] }
+
+        if (notes == undefined) { notes = lineDict[messageNum].notes }
+        if (species == undefined) { species = lineDict[messageNum].species }
+        if (status == undefined) { status = lineDict[messageNum].status }
+        if (petNum == undefined) { petNum = lineDict[messageNum].numOfPets }
+        
         
         // Check if there are any new lines in notes column. If so, replace them with a space.
         if (notes != undefined) { notes = String(notes).replaceAll(newLines, " ") }
-        
-        // Check if the date is in the format I want (2024-11-21T19:11:21+00:00) and if it is keep it, else try to assign it to the previous timestamp
-        // if ((lineDict[messageNum] === undefined) && time.indexOf("+") == -1 && time.indexOf(".") == -1) { time = ""; console.log("discarded time") }
-        // if (lineDict[messageNum] === undefined) { time = ""; console.log("discarded time") }
-        // if (time == undefined && lineDict[messageNum] != undefined) { time = lineDict[messageNum].callDate?.toString() ?? "" } else { time = row["Date of Message"] }
-        // if (time == undefined && lineDict[messageNum] == undefined) { time = "" } else { time = lineDict[messageNum].callDate ?? new Date().toString() }
-        // if (time == undefined && lineDict[messageNum] != undefined) { 
-        //   time = lineDict[messageNum].callDate ?? new Date().toISOString() 
-        //   try {
-        //     new Date(time).toISOString()
-        //   }
-        // } else { time = row["Date of Message"] }
-        // gotta get time to be gotten from file and if it doesnt read correctly try getting the previous file but if that doesnt exist just default to now
-
-        if (typeof(time) === "string") { 
-          console.log(row)
-          console.log(time)
-          console.log(new Date(time))
-          console.log(new Date(time).toISOString())        
-        }
         
         
         // Debugging lines //
@@ -292,7 +303,7 @@ export class UploadingComponent {
           numOfPets: petNum,
           species: species,
           isDeleted: false,
-          callDate: time
+          callDate: new Timestamp(Number(time), 0)
         }
       }
       // Debugging lines //
