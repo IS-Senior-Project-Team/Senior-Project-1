@@ -160,7 +160,7 @@ export class UploadingComponent {
       thisFile.cases.push(c)
     }
     this.files.push(thisFile)
-    console.log('Got CSV')
+    console.log('Successfully got CSV')
 
     // ...To alert the user here
     if (missingImportantValue) { this.toast.warning("Important values are missing in the csv file(s), please be sure all values are filled to the best of your ability.") }
@@ -316,7 +316,7 @@ export class UploadingComponent {
       }
 
       this.files.push(thisFile) // Push the CaseFile object to this.files so that the index can be used for populating the edit data modal
-      console.log('Got XLSX')
+      console.log('Successfully got XLSX')
     }
     reader.readAsBinaryString(file);
   }
