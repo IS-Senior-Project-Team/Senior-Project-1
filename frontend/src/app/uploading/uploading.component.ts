@@ -20,6 +20,9 @@ import { v4 as uuidv4 } from 'uuid';
 })
 export class UploadingComponent {
 
+  // Here, files to upload are just what are just to temp store the files before they are parsed,
+  // files are the CaseFiles (Object that stores the name of the file and the cases that came from it) that will be uploaded
+  // species and statuses here are used by the HTML to fill out the dropdowns, and other info is used to keep track of which file is being handled
   filesToUpload: File[] = [];
   isEditingData = false;
   checkData = false;
@@ -30,7 +33,7 @@ export class UploadingComponent {
   currentFile: Case[] = [];
   XLSXType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
   CSVType = 'text/csv';
-  phoneShape = /[0-9]{10}$/;
+  phoneShape = /[0-9]{10}/;
   species = SPECIES;
   statuses = STATUSES;
 
@@ -132,11 +135,12 @@ export class UploadingComponent {
     let missingImportantValue: boolean = false
 
     for(let row = 1; row < returnable.data.length-1; row++){
-      // debugger;
-      let phoneNum: string = data[row][4]
+      // Get the initial value of the phone number, and ignore the first "1"
+      let phoneNum: string = data[row][4].trim().substring(1)
       let phoneExec: RegExpExecArray | null = this.phoneShape.exec(phoneNum)
       // Checks if the regular expression works, and if it does not, sets the phone number to be blank.
-      phoneExec != null ? phoneNum = phoneExec[0] : phoneNum = ""
+      // phoneExec != null ? phoneNum = phoneExec[0] : phoneNum = "" //;;;;;
+      // (The above line has been disabled to prevent the clearing of the phone number, as form validation takes care of this)
 
       let c: Case = {
         id: uuidv4(),
@@ -151,10 +155,10 @@ export class UploadingComponent {
         createdDate: Timestamp.now()
       }
 
-      // Skip adding a completely empty case to the case list (to avoid uploading an empty case)
+      // Skip adding a completely empty CASE to the case list (to avoid uploading an empty case)
       if (this.isEmptyCase(c)) { continue }
 
-      // If important missing values are not already found in the case set and there are some found missing, set the variable here...
+      // If important missing VALUES are not already found in the case set and there are some found missing, set the variable here...
       if (missingImportantValue != true && this.isEmptyValues(c)) { missingImportantValue = true }
 
       thisFile.cases.push(c)
@@ -171,20 +175,6 @@ export class UploadingComponent {
    * @param file The file being parsed.
    */
   parseXLSX(file: File) {
-    // function getSecondsFromTime(timeIn: any): timeIn is Timestamp | string | undefined { 
-    //   if (typeof timeIn === typeof Timestamp) {
-    //     return timeIn.seconds.toString()
-    //   } else if (typeof timeIn === typeof("")) {
-    //     return timeIn
-    //   } else { 
-    //     return undefined
-    //   }
-    // }
-
-    // function checkTime(timeIn: Timestamp | string): timeIn is Timestamp {
-    //   if ("seconds" in timeIn) { }
-    // }
-
     let workBook: XLSX.WorkBook;
     let jsonData: JSON[] = [];
     const reader = new FileReader();
@@ -199,7 +189,6 @@ export class UploadingComponent {
       
       // Variable that contains all of the JSON data from the XLSX file
       const parsedJsonData = JSON.parse(JSON.stringify(jsonData))
-      // console.log(parsedJsonData) //;;;;
 
       // Dictionary to house all of the objects to be converted to Cases.
       // As it is added to, it safely manages the lines from parsedJsonData such that all messages are grouped and keyed by message numbers
@@ -222,17 +211,21 @@ export class UploadingComponent {
         let messageNum: number = row["Message Number"]
 
         // Create the instance of the case in the lineDict dictionary so we can start editing the values
-        lineDict[messageNum] = {
-          id: uuidv4(),
-          firstName: "",
-          lastName: "",
-          phoneNumber: "",
-          notes: "",
-          status: "",
-          numOfPets: 1,
-          species: "",
-          isDeleted: false,
-          callDate: Timestamp.now()
+        // and setting default values to something clean and readable for users (and system) in the upload 
+        // case edit modal, in the case the dropdown supports it, and to avoid errors uploading to Firebase
+        if (lineDict[messageNum] == undefined) {
+          lineDict[messageNum] = {
+            id: uuidv4(),
+            firstName: "",
+            lastName: "",
+            phoneNumber: "",
+            notes: "",
+            status: "",
+            numOfPets: 1,
+            species: "Unknown",
+            isDeleted: false,
+            callDate: new Date().toISOString()
+          }
         }
 
         let phone, notes, species, status: string = ""
@@ -246,26 +239,24 @@ export class UploadingComponent {
         status = row["Status"]
         time = row["Date of Message"]
 
-console.log(lineDict[messageNum].callDate)
+        // console.log(lineDict[messageNum].callDate)
 
         // Check if the value of the variables are undefined. If it is, try to assign it to the same value of the key in the dict.
         // If the dict is undefined there too, go ahead and assign undefined. If the old value is not undefined, get the old value to avoid overwritting.
 
 
         // Get time in the format I want based on content of the line
-        if (phone == undefined) { time = row["Date of Message"] }
-        if (time == undefined) { 
-            // time = lineDict[messageNum].callDate?.seconds.toString() || lineDict[messageNum].callDate?.toString().replace(notNumbers, "")
-            time = lineDict[messageNum].callDate?.toString().replace(notNumbers, "") ?? new Date().getSeconds().toString() 
-            
+        // If that line does not exist (or the line is not the one I want) set time to what was gathered last or blank if nothing can be found
+        if (phone == undefined) { 
+          try {
+            time = new Date(row["Date of Message"]).toISOString()
+          } catch (error) {
+            console.error("Unable to read Date string")
+            console.log(error)
+            time = lineDict[messageNum].callDate ?? ""
           }
-          
-        else { time = new Date(time.toString().replace(notNumbers, "")).getSeconds().toString() }
-
-        time = time.substring(0, 10)
-
-        // console.log(time)
-        // console.log("AAAAAAAAA")
+        }
+        else { time = lineDict[messageNum].callDate ?? "" }
 
 
         // Execute a phone number checker to grab just numbers from the phone number in the case the value in the phone number section is something other than a clean number
@@ -273,8 +264,6 @@ console.log(lineDict[messageNum].callDate)
           phone = String(phone).replace(notNumbers, "").trim()
           if (this.phoneShape.exec(phone) === null) { 
             this.toast.warning("Some phone numbers were not correct in the file. Please confirm.")
-            // console.log(this.phoneShape.exec(phone))
-            phone = ""
           }
         } else {
           phone = lineDict[messageNum].phoneNumber
@@ -322,7 +311,7 @@ console.log(lineDict[messageNum].callDate)
           numOfPets: petNum,
           species: species,
           isDeleted: false,
-          callDate: new Timestamp(Number(time), 0)
+          callDate: time // maybe (typeof time === "string") ? "" : ""    or    new Timestamp(Number(time), 0) if just time doesnt work
         }
       }
       // Debugging lines //
@@ -330,16 +319,10 @@ console.log(lineDict[messageNum].callDate)
       console.log(lineDict[21])
       console.log(lineDict)
       */
-      for (let c in lineDict){
-        // console.log(`${c}, ${lineDict[c].numOfPets}`)
-        // Setting case values to something clean and readable for users (and system) in the upload case edit modal, in the case the dropdown supports it, and to avoid errors uploading to Firebase
-        if (lineDict[c].species === undefined) { lineDict[c].species = "Unknown"; console.log("Values have been edited to defaults to accommodate missing data") /* console.log("undefined species") */}
-        if (lineDict[c].status === undefined) { lineDict[c].status = ""; /* console.log("undefined status") */}
-        if (lineDict[c].notes === undefined) { lineDict[c].notes = ""; /* console.log("undefined notes") */}
-        if (lineDict[c].phoneNumber === undefined) { lineDict[c].phoneNumber = ""; /* console.log("undefined phone") */}
-        if (lineDict[c].numOfPets === undefined) { lineDict[c].numOfPets = 1; /* console.log("undefined number of pets") */}
+     for (let c in lineDict){
         thisFile.cases.push(lineDict[c] as Case)
-        // console.log(lineDict[c].callDate)
+        // console.log(lineDict[c])
+        // console.log(`messageNum: ${c}`)
       }
 
       this.files.push(thisFile) // Push the CaseFile object to this.files so that the index can be used for populating the edit data modal
@@ -383,14 +366,21 @@ console.log(lineDict[messageNum].callDate)
   }
   
   /**
-   * This method may be removed, but if there was a need to check if the fields from an edited file are valid.
+   * Checks that all phone numbers in the files are valid (or at least blank)
    * @returns Boolean confirming that all checked fields are valid. 
    */
   allCasesValid(): boolean {
-    // If there are any fields that are required to be filled, it would be checked here
+    let allCasesValid: boolean = true
 
+    // If there are any fields that are required to be filled, it would be checked here
+    this.files.forEach(caseFile => {
+      caseFile.cases.forEach(c => {
+        if (!allCasesValid) { return }
+        if (c.phoneNumber != "" && this.phoneShape.exec(c.phoneNumber) == null) { allCasesValid = false }
+      });
+    })
     
-    return true
+    if (allCasesValid) { return true } else { return false }
   }
 
   /**
@@ -402,13 +392,22 @@ console.log(lineDict[messageNum].callDate)
     if (this.files.length == 0 || this.filesToUpload.length == 0) { return false }
     
     // Loop through each CaseFile that is being stored in "files" and upload all of the cases and upload them using firebaseConnection
-    // if (!allCasesValid()) { halt upload and show required fields }
+    if (!this.allCasesValid()) { this.toast.error("Please confirm all fields have properly formatted information. (e.g. Phone number is only numbers)"); return false }
+
     let errorLevel: boolean;
     this.files.forEach(caseFile => { 
       caseFile.cases.forEach(async uploadCase => {
-        // console.log(uploadCase.id)
-        errorLevel = await this.caseService.createCase(uploadCase)
-        if (errorLevel == false) { return uploadCase }
+        // Change the format of the phone number right before uploading so that other parts of the project do not break
+        if (uploadCase.phoneNumber != undefined && this.phoneShape.exec(uploadCase.phoneNumber) != null) 
+          { uploadCase.phoneNumber = uploadCase.phoneNumber.substring(0, 3) + "-" + uploadCase.phoneNumber.substring(3, 6) + "-" + uploadCase.phoneNumber.substring(6) 
+            // errorLevel = false
+          }
+        else { uploadCase.phoneNumber = "" }
+          
+        // True is good here
+        errorLevel = await this.caseService.createCase(uploadCase) //;;;;;
+        console.log(uploadCase.phoneNumber)
+        if (!errorLevel) { console.log(uploadCase); return errorLevel }
         return true
       })
     })
@@ -418,7 +417,7 @@ console.log(lineDict[messageNum].callDate)
     this.files = []
 
     // Alert the user that the upload was succesful
-    this.toast.info("File(s) uploaded! Find it in the \"Cases\" tab.")
+    this.toast.success("File(s) uploaded! Find it in the \"Cases\" tab.")
 
     // Signify that all Cases were uploaded successfully
     return true

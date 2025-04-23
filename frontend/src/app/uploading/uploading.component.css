@@ -158,6 +158,12 @@ td > input[type='text'],select {
     height: 30px;
 }
 
+
+input.ng-invalid {
+    border: 1px solid red; /* Red border for invalid input */
+}
+    
+
 .fileCard {
     border-radius: 20px;
     height: 100px;

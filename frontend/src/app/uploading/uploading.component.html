@@ -57,9 +57,11 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let row of currentFile; index as i">
-                        <td><input type="text" [(ngModel)]="row.firstName"></td>
-                        <td><input type="text" [(ngModel)]="row.lastName"></td>
-                        <td><input type="text" [(ngModel)]="row.phoneNumber"></td>
+                        <td><input type="text" [(ngModel)]="row.firstName" placeholder="First"></td>
+                        <td><input type="text" [(ngModel)]="row.lastName" placeholder="Last"></td>
+                        <td>
+                            <input type="text" [(ngModel)]="row.phoneNumber" placeholder="1234567890" minlength="10" maxlength="10" pattern="[0-9]{10}" #phone="ngModel">
+                        </td>
                         <td>
                             <select [(ngModel)]="row.status">
                                 <option *ngFor="let s of statuses" value="{{s}}">{{s}}</option>
@@ -71,7 +73,7 @@
                             </select>
                         </td>
                         <td><input type="text" [(ngModel)]="row.numOfPets"></td>
-                        <td><input type="text" [(ngModel)]="row.notes"></td>
+                        <td><input type="text" [(ngModel)]="row.notes" placeholder="Notes..."></td>
                     </tr>
                 </tbody>
             </table>
