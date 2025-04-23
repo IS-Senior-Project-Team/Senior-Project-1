@@ -72,7 +72,7 @@
                                 <option *ngFor="let s of species" value="{{s}}">{{s}}</option>
                             </select>
                         </td>
-                        <td><input type="text" [(ngModel)]="row.numOfPets"></td>
+                        <td><input type="number" style="width: 50px; max-width: 50px;" [(ngModel)]="row.numOfPets" max="99"></td>
                         <td><input type="text" [(ngModel)]="row.notes" placeholder="Notes..."></td>
                     </tr>
                 </tbody>
