@@ -1,0 +1,20 @@
+::ng-deep .mat-mdc-dialog-container .mat-mdc-dialog-title {
+    color: #4CAF50 !important;
+}
+
+::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled).mdc-text-field--focused .mdc-floating-label {
+    color: #4CAF50 !important;
+}
+
+::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-text-field__input {
+    caret-color: #4CAF50 !important;
+}
+
+::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) .mdc-line-ripple::after {
+    border-bottom-color: #4CAF50 !important;
+}
+
+::ng-deep .mat-mdc-raised-button:not(:disabled) {
+    color: #4CAF50 !important;
+}
+
