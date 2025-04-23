@@ -171,6 +171,20 @@ export class UploadingComponent {
    * @param file The file being parsed.
    */
   parseXLSX(file: File) {
+    // function getSecondsFromTime(timeIn: any): timeIn is Timestamp | string | undefined { 
+    //   if (typeof timeIn === typeof Timestamp) {
+    //     return timeIn.seconds.toString()
+    //   } else if (typeof timeIn === typeof("")) {
+    //     return timeIn
+    //   } else { 
+    //     return undefined
+    //   }
+    // }
+
+    // function checkTime(timeIn: Timestamp | string): timeIn is Timestamp {
+    //   if ("seconds" in timeIn) { }
+    // }
+
     let workBook: XLSX.WorkBook;
     let jsonData: JSON[] = [];
     const reader = new FileReader();
@@ -232,7 +246,7 @@ export class UploadingComponent {
         status = row["Status"]
         time = row["Date of Message"]
 
-console.log(Timestamp.toString())
+console.log(lineDict[messageNum].callDate)
 
         // Check if the value of the variables are undefined. If it is, try to assign it to the same value of the key in the dict.
         // If the dict is undefined there too, go ahead and assign undefined. If the old value is not undefined, get the old value to avoid overwritting.
@@ -241,12 +255,17 @@ console.log(Timestamp.toString())
         // Get time in the format I want based on content of the line
         if (phone == undefined) { time = row["Date of Message"] }
         if (time == undefined) { 
-          time = lineDict[messageNum].callDate?.toString().replace(notNumbers, "") ?? new Date().getSeconds().toString() }
+            // time = lineDict[messageNum].callDate?.seconds.toString() || lineDict[messageNum].callDate?.toString().replace(notNumbers, "")
+            time = lineDict[messageNum].callDate?.toString().replace(notNumbers, "") ?? new Date().getSeconds().toString() 
+            
+          }
           
         else { time = new Date(time.toString().replace(notNumbers, "")).getSeconds().toString() }
 
-        console.log(time)
-        console.log("AAAAAAAAA")
+        time = time.substring(0, 10)
+
+        // console.log(time)
+        // console.log("AAAAAAAAA")
 
 
         // Execute a phone number checker to grab just numbers from the phone number in the case the value in the phone number section is something other than a clean number
