@@ -62,7 +62,6 @@ export class UploadingComponent {
   }
 
   apply() {    
-    // console.log(this.currentFile)
     this.toast.info("Changes saved.")
     this.disableEditData()
   }
@@ -120,11 +119,12 @@ export class UploadingComponent {
     // (not every row contains data for that piece of data, and the columns can change locations between WaitWhile exports)
     for(let row = 1; row < returnable.data.length-1; row++){
       for(let currentColumn = 1; data[0][currentColumn] != undefined; currentColumn++){
-        // if (currentColumn == 155) { debugger }
-        if (data[row][currentColumn] == "Outcome" && outcomeColumnFound == false) { outcomeColumn = currentColumn + 3; outcomeColumnFound = true; /* console.log(`outcomeColumn: ${outcomeColumn}, Outcome: ${data[row][outcomeColumn]}`) */ }
-        if (data[row][currentColumn] == "Animal Type" && speciesColumnFound == false) { speciesColumn = currentColumn + 3; speciesColumnFound = true; /* console.log(`speciesColumn: ${speciesColumn}, Species: ${data[row][speciesColumn]}`) */ }
-        if (data[row][currentColumn] == "Notes" && notesColumnFound == false) { notesColumn = currentColumn + 3; notesColumnFound = true; /* console.log(`notesColumn: ${notesColumn}, Notes: ${data[row][notesColumn]}`) */ }
-        if (data[row][currentColumn] == "# of Pets" && numOfPetsColumnFound == false) { numOfPetsColumn = currentColumn + 3; numOfPetsColumnFound = true; /* console.log(`numOfPetsColumn: ${numOfPetsColumn}, # of Pets: ${data[row][numOfPetsColumn]}`) */ }
+        // Debugging line
+        /* console.log(`outcomeColumn: ${outcomeColumn}, Outcome: ${data[row][outcomeColumn]}`) */
+        if (data[row][currentColumn] == "Outcome" && outcomeColumnFound == false) { outcomeColumn = currentColumn + 3; outcomeColumnFound = true; }
+        if (data[row][currentColumn] == "Animal Type" && speciesColumnFound == false) { speciesColumn = currentColumn + 3; speciesColumnFound = true; }
+        if (data[row][currentColumn] == "Notes" && notesColumnFound == false) { notesColumn = currentColumn + 3; notesColumnFound = true; }
+        if (data[row][currentColumn] == "# of Pets" && numOfPetsColumnFound == false) { numOfPetsColumn = currentColumn + 3; numOfPetsColumnFound = true; }
 
         if (outcomeColumnFound && speciesColumnFound && notesColumnFound && numOfPetsColumnFound) { columnsFound = true }
         if (columnsFound) { break }
@@ -137,10 +137,6 @@ export class UploadingComponent {
     for(let row = 1; row < returnable.data.length-1; row++){
       // Get the initial value of the phone number, and ignore the first "1"
       let phoneNum: string = data[row][4].trim().substring(1)
-      let phoneExec: RegExpExecArray | null = this.phoneShape.exec(phoneNum)
-      // Checks if the regular expression works, and if it does not, sets the phone number to be blank.
-      // phoneExec != null ? phoneNum = phoneExec[0] : phoneNum = "" //;;;;;
-      // (The above line has been disabled to prevent the clearing of the phone number, as form validation takes care of this)
 
       let c: Case = {
         id: uuidv4(),
@@ -198,8 +194,6 @@ export class UploadingComponent {
       let newLines = /[\r\n]+/gm
       let notNumbers = /\D/g
       
-      console.log(parsedJsonData) //;;;;;
-      
       // Loops through all lines in parsedJsonData, collects data from the rows and groups them into lineDict based on message number
       for(let row of parsedJsonData) {
 
@@ -238,8 +232,6 @@ export class UploadingComponent {
         species = row["Species"]
         status = row["Status"]
         time = row["Date of Message"]
-
-        // console.log(lineDict[messageNum].callDate)
 
         // Check if the value of the variables are undefined. If it is, try to assign it to the same value of the key in the dict.
         // If the dict is undefined there too, go ahead and assign undefined. If the old value is not undefined, get the old value to avoid overwritting.
@@ -321,8 +313,6 @@ export class UploadingComponent {
       */
      for (let c in lineDict){
         thisFile.cases.push(lineDict[c] as Case)
-        // console.log(lineDict[c])
-        // console.log(`messageNum: ${c}`)
       }
 
       this.files.push(thisFile) // Push the CaseFile object to this.files so that the index can be used for populating the edit data modal
@@ -399,14 +389,11 @@ export class UploadingComponent {
       caseFile.cases.forEach(async uploadCase => {
         // Change the format of the phone number right before uploading so that other parts of the project do not break
         if (uploadCase.phoneNumber != undefined && this.phoneShape.exec(uploadCase.phoneNumber) != null) 
-          { uploadCase.phoneNumber = uploadCase.phoneNumber.substring(0, 3) + "-" + uploadCase.phoneNumber.substring(3, 6) + "-" + uploadCase.phoneNumber.substring(6) 
-            // errorLevel = false
-          }
+          { uploadCase.phoneNumber = uploadCase.phoneNumber.substring(0, 3) + "-" + uploadCase.phoneNumber.substring(3, 6) + "-" + uploadCase.phoneNumber.substring(6) }
         else { uploadCase.phoneNumber = "" }
           
         // True is good here
-        errorLevel = await this.caseService.createCase(uploadCase) //;;;;;
-        console.log(uploadCase.phoneNumber)
+        errorLevel = await this.caseService.createCase(uploadCase)
         if (!errorLevel) { console.log(uploadCase); return errorLevel }
         return true
       })
@@ -440,9 +427,6 @@ export class UploadingComponent {
         this.files?.splice((index ?? 0), 1);
       }
     }
-
-    console.log(this.files)
-    console.log(this.filesToUpload)
 
   }
 }
