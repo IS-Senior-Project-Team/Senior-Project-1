@@ -255,14 +255,4 @@
         }
         }
     }
-
-    @media (max-width: 768px) {
-        .card {
-            margin: 0.5rem;
-        }
-        
-        .table-responsive {
-            border: none;
-        }
-    }
 }
