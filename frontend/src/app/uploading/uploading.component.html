@@ -15,28 +15,18 @@
            #fileInput
            style="display: none;"
           (change)="handleFileInput($event)">
-
-    <!-- Commented out section for listing files and removing - maybe temporary -->
-    <!-- <div class="file-item" *ngFor="let file of filesToUpload">
-        <div class="file-info">
-            <span class="file-icon">📄</span>
-            <div class="file-details">
-                <p class="file-name">{{ file.name }}</p>
-                <p class="file-size">{{ (file.size / 1024 / 1024).toFixed(2) }} MB</p>
-            </div>
-        </div>
-        <div class="file-actions">
-            <button class="delete-btn" (click)="removeFile(file)">🗑</button>
-        </div>
-    </div> -->
 </div>
 
 <div class="fileCard" *ngFor="let file of files; index as i">
             <h3>File {{ i+1 }}</h3>
-            <span class="fileTitle">{{ file.name }}</span>
-            <div class="alignRight center">
-                <button class="fileButton editButton" (click)="editData(i)">Edit Data</button>
-                <button class="fileButton deleteButton" (click)="removeFile(i)">Remove</button>
+            <span>{{ file.name }}</span>
+            <div class="alignRight center">                
+                <button class="iconButtons" title="Edit" (click)="editData(i)">
+                    <img src="/edit-icon.png" alt="Edit">
+                </button>
+                <button class="iconButtons" title="Remove file" (click)="removeFile(i)">
+                    <img src="/red-trashcan-icon.png" alt="Remove">
+                </button>
             </div>
         </div>
         
@@ -52,14 +42,16 @@
                         <th style="width: 160px; min-width: 150px;">Status</th>
                         <th style="width: 120px; min-width: 100px;">Species</th>
                         <th style="width: 25px;"># of Pets</th>
-                        <th style="width: 25%; min-width: 300px;">Message/Notes</th>
+                        <th style="width: 25%; min-width: 300px;">Message/Notes <span style="font-size: x-small;">(try holding shift and scrolling)</span></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let row of currentFile; index as i">
-                        <td><input type="text" [(ngModel)]="row.firstName"></td>
-                        <td><input type="text" [(ngModel)]="row.lastName"></td>
-                        <td><input type="text" [(ngModel)]="row.phoneNumber"></td>
+                        <td><input type="text" [(ngModel)]="row.firstName" placeholder="First"></td>
+                        <td><input type="text" [(ngModel)]="row.lastName" placeholder="Last"></td>
+                        <td>
+                            <input type="text" [(ngModel)]="row.phoneNumber" placeholder="1234567890" minlength="10" maxlength="10" pattern="[0-9]{10}" #phone="ngModel">
+                        </td>
                         <td>
                             <select [(ngModel)]="row.status">
                                 <option *ngFor="let s of statuses" value="{{s}}">{{s}}</option>
@@ -70,13 +62,12 @@
                                 <option *ngFor="let s of species" value="{{s}}">{{s}}</option>
                             </select>
                         </td>
-                        <td><input type="text" [(ngModel)]="row.numOfPets"></td>
-                        <td><input type="text" [(ngModel)]="row.notes"></td>
+                        <td><input type="number" style="width: 50px; max-width: 50px;" [(ngModel)]="row.numOfPets" max="99"></td>
+                        <td><input type="text" [(ngModel)]="row.notes" placeholder="Notes..."></td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <!-- <button class="deleteButton">X</button> -->
         <button class="applyButton alignRight" (click)="apply()">Apply Changes</button>
     </div>
     <button class="upload-file-btn" accept=".csv" [disabled]="filesToUpload.length == 0 || filesToUpload == null" (click)="upload()">Upload</button>

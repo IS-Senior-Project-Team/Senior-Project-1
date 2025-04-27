@@ -2,7 +2,7 @@
 
 html, body {
     background-color: #EAF3EA;
-    overflow-x: hidden;
+    /* overflow-x: hidden; */
 }
 .card {
     display: flex;

@@ -41,4 +41,10 @@ export const STATUSES: string[] = [
     "Puppy",
     "Kitten",
     "Unknown"
+    // Beginning of additional selections from WaitWhile and XLSX files (Really should be reduced to the above or similar, the below are added just so the data is not blank in the uploading section for this commit)
+    // The below are to be caught when uploading (if seen in an old section of the VM log file) and are swapped to the above selections
+    // "Dog",
+    // "Cat",
+    // "Large Dog",
+    // "Small Dog"
   ]
