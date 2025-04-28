@@ -94,12 +94,20 @@ export async function getCases(
 
   if (createdStartDate && createdEndDate) {
     q = query(q, where('createdDate', '>=', Timestamp.fromDate(createdStartDate)));
-    q = query(q, where('createdDate', '<=', Timestamp.fromDate(createdEndDate)));
+
+    // Set end date to the end of the day to include cases created on the end date
+    const endOfDayEndDate = new Date(createdEndDate);
+    endOfDayEndDate.setHours(23, 59, 59, 999);
+    q = query(q, where('createdDate', '<=', Timestamp.fromDate(endOfDayEndDate)));
   }
 
   if (updatedStartDate && updatedEndDate) {
     q = query(q, where('updateDate', '>=', Timestamp.fromDate(updatedStartDate)));
-    q = query(q, where('updateDate', '<=', Timestamp.fromDate(updatedEndDate)));
+
+    // Set end date to the end of the day to include cases updated on the end date
+    const endOfDayEndDate = new Date(updatedEndDate);
+    endOfDayEndDate.setHours(23, 59, 59, 999);
+    q = query(q, where('updateDate', '<=', Timestamp.fromDate(endOfDayEndDate)));
   }
 
   // Apply if no date range/filter applied

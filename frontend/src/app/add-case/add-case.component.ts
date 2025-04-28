@@ -25,7 +25,7 @@ export class AddCaseComponent {
     firstName: '',
     lastName: '',
     phoneNumber: '',
-    callDate: new Date().toISOString().slice(0, 10),  // Sets callDate (interaction date) to the current date formatted as YYYY-MM-DD
+    callDate: new Date().toLocaleDateString('en-CA'),  // Sets callDate (interaction date) to the current date formatted as YYYY-MM-DD
     notes: '',
     status: 'Open',
     numOfPets: 1,
@@ -34,8 +34,8 @@ export class AddCaseComponent {
     createdDate: undefined,
   };
 
-  statuses: string[] = STATUSES;
-  species: string[] = SPECIES;
+  statuses: string[] = STATUSES.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())); // Sort alphabetically
+  species: string[] = SPECIES.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())); // Sort alphabetically
 
   constructor (private router: Router, 
     private route: ActivatedRoute, 
@@ -100,6 +100,7 @@ export class AddCaseComponent {
       try {
         this.case.id = uuidv4(); // Generate unique id using the UUID library
         this.case.createdDate = Timestamp.fromDate(new Date()); // Generate the case's created date when a case is added
+        this.case.updateDate = Timestamp.fromDate(new Date()); // Generate the case's updated date when a case is added
         const success = await this.casesService.createCase(this.case);
         
         if (success) {

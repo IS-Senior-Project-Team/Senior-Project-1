@@ -23,17 +23,16 @@ export class EditCaseComponent implements OnInit {
     firstName: '',
     lastName: '',
     phoneNumber: '',
-    callDate: '',
     notes: '',
     status: '',
     numOfPets: 0,
     species: '',
-    isDeleted: false
+    isDeleted: false,
+    callDate: ''
   };
 
-  statuses: string[] = STATUSES;
-
-  species: string[] = SPECIES;
+  statuses: string[] = STATUSES.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())); // Sort alphabetically
+  species: string[] = SPECIES.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())); // Sort alphabetically
 
   loading = true;
 
@@ -134,6 +133,7 @@ export class EditCaseComponent implements OnInit {
   save(editCaseForm: NgForm) {
 
     if (editCaseForm.valid) {
+        this.case.updateDate = Timestamp.fromDate(new Date()); // Generate the case's updated date when a case is added
         this.casesService.updateCase(this.case).subscribe({
             next: updatedCase => {
                 console.log('Case updated successfully:', updatedCase);

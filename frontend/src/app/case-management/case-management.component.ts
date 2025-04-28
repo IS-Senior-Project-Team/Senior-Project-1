@@ -44,11 +44,11 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
   showDeleted: boolean = false; // Toggle to show/hide deleted cases
   loading = true;
 
-  // Default values for Created Date Range (last 7 days)
-  startDate: Date | undefined = new Date(new Date().setDate(new Date().getDate() - 7)); // 7 days ago
-  endDate: Date | undefined = new Date(); // Today
+  // Default values for Created Date Range
+  startDate: Date | undefined = undefined;
+  endDate: Date | undefined = undefined;
 
-  // Updated Date Range (no default values)
+  // Default values for Updated Date Range
   updatedStartDate: Date | undefined = undefined;
   updatedEndDate: Date | undefined = undefined;
 
@@ -81,6 +81,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     }
     finally {
       this.loading = false;
+      this.onDateChange();
     }
   }
   
@@ -167,10 +168,10 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
         return (
           `
           <button class="btn btn-link p-1" data-action="recover" data-id="${caseItem.id}">
-            <img src="undo.png" alt="Recover" style="width: 25px; height: 25px;">
+            <img src="undo.png" alt="Recover" title="Recover" style="width: 25px; height: 25px;">
           </button>
           <button class="btn btn-link p-1" data-action="permanentdelete" data-id="${caseItem.id}">
-            <img src="red-trashcan-icon.png" alt="Delete" style="width: 25px; height: 25px;">
+            <img src="red-trashcan-icon.png" alt="Delete" title="Delete" style="width: 25px; height: 25px;">
           </button>
           `
         );
@@ -179,7 +180,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
         return (
           `
           <button class="btn btn-link p-1" data-action="recover" data-id="${caseItem.id}">
-            <img src="undo.png" alt="Recover" style="width: 25px; height: 25px;">
+            <img src="undo.png" alt="Recover" title="Recover" style="width: 25px; height: 25px;">
           </button>
           `
         );
@@ -190,10 +191,10 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
       return (
         `
         <button class="btn btn-link p-1" data-action="edit" data-id="${caseItem.id}">
-          <img src="edit-icon.png" alt="Edit" style="width: 25px; height: 25px;">
+          <img src="edit-icon.png" alt="Edit" title="Edit" style="width: 25px; height: 25px;">
         </button>
         <button class="btn btn-link p-1" data-action="delete" data-id="${caseItem.id}">
-          <img src="red-trashcan-icon.png" alt="Delete" style="width: 25px; height: 25px;">
+          <img src="red-trashcan-icon.png" alt="Delete" title="Delete" style="width: 25px; height: 25px;">
         </button>
         `
       );
@@ -351,8 +352,16 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
         },
         {
           targets: 3, // createdDate column
-          width: '150px', // Reduce width
+          width: '120px', // Reduce width
           className: 'dt-left' // align left
+        },
+        {
+          targets: 4, // notes column
+          width: '150px' // Add width
+        },
+        {
+          targets: 5, // status column
+          width: '150px' // Add width
         },
         {
           targets: 6, // numOfPets column
@@ -541,15 +550,15 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
 
     if (this.showDeleted === false) {
       // Set default created date range filter, clear updated date range and search value
-      this.startDate = new Date(new Date().setDate(new Date().getDate() - 7)); // 7 days ago
-      this.endDate = new Date(); // current date
+      this.startDate = undefined;
+      this.endDate = undefined;
       this.updatedStartDate = undefined;
       this.updatedEndDate = undefined;
       this.searchInput.nativeElement.value = '';
       this.searchInputValue = '';
 
       //Get cases that have been created in the past week
-      await this.getFilteredCases(false);
+      await this.getFilteredCases(true);
     }
   }
 
@@ -617,13 +626,14 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
   }
 
   // Permanently delete a case with a prompt
-  permDeleteWithPrompt(caseItem: Case) {
+  async permDeleteWithPrompt(caseItem: Case) {
     const confirmDelete = window.confirm(`Are you sure you want to PERMANENTLY DELETE this case?\nCase ID: ${caseItem.id}`);
 
     if (confirmDelete) {
-      permDeleteCase(caseItem);
+      await permDeleteCase(caseItem);
 
       this.getFilteredCases(true);
+      this.reInitDataTable();
 
       // Display success message
       this.toastr.success('Case deleted successfully', 'Success');
@@ -634,7 +644,7 @@ export class CaseManagementComponent implements OnInit, AfterViewInit, AfterView
     }
   }
 
-  // Permanently delete a case without a prompt
+  // Permanently delete a case without a prompt - used for 30 day expiration
   async permDeleteNoPrompt(caseItem: Case): Promise<void> {
     await permDeleteCase(caseItem);
   }

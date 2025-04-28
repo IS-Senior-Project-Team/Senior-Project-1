@@ -16,6 +16,11 @@
   background-color: #d3e4d3;
 }
 
+.jhs-logo {
+  align-self: center;
+  margin-bottom: 0.5rem;
+}
+
 /* Profile section */
 .profile {
   display: flex;
@@ -88,7 +93,11 @@
   font-weight: bold;
   /* font-size: 1rem; Larger text */
   margin-top: 15rem;
-  margin-left: 3rem;
+  align-self: center;
+}
+
+.logout-button:hover {
+  background-color: rgb(198, 117, 19);
 }
 
 a {
