@@ -18,8 +18,6 @@ Welcome to **Team Pawesome**, a project designed to streamline and enhance the m
 
 - **Backend**: Firebase + nodejs
 
--   **Version Control**: GitHub
-
 **Starting the Project**
 
 **Start Frontend and Backend**
@@ -37,11 +35,9 @@ To run the application locally, follow these steps:
 
 - Frontend: [http://localhost:4200/](http://localhost:4200/)
 
-- Backend (optional): [http://localhost:3000/](http://localhost:3000/)
+- Backend (optional, used for auth): [http://localhost:3000/](http://localhost:3000/)
 
 **Firebase Connection**
-
-Firebase integration is currently functional, with basic features in place.
 
 To interact with Firebase:
 
