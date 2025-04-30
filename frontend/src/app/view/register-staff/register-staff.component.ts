@@ -15,6 +15,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 
 export class RegisterStaffComponent {
+  creatingUser: boolean = false;
   constructor(private authSvc: AuthService, private router:Router, private toastr:ToastrService){
   }
   isAdmin = false;
@@ -23,19 +24,23 @@ export class RegisterStaffComponent {
   }
   errorMessage:string = '';
 
-  async create(registerForm: any) {
+  async createAccount(registerForm: any) {
+    this.creatingUser = true;
     try{
     if (registerForm.valid) {
+      this.toastr.info("Please Wait", "User is being created...", { positionClass: 'toast-bottom-left',  progressBar: true, tapToDismiss: false })
       await this.authSvc.CreateUser(this.staffEmailForCreation, this.isAdmin)
-
+      this.toastr.clear();
       registerForm = ""
-
     } else {
       this.errorMessage = 'Please fill out all fields correctly!';
     }
   } catch (err){
     console.error("Error:", err);
       this.toastr.error("Failed to create user", "Error");
+  }
+  finally {
+    this.creatingUser = false;
   }
 }
   toggleLogin () {

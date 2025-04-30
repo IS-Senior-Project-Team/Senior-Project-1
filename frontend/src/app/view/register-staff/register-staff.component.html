@@ -2,7 +2,7 @@
   <h2 style="text-align: center;">Create Account</h2>
     <div class="form">
       
-  <form #registerForm="ngForm" (ngSubmit)="create(registerForm)" novalidate>
+  <form #registerForm="ngForm" (ngSubmit)="createAccount(registerForm)" novalidate>
     <input type="email" name="st_email" [(ngModel)]="staffEmailForCreation.staffEmail" placeholder="Email" required email #email="ngModel" />
     <div *ngIf="email.invalid && email.touched" style="color:red; font-size:smaller">
       Please enter a valid email address.
@@ -12,7 +12,7 @@
       <label for="adminRole"> Admin?</label>
     </div>
   
-    <button type="submit" [disabled]="registerForm.invalid">Create</button>
+    <button type="submit" [disabled]="creatingUser">{{ creatingUser ? 'Creating...' : 'Create Account' }}</button>
     <button type="submit" [routerLink]="['/admin-dashboard/users']">Go Back</button>
   </form>
   </div>
